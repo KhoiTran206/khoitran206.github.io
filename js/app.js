@@ -1264,6 +1264,19 @@ function initInstallApp() {
   }
 }
 
+/* Mega menu: điền sản phẩm bán chạy khi khách mở danh mục lần đầu */
+function initMegaFeatured() {
+  const fill = (e) => {
+    const item = e.target.closest?.('[data-mega-cat]');
+    if (!item || item.dataset.filled) return;
+    item.dataset.filled = '1';
+    const slot = $('[data-mega-featured]', item);
+    if (slot) slot.innerHTML = megaFeaturedHTML(item.dataset.megaCat);
+  };
+  document.addEventListener('mouseover', fill);
+  document.addEventListener('focusin', fill);
+}
+
 /* ---------- Khởi động ---------- */
 document.addEventListener('DOMContentLoaded', () => {
   const headerSlot = $('#site-header-slot');
@@ -1288,6 +1301,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initWishCompare();
   syncWishCompare();
   initCategoryDropdown();
+  initMegaFeatured();
   initSearch();
   initSliders();
   initCartButtons();

@@ -104,19 +104,48 @@ function renderHeader() {
     </nav>`;
 }
 
-/* ---------- Menu danh mục (hero, desktop) ---------- */
+/* ---------- Menu danh mục (desktop: mega menu) ----------
+   Liên kết: 'chữ' → tìm trong danh mục đó, hoặc ['chữ', 'địa chỉ riêng'] */
+const catLink = (c, l) => (Array.isArray(l) ? l : [l, `category.html?cat=${c.id}&q=${encodeURIComponent(l)}`]);
+
 function renderCategoryMenu() {
   return `<ul>${CATEGORIES.map((c) => `
-    <li class="cat-menu__item">
+    <li class="cat-menu__item" data-mega-cat="${c.id}">
       <a class="cat-menu__link" href="category.html?cat=${c.id}">${icon(c.icon)}<span>${c.name}</span>${icon('chevron-right', 'cat-menu__chevron')}</a>
       <div class="mega">
-        ${c.groups.map((g) => `
-          <div>
-            <p class="mega__title">${g.title}</p>
-            <ul class="mega__list">${g.links.map((l) => `<li><a href="category.html?cat=${c.id}&q=${encodeURIComponent(l)}">${l}</a></li>`).join('')}</ul>
-          </div>`).join('')}
+        <div class="mega__groups">
+          ${c.groups.map((g) => `
+            <div>
+              <p class="mega__title">${g.title}</p>
+              <ul class="mega__list">${g.links.map((l) => catLink(c, l)).map(([text, href]) => `<li><a href="${href}">${text}</a></li>`).join('')}</ul>
+            </div>`).join('')}
+        </div>
+        <div class="mega__featured" data-mega-featured></div>
       </div>
     </li>`).join('')}</ul>`;
+}
+
+/* Hàng "Bán chạy nhất" trong mega menu — chỉ dựng khi khách rê chuột vào (ảnh không tải sẵn) */
+function megaFeaturedHTML(catId) {
+  const rule = CATEGORY_RULES[catId];
+  if (!rule) return '';
+  const all = PRODUCTS.filter((p) => rule.match(p) && (catId === 'used' || !p.tags.includes('used')));
+  const top = [...all].sort((a, b) => b.reviews - a.reviews).slice(0, 5);
+  if (!top.length) return '';
+  return `
+    <div class="mega__featured-head">
+      <p class="mega__title">${icon('flame')}Bán chạy nhất</p>
+      <a class="mega__all" href="category.html?cat=${catId}">Xem tất cả ${all.length} sản phẩm${icon('chevron-right')}</a>
+    </div>
+    <div class="mega__products">
+      ${top.map((p) => `
+        <a class="mega-card" href="product.html?id=${p.id}">
+          <span class="mega-card__img"><img src="${thumb(p.img)}" alt="${p.name}" width="120" height="120" loading="lazy"></span>
+          <span class="mega-card__name">${p.name}</span>
+          <b class="mega-card__price">${formatPrice(p.price)}</b>
+          ${p.oldPrice > p.price ? `<del class="mega-card__old">${formatPrice(p.oldPrice)}</del>` : ''}
+        </a>`).join('')}
+    </div>`;
 }
 
 /* ---------- Drawer (mobile + nút Danh mục) ---------- */
@@ -134,7 +163,8 @@ function renderDrawer() {
             <details class="drawer__group">
               <summary>${icon(c.icon)}<span>${c.name}</span>${icon('chevron-right', 'drawer__chevron')}</summary>
               <div class="drawer__sub">
-                ${c.groups.flatMap((g) => g.links).slice(0, 8).map((l) => `<a href="category.html?cat=${c.id}&q=${encodeURIComponent(l)}">${l}</a>`).join('')}
+                <a class="drawer__all" href="category.html?cat=${c.id}">Xem tất cả ${c.name}${icon('chevron-right')}</a>
+                ${c.groups.flatMap((g) => g.links).slice(0, 10).map((l) => catLink(c, l)).map(([text, href]) => `<a href="${href}">${text}</a>`).join('')}
               </div>
             </details>`).join('')}
         </div>
