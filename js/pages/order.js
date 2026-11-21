@@ -3,10 +3,15 @@
    order.html?code=MK...&new=1
    ========================================================== */
 
-const STATUS_STEPS = ['Chờ xác nhận', 'Đã xác nhận', 'Đang giao hàng', 'Hoàn thành'];
+/* 4 bước trên thanh trạng thái — dùng đúng tên trạng thái của ORDER_STATUSES (app.js),
+   trang quản trị cũng lưu theo danh sách đó */
+const STATUS_STEPS = ORDER_STATUSES.slice(0, 4);
+const STATUS_LABELS = { 'Đang giao': 'Đang giao hàng' };
 
 function orderDetailHTML(order, isNew) {
-  const step = Math.max(0, STATUS_STEPS.indexOf(order.status));
+  const cancelled = order.status === 'Đã hủy';
+  const step = cancelled ? -1 : Math.max(0, STATUS_STEPS.indexOf(order.status));
+  const updated = order.updatedAt ? ` · Cập nhật lúc ${new Date(order.updatedAt).toLocaleString('vi-VN')}` : '';
   const created = new Date(order.createdAt).toLocaleString('vi-VN');
   return `
     ${isNew ? `
@@ -31,10 +36,11 @@ function orderDetailHTML(order, isNew) {
       <div>
         <section class="panel">
           <h2 class="panel__title">${icon('package')}Trạng thái đơn hàng</h2>
-          <ol class="timeline">
-            ${STATUS_STEPS.map((s, i) => `<li class="${i < step ? 'is-done' : ''}${i === step ? ' is-active' : ''}"><span>${icon(['clipboard-list', 'phone-call', 'truck', 'package-check'][i])}</span>${s}</li>`).join('')}
+          ${cancelled ? `<p class="alert alert--info order-cancelled">${icon('circle-x')}<span>Đơn hàng đã được hủy. Cần hỗ trợ, vui lòng gọi <a href="tel:${COMPANY.phone}"><b>${COMPANY.phoneDisplay}</b></a>.</span></p>` : ''}
+          <ol class="timeline${cancelled ? ' timeline--cancelled' : ''}">
+            ${STATUS_STEPS.map((s, i) => `<li class="${i < step ? 'is-done' : ''}${i === step ? ' is-active' : ''}"${i === step ? ' aria-current="step"' : ''}><span>${icon(['clipboard-list', 'phone-call', 'truck', 'package-check'][i])}</span>${STATUS_LABELS[s] || s}</li>`).join('')}
           </ol>
-          <p class="field__hint">Đặt lúc ${created}. Trạng thái đơn được cập nhật qua điện thoại / Zalo khi nhân viên xử lý.</p>
+          <p class="field__hint">Đặt lúc ${created}${updated}. ${order.uid ? 'Trạng thái do cửa hàng cập nhật, bạn xem được trên mọi thiết bị khi đăng nhập.' : 'Nhân viên sẽ gọi điện / Zalo để báo trạng thái đơn.'}</p>
         </section>
         <section class="panel">
           <h2 class="panel__title">${icon('shopping-bag')}Sản phẩm</h2>

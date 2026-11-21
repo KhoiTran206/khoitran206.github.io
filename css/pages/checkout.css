@@ -687,3 +687,12 @@ a.mini-list__name:hover {
   color: var(--color-text-muted);
   text-decoration: line-through;
 }
+
+/* Đơn đã hủy: thanh trạng thái mờ đi */
+.timeline--cancelled {
+  opacity: 0.5;
+}
+
+.order-cancelled {
+  margin-bottom: 12px;
+}
