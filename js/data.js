@@ -11,6 +11,7 @@ const COMPANY = {
   email: 'tranngminhkhoi062@gmail.com',
   // Mạng xã hội — đang để trang chủ chung, chủ shop thay bằng link trang của shop
   socials: { facebook: 'https://facebook.com/', tiktok: 'https://www.tiktok.com/', youtube: 'https://www.youtube.com/', github: 'https://github.com/' },
+  zalo: 'https://zalo.me/0937805704', // nút chat nổi góc phải dưới (Zalo theo số hotline)
 };
 
 const IMG = 'assets/images/photos/'; // Ảnh chụp thật (Pexels, giấy phép miễn phí thương mại)
