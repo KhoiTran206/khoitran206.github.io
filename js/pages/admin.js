@@ -133,7 +133,8 @@ async function loadAdminData() {
     db.collection('users').get(),
   ]);
   admin.orders = orders.docs.map((d) => d.data());
-  admin.users = users.docs.map((d) => d.data()).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  // Tài khoản quản trị không tính là khách hàng
+  admin.users = users.docs.map((d) => d.data()).filter((u) => !SHOP.adminEmails.includes(u.email)).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
 }
 
 async function refreshAdmin() {

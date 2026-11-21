@@ -1359,3 +1359,8 @@
 
   .admin-order__chevron { grid-area: chev; }
 }
+
+/* Thẻ thống kê nằm trong grid → bỏ margin-top của .panel + .panel cho đều hàng */
+.admin__stats > .panel + .panel {
+  margin-top: 0;
+}
