@@ -30,6 +30,7 @@ function describe(p) {
     desk: `${p.name} kích thước ${spec('size')}, ${String(spec('material') || '').toLowerCase()} — mặt bàn rộng, chắc chắn, đủ chỗ cho màn hình, PC và gear.`,
     software: `${p.name} — bản quyền ${String(spec('license') || '').toLowerCase()}, dùng cho ${spec('platform')}. Key được gửi qua email sau khi thanh toán, nhân viên hỗ trợ kích hoạt từ xa miễn phí.`,
     network: `${p.name} (${spec('wifi')}, ${spec('ports')}) giúp mạng gia đình, văn phòng ổn định. Minh Khôi PC hỗ trợ tư vấn và cài đặt miễn phí.`,
+    accessory: `${p.name} — phụ kiện chính hãng, dễ lắp đặt, tương thích PC và laptop phổ biến. Nhân viên Minh Khôi PC sẵn sàng tư vấn chọn đúng loại theo nhu cầu.`,
   }[p.cat] || p.name;
   const used = p.tags.includes('used');
   const usedIntro = `${p.name} là hàng đã qua sử dụng, được kỹ thuật ${COMPANY.name} kiểm tra, vệ sinh và chạy thử kỹ trước khi bán. Tình trạng: ${spec('condition') || 'đã kiểm tra'}.`;
