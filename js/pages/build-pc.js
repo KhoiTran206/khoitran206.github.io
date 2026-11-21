@@ -5,9 +5,14 @@
 const BUILD_KEY = 'mkpc-build';
 const SLOTS = [
   { id: 'cpu', name: 'Vi xử lý (CPU)', icon: 'cpu', match: (p) => p.cat === 'components' && p.tags.includes('cpu') },
+  { id: 'mainboard', name: 'Bo mạch chủ (Mainboard)', icon: 'microchip', match: (p) => p.cat === 'components' && p.tags.includes('mainboard') },
   { id: 'vga', name: 'Card đồ họa (VGA)', icon: 'circuit-board', match: (p) => p.cat === 'components' && p.tags.includes('vga') },
   { id: 'ram', name: 'Bộ nhớ RAM', icon: 'memory-stick', match: (p) => p.cat === 'components' && p.tags.includes('ram') },
   { id: 'ssd', name: 'Ổ cứng SSD', icon: 'hard-drive', match: (p) => p.cat === 'components' && p.tags.includes('ssd') },
+  { id: 'hdd', name: 'Ổ cứng HDD (tùy chọn)', icon: 'database', match: (p) => p.cat === 'components' && p.tags.includes('hdd') },
+  { id: 'psu', name: 'Nguồn (PSU)', icon: 'zap', match: (p) => p.cat === 'components' && p.tags.includes('psu') },
+  { id: 'cooler', name: 'Tản nhiệt CPU', icon: 'fan', match: (p) => p.cat === 'components' && p.tags.includes('cooler') },
+  { id: 'case', name: 'Vỏ case', icon: 'box', match: (p) => p.cat === 'components' && p.tags.includes('case') },
   { id: 'monitor', name: 'Màn hình', icon: 'monitor', match: (p) => p.cat === 'monitor' },
   { id: 'keyboard', name: 'Bàn phím', icon: 'keyboard', match: (p) => p.cat === 'keyboard' },
   { id: 'mouse', name: 'Chuột', icon: 'mouse', match: (p) => p.cat === 'mouse' },

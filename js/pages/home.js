@@ -43,8 +43,15 @@ function renderFlashSale() {
     ${sliderHTML(cards)}`;
 }
 
+const HOME_SECTION_LIMIT = 12;
+
 function productsFor(section, filter) {
-  return PRODUCTS.filter((p) => p.cat === section.id && (filter === 'all' || p.tags.includes(filter)));
+  const inSection = section.rule ? CATEGORY_RULES[section.rule].match : (p) => p.cat === section.id;
+  const usedOk = (p) => section.rule === 'used' || !p.tags.includes('used');
+  // Trang chủ chỉ hiện 12 sản phẩm bán chạy nhất mỗi khối (xem hết ở "Xem tất cả") → trang nhẹ, mở nhanh
+  return PRODUCTS.filter((p) => inSection(p) && usedOk(p) && (filter === 'all' || p.tags.includes(filter)))
+    .sort((a, b) => b.reviews - a.reviews)
+    .slice(0, HOME_SECTION_LIMIT);
 }
 
 function renderHomeSections() {

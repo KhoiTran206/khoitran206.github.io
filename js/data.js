@@ -52,7 +52,7 @@ const SHOP = {
     BLACKFRIDAY: { type: 'percent', value: 5, max: 500000, minOrder: 0, label: 'Giảm 5% (tối đa 500.000đ)' },
   },
   // Bảo hành mẫu theo nhóm hàng (tháng)
-  warranty: { pc: 36, 'laptop-gaming': 24, laptop: 24, components: 36, mouse: 24, keyboard: 24, monitor: 36, headset: 12, chair: 12 },
+  warranty: { pc: 36, 'laptop-gaming': 24, laptop: 24, components: 36, mouse: 24, keyboard: 24, monitor: 36, headset: 12, chair: 12, desk: 12, software: 12, network: 24 },
   // Email quản trị viên: xem toàn bộ đơn hàng + khách hàng ở admin.html.
   // Thêm/bớt email ở đây VÀ trong firestore.rules (hàm isAdmin) rồi dán lại Rules trên Firebase.
   adminEmails: ['tranngminhkhoi062@gmail.com'],
@@ -70,7 +70,7 @@ const FIREBASE_CONFIG = {
 };
 const FIREBASE_SDK = 'https://www.gstatic.com/firebasejs/13.4.0/';
 
-const BRANDS = ['MKPC', 'ASUS', 'Acer', 'MSI', 'Lenovo', 'Dell', 'HP', 'Logitech', 'Razer', 'Corsair', 'Akko', 'AULA', 'LG', 'Samsung', 'Kingston', 'WD', 'Intel', 'AMD', 'HyperX', 'E-Dra'];
+const BRANDS = ['MKPC', 'ASUS', 'Acer', 'MSI', 'Lenovo', 'Dell', 'HP', 'Apple', 'Logitech', 'Razer', 'Corsair', 'Akko', 'AULA', 'LG', 'Samsung', 'ViewSonic', 'Kingston', 'Crucial', 'G.Skill', 'Lexar', 'WD', 'Seagate', 'Toshiba', 'Intel', 'AMD', 'GIGABYTE', 'ASRock', 'ZOTAC', 'Cooler Master', 'DeepCool', 'Thermalright', 'NZXT', 'Lian Li', 'Xigmatek', 'be quiet', 'HyperX', 'SteelSeries', 'Sony', 'E-Dra', 'Warrior', 'Microsoft', 'Kaspersky', 'Adobe', 'TP-Link', 'Mercusys', 'UGREEN'];
 
 /* Danh mục "ảo" trên menu → điều kiện lọc sản phẩm */
 const CATEGORY_RULES = {
@@ -79,13 +79,24 @@ const CATEGORY_RULES = {
   pc: { name: 'PC Gaming', match: (p) => p.cat === 'pc' && p.tags.includes('gaming') },
   'pc-office': { name: 'PC Văn phòng - Đồ họa', match: (p) => p.cat === 'pc' && !p.tags.includes('gaming') },
   components: { name: 'Linh kiện máy tính', match: (p) => p.cat === 'components' },
+  cpu: { name: 'CPU - Vi xử lý', match: (p) => p.cat === 'components' && p.tags.includes('cpu') },
+  mainboard: { name: 'Mainboard', match: (p) => p.cat === 'components' && p.tags.includes('mainboard') },
   vga: { name: 'Card đồ họa (VGA)', match: (p) => p.cat === 'components' && p.tags.includes('vga') },
+  ram: { name: 'RAM', match: (p) => p.cat === 'components' && p.tags.includes('ram') },
+  storage: { name: 'Ổ cứng SSD - HDD', match: (p) => p.cat === 'components' && (p.tags.includes('ssd') || p.tags.includes('hdd')) },
+  psu: { name: 'Nguồn máy tính (PSU)', match: (p) => p.cat === 'components' && p.tags.includes('psu') },
+  cooler: { name: 'Tản nhiệt', match: (p) => p.cat === 'components' && p.tags.includes('cooler') },
+  case: { name: 'Vỏ case', match: (p) => p.cat === 'components' && p.tags.includes('case') },
   monitor: { name: 'Màn hình', match: (p) => p.cat === 'monitor' },
   keyboard: { name: 'Bàn phím', match: (p) => p.cat === 'keyboard' },
-  mouse: { name: 'Chuột', match: (p) => p.cat === 'mouse' },
+  mouse: { name: 'Chuột - Lót chuột', match: (p) => p.cat === 'mouse' },
   headset: { name: 'Tai nghe', match: (p) => p.cat === 'headset' },
-  chair: { name: 'Ghế gaming', match: (p) => p.cat === 'chair' },
-  storage: { name: 'Ổ cứng - RAM', match: (p) => p.cat === 'components' && (p.tags.includes('ram') || p.tags.includes('ssd')) },
+  furniture: { name: 'Bàn ghế gaming', match: (p) => p.cat === 'chair' || p.cat === 'desk' },
+  chair: { name: 'Ghế gaming - Công thái học', match: (p) => p.cat === 'chair' },
+  desk: { name: 'Bàn gaming', match: (p) => p.cat === 'desk' },
+  software: { name: 'Phần mềm bản quyền', match: (p) => p.cat === 'software' },
+  network: { name: 'Thiết bị mạng', match: (p) => p.cat === 'network' },
+  used: { name: 'Hàng cũ giá tốt', match: (p) => p.tags.includes('used') },
 };
 
 /* Danh mục: dùng cho menu hero, mega menu, drawer mobile và hàng icon */
@@ -129,10 +140,10 @@ const CATEGORIES = [
   {
     id: 'components', name: 'Linh kiện PC', icon: 'cpu',
     groups: [
-      { title: 'CPU', links: ['Intel', 'AMD'] },
-      { title: 'VGA', links: ['NVIDIA GeForce', 'AMD Radeon'] },
-      { title: 'RAM - Lưu trữ', links: ['RAM DDR4', 'RAM DDR5', 'SSD NVMe', 'HDD'] },
-      { title: 'Khác', links: ['Mainboard', 'Nguồn (PSU)', 'Case', 'Tản nhiệt'] },
+      { title: 'CPU - Mainboard', links: ['CPU Intel', 'CPU AMD', 'Mainboard Intel', 'Mainboard AMD'] },
+      { title: 'VGA - RAM', links: ['Card màn hình', 'Radeon', 'RAM DDR4', 'RAM DDR5'] },
+      { title: 'Lưu trữ', links: ['SSD NVMe', 'SSD SATA', 'Ổ cứng HDD'] },
+      { title: 'Nguồn - Tản - Case', links: ['Nguồn', 'Tản nhiệt khí', 'Tản nhiệt nước AIO', 'Case'] },
     ],
   },
   {
@@ -181,21 +192,42 @@ const CATEGORIES = [
     ],
   },
   {
-    id: 'chair', name: 'Ghế gaming', icon: 'armchair',
+    id: 'furniture', name: 'Bàn ghế gaming', icon: 'armchair',
     groups: [
-      { title: 'Ghế gaming', links: ['E-Dra', 'Corsair', 'Warrior', 'Cougar'] },
+      { title: 'Ghế gaming', links: ['E-Dra', 'Corsair', 'Cooler Master'] },
       { title: 'Ghế công thái học', links: ['Lưng lưới', 'Có tựa đầu'] },
-      { title: 'Bàn', links: ['Bàn gaming', 'Bàn nâng hạ'] },
-      { title: 'Phụ kiện', links: ['Giá treo màn hình', 'Đèn LED'] },
+      { title: 'Bàn', links: ['Bàn gaming', 'Bàn nâng hạ', 'Có LED'] },
     ],
   },
   {
-    id: 'storage', name: 'Ổ cứng - RAM', icon: 'hard-drive',
+    id: 'storage', name: 'Ổ cứng SSD - HDD', icon: 'hard-drive',
     groups: [
-      { title: 'SSD', links: ['SSD NVMe', 'SSD SATA', 'SSD di động'] },
-      { title: 'RAM', links: ['RAM PC', 'RAM Laptop'] },
-      { title: 'HDD', links: ['HDD PC', 'HDD di động'] },
-      { title: 'USB - Thẻ nhớ', links: ['USB', 'Thẻ nhớ'] },
+      { title: 'SSD', links: ['SSD NVMe', 'SSD SATA', '1TB', '2TB'] },
+      { title: 'HDD', links: ['Ổ cứng HDD', 'NAS', 'Camera'] },
+    ],
+  },
+  {
+    id: 'network', name: 'Thiết bị mạng', icon: 'router',
+    groups: [
+      { title: 'WiFi', links: ['Router WiFi 6', 'WiFi Mesh', 'Bộ phát WiFi'] },
+      { title: 'Có dây', links: ['Switch', 'Cáp mạng'] },
+      { title: 'Thương hiệu', links: ['TP-Link', 'ASUS', 'Mercusys'] },
+    ],
+  },
+  {
+    id: 'software', name: 'Phần mềm', icon: 'app-window',
+    groups: [
+      { title: 'Hệ điều hành', links: ['Windows 11 Home', 'Windows 11 Pro'] },
+      { title: 'Văn phòng', links: ['Office 2024', 'Microsoft 365'] },
+      { title: 'Khác', links: ['Diệt virus', 'Adobe'] },
+    ],
+  },
+  {
+    id: 'used', name: 'Hàng cũ', icon: 'recycle',
+    groups: [
+      { title: 'Linh kiện cũ', links: ['Card màn hình', 'CPU'] },
+      { title: 'Máy cũ', links: ['Laptop', 'PC văn phòng', 'Màn hình'] },
+      { title: 'Gear cũ', links: ['Chuột', 'Ghế'] },
     ],
   },
 ];
@@ -217,6 +249,7 @@ function product(cat, name, img, price, oldPrice, specs, tags = [], extra = {}) 
     label: extra.label ?? '',
     brand: BRANDS.find((b) => new RegExp(`\\b${b}\\b`, 'i').test(name)) || 'Khác',
     stock: extra.stock ?? 5 + ((__id * 13) % 20), // Tồn kho mẫu
+    warranty: extra.warranty ?? SHOP.warranty[cat] ?? 12, // tháng (hàng cũ có thời hạn riêng)
   };
 }
 
@@ -348,6 +381,294 @@ const PRODUCTS = [
     [['material', 'Da PU'], ['weight', 'Tải 150kg']], ['edra'], { reviews: 14 }),
   product('chair', 'Ghế gaming Corsair TC100 Relaxed', 'chair-2.jpg', 4990000, 5990000,
     [['material', 'Vải thoáng'], ['weight', 'Tải 120kg']], ['corsair'], { reviews: 7 }),
+
+  /* ====== Bổ sung (giữ nguyên thứ tự các sản phẩm phía trên để không đổi mã mk001…) ====== */
+
+  /* Mainboard */
+  product('components', 'Mainboard ASUS PRIME B760M-A WIFI D4', 'mainboard-1.jpg', 3290000, 3690000,
+    [['chipset', 'Intel B760'], ['socket', 'LGA 1700'], ['form', 'Micro-ATX'], ['ram', 'DDR4']], ['mainboard', 'intel'], { reviews: 31, label: 'Bán chạy' }),
+  product('components', 'Mainboard MSI PRO B760M-P DDR4', 'mainboard-2.jpg', 2490000, 2790000,
+    [['chipset', 'Intel B760'], ['socket', 'LGA 1700'], ['form', 'Micro-ATX'], ['ram', 'DDR4']], ['mainboard', 'intel'], { reviews: 22 }),
+  product('components', 'Mainboard GIGABYTE B650M AORUS ELITE AX', 'mainboard-3.jpg', 4990000, 5590000,
+    [['chipset', 'AMD B650'], ['socket', 'AM5'], ['form', 'Micro-ATX'], ['ram', 'DDR5']], ['mainboard', 'amd'], { reviews: 17 }),
+  product('components', 'Mainboard ASUS ROG STRIX B650-A GAMING WIFI', 'mainboard-4.jpg', 6490000, 7290000,
+    [['chipset', 'AMD B650'], ['socket', 'AM5'], ['form', 'ATX'], ['ram', 'DDR5']], ['mainboard', 'amd'], { reviews: 12 }),
+  product('components', 'Mainboard MSI MAG B550M MORTAR WIFI', 'mainboard-1.jpg', 3390000, 3890000,
+    [['chipset', 'AMD B550'], ['socket', 'AM4'], ['form', 'Micro-ATX'], ['ram', 'DDR4']], ['mainboard', 'amd'], { reviews: 26 }),
+  product('components', 'Mainboard ASRock B760M Pro RS', 'mainboard-2.jpg', 2690000, 2990000,
+    [['chipset', 'Intel B760'], ['socket', 'LGA 1700'], ['form', 'Micro-ATX'], ['ram', 'DDR5']], ['mainboard', 'intel'], { reviews: 9 }),
+  product('components', 'Mainboard GIGABYTE Z790 AORUS ELITE AX', 'mainboard-3.jpg', 7490000, 8490000,
+    [['chipset', 'Intel Z790'], ['socket', 'LGA 1700'], ['form', 'ATX'], ['ram', 'DDR5']], ['mainboard', 'intel'], { reviews: 8 }),
+  product('components', 'Mainboard ASUS TUF GAMING B850M-PLUS WIFI', 'mainboard-4.jpg', 5690000, 6290000,
+    [['chipset', 'AMD B850'], ['socket', 'AM5'], ['form', 'Micro-ATX'], ['ram', 'DDR5']], ['mainboard', 'amd'], { reviews: 5, label: 'Mới' }),
+
+  /* Card đồ họa */
+  product('components', 'Card màn hình GIGABYTE GeForce RTX 3050 WINDFORCE OC 6GB', 'vga-2.jpg', 4790000, 5490000,
+    [['gpu', '6GB GDDR6'], ['fan', '2 quạt'], ['power', '450W']], ['vga'], { reviews: 39 }),
+  product('components', 'Card màn hình MSI GeForce RTX 5060 Ventus 2X OC 8GB', 'vga-1.jpg', 8990000, 9790000,
+    [['gpu', '8GB GDDR7'], ['fan', '2 quạt'], ['power', '550W']], ['vga'], { reviews: 11, label: 'Mới' }),
+  product('components', 'Card màn hình ZOTAC GAMING GeForce RTX 4060 Ti Twin Edge 8GB', 'vga-3.jpg', 10490000, 11990000,
+    [['gpu', '8GB GDDR6'], ['fan', '2 quạt'], ['power', '550W']], ['vga'], { reviews: 15 }),
+  product('components', 'Card màn hình ASUS TUF Gaming GeForce RTX 5070 Ti OC 16GB', 'vga-2.jpg', 27990000, 30990000,
+    [['gpu', '16GB GDDR7'], ['fan', '3 quạt'], ['power', '750W']], ['vga'], { reviews: 6, label: 'Mới' }),
+  product('components', 'Card màn hình MSI GeForce RTX 5080 Gaming Trio OC 16GB', 'vga-3.jpg', 35990000, 38990000,
+    [['gpu', '16GB GDDR7'], ['fan', '3 quạt'], ['power', '850W']], ['vga'], { reviews: 4 }),
+  product('components', 'Card màn hình GIGABYTE Radeon RX 7600 GAMING OC 8GB', 'vga-1.jpg', 6790000, 7490000,
+    [['gpu', '8GB GDDR6'], ['fan', '3 quạt'], ['power', '550W']], ['vga', 'amd'], { reviews: 13 }),
+  product('components', 'Card màn hình ASUS Prime Radeon RX 9070 XT OC 16GB', 'vga-2.jpg', 19990000, 21990000,
+    [['gpu', '16GB GDDR6'], ['fan', '3 quạt'], ['power', '750W']], ['vga', 'amd'], { reviews: 7 }),
+
+  /* CPU */
+  product('components', 'CPU Intel Core i3-12100F (up to 4.3GHz, 4 nhân)', 'cpu-3.jpg', 1990000, 2390000,
+    [['cpu', '4C / 8T'], ['speed', '4.3GHz'], ['socket', 'LGA 1700']], ['cpu', 'intel'], { reviews: 42 }),
+  product('components', 'CPU Intel Core i5-12400F (up to 4.4GHz, 6 nhân)', 'cpu-2.jpg', 2590000, 2990000,
+    [['cpu', '6C / 12T'], ['speed', '4.4GHz'], ['socket', 'LGA 1700']], ['cpu', 'intel'], { reviews: 77, label: 'Bán chạy' }),
+  product('components', 'CPU Intel Core i7-14700K (up to 5.6GHz, 20 nhân)', 'cpu-1.jpg', 9290000, 10490000,
+    [['cpu', '20C / 28T'], ['speed', '5.6GHz'], ['socket', 'LGA 1700']], ['cpu', 'intel'], { reviews: 14 }),
+  product('components', 'CPU Intel Core Ultra 7 265K (up to 5.5GHz, 20 nhân)', 'cpu-3.jpg', 9990000, 11490000,
+    [['cpu', '20C / 20T'], ['speed', '5.5GHz'], ['socket', 'LGA 1851']], ['cpu', 'intel'], { reviews: 6, label: 'Mới' }),
+  product('components', 'CPU AMD Ryzen 5 5600 (up to 4.4GHz, 6 nhân)', 'cpu-1.jpg', 2690000, 3190000,
+    [['cpu', '6C / 12T'], ['speed', '4.4GHz'], ['socket', 'AM4']], ['cpu', 'amd'], { reviews: 51 }),
+  product('components', 'CPU AMD Ryzen 5 7500F (up to 5.0GHz, 6 nhân)', 'cpu-2.jpg', 3890000, 4390000,
+    [['cpu', '6C / 12T'], ['speed', '5.0GHz'], ['socket', 'AM5']], ['cpu', 'amd'], { reviews: 36 }),
+  product('components', 'CPU AMD Ryzen 7 7700 (up to 5.3GHz, 8 nhân)', 'cpu-3.jpg', 6990000, 7790000,
+    [['cpu', '8C / 16T'], ['speed', '5.3GHz'], ['socket', 'AM5']], ['cpu', 'amd'], { reviews: 10 }),
+
+  /* RAM */
+  product('components', 'RAM Kingston Fury Beast 8GB DDR4 3200MHz', 'ram-2.jpg', 490000, 650000,
+    [['ram', '8GB DDR4'], ['speed', '3200MHz']], ['ram'], { reviews: 93 }),
+  product('components', 'RAM Corsair Vengeance LPX 16GB (2x8GB) DDR4 3200MHz', 'ram-1.jpg', 1090000, 1290000,
+    [['ram', '16GB DDR4'], ['speed', '3200MHz']], ['ram'], { reviews: 48 }),
+  product('components', 'RAM G.Skill Trident Z5 RGB 32GB (2x16GB) DDR5 6400MHz', 'ram-1.jpg', 3290000, 3790000,
+    [['ram', '32GB DDR5'], ['speed', '6400MHz']], ['ram'], { reviews: 12 }),
+  product('components', 'RAM Kingston Fury Beast RGB 32GB (2x16GB) DDR5 6000MHz', 'ram-2.jpg', 2890000, 3290000,
+    [['ram', '32GB DDR5'], ['speed', '6000MHz']], ['ram'], { reviews: 19 }),
+  product('components', 'RAM Laptop Crucial 16GB DDR5 5600MHz SODIMM', 'ram-2.jpg', 1090000, 1290000,
+    [['ram', '16GB DDR5'], ['speed', '5600MHz']], ['ram', 'laptop-ram'], { reviews: 24 }),
+
+  /* SSD */
+  product('components', 'SSD Kingston NV3 1TB M.2 NVMe PCIe 4.0', 'ssd-1.jpg', 1690000, 1990000,
+    [['ssd', '1TB NVMe'], ['speed', '6000MB/s']], ['ssd'], { reviews: 61, label: 'Bán chạy' }),
+  product('components', 'SSD Samsung 870 EVO 500GB 2.5" SATA', 'ssd-1.jpg', 1290000, 1490000,
+    [['ssd', '500GB SATA'], ['speed', '560MB/s']], ['ssd'], { reviews: 33 }),
+  product('components', 'SSD Lexar NM790 2TB M.2 NVMe PCIe 4.0', 'ssd-1.jpg', 3490000, 3990000,
+    [['ssd', '2TB NVMe'], ['speed', '7400MB/s']], ['ssd'], { reviews: 9 }),
+  product('components', 'SSD WD Blue SN580 1TB M.2 NVMe PCIe 4.0', 'ssd-1.jpg', 1790000, 2090000,
+    [['ssd', '1TB NVMe'], ['speed', '4150MB/s']], ['ssd'], { reviews: 21 }),
+
+  /* Ổ cứng HDD */
+  product('components', 'Ổ cứng HDD Seagate BarraCuda 1TB 7200rpm', 'hdd-1.jpg', 1190000, 1390000,
+    [['capacity', '1TB'], ['rpm', '7200rpm'], ['form', '3.5 inch SATA']], ['hdd'], { reviews: 28 }),
+  product('components', 'Ổ cứng HDD WD Blue 2TB 7200rpm', 'hdd-2.jpg', 1690000, 1890000,
+    [['capacity', '2TB'], ['rpm', '7200rpm'], ['form', '3.5 inch SATA']], ['hdd'], { reviews: 35 }),
+  product('components', 'Ổ cứng HDD Toshiba P300 2TB 7200rpm', 'hdd-3.jpg', 1590000, 1790000,
+    [['capacity', '2TB'], ['rpm', '7200rpm'], ['form', '3.5 inch SATA']], ['hdd'], { reviews: 14 }),
+  product('components', 'Ổ cứng HDD Seagate IronWolf 4TB NAS', 'hdd-1.jpg', 2990000, 3390000,
+    [['capacity', '4TB'], ['rpm', '5400rpm'], ['form', 'Chuyên NAS']], ['hdd'], { reviews: 8 }),
+  product('components', 'Ổ cứng HDD WD Purple 4TB chuyên camera', 'hdd-2.jpg', 2690000, 2990000,
+    [['capacity', '4TB'], ['rpm', '5400rpm'], ['form', 'Chuyên camera']], ['hdd'], { reviews: 11 }),
+
+  /* Nguồn (PSU) */
+  product('components', 'Nguồn Xigmatek X-Power III 500W', 'psu-1.jpg', 690000, 850000,
+    [['watt', '500W'], ['cert', '80 Plus'], ['form', 'ATX']], ['psu'], { reviews: 46 }),
+  product('components', 'Nguồn MSI MAG A650BN 650W 80 Plus Bronze', 'psu-1.jpg', 1190000, 1390000,
+    [['watt', '650W'], ['cert', '80 Plus Bronze'], ['form', 'ATX']], ['psu'], { reviews: 38, label: 'Bán chạy' }),
+  product('components', 'Nguồn Corsair CX650 650W 80 Plus Bronze', 'psu-1.jpg', 1590000, 1890000,
+    [['watt', '650W'], ['cert', '80 Plus Bronze'], ['form', 'ATX']], ['psu'], { reviews: 20 }),
+  product('components', 'Nguồn be quiet! Pure Power 12 M 750W 80 Plus Gold', 'psu-2.jpg', 2490000, 2890000,
+    [['watt', '750W'], ['cert', '80 Plus Gold'], ['form', 'ATX 3.0, Full Modular']], ['psu'], { reviews: 9 }),
+  product('components', 'Nguồn Cooler Master MWE Gold 850 V2 Full Modular', 'psu-1.jpg', 2390000, 2790000,
+    [['watt', '850W'], ['cert', '80 Plus Gold'], ['form', 'ATX, Full Modular']], ['psu'], { reviews: 13 }),
+  product('components', 'Nguồn ASUS ROG Strix 1000W Gold Aura Edition', 'psu-1.jpg', 4990000, 5690000,
+    [['watt', '1000W'], ['cert', '80 Plus Gold'], ['form', 'ATX 3.0, Full Modular']], ['psu'], { reviews: 5 }),
+
+  /* Tản nhiệt */
+  product('components', 'Tản nhiệt khí Cooler Master Hyper 212 Black Edition', 'cooler-2.jpg', 590000, 750000,
+    [['radiator', '1 tháp, 1 quạt'], ['tdp', '150W'], ['socket', 'LGA 1700 / AM5']], ['cooler'], { reviews: 54 }),
+  product('components', 'Tản nhiệt khí DeepCool AK400 Digital', 'cooler-2.jpg', 790000, 950000,
+    [['radiator', '1 tháp, 1 quạt'], ['tdp', '220W'], ['socket', 'LGA 1700 / AM5']], ['cooler'], { reviews: 27 }),
+  product('components', 'Tản nhiệt khí Thermalright Peerless Assassin 120 SE ARGB', 'cooler-2.jpg', 890000, 1090000,
+    [['radiator', '2 tháp, 2 quạt'], ['tdp', '260W'], ['socket', 'LGA 1700 / AM5']], ['cooler'], { reviews: 63, label: 'Bán chạy' }),
+  product('components', 'Tản nhiệt nước AIO DeepCool LE720 360mm ARGB', 'cooler-1.jpg', 1990000, 2390000,
+    [['radiator', 'Radiator 360mm'], ['tdp', '300W'], ['socket', 'LGA 1700 / AM5']], ['cooler'], { reviews: 18 }),
+  product('components', 'Tản nhiệt nước AIO NZXT Kraken 240 RGB', 'cooler-3.jpg', 3290000, 3790000,
+    [['radiator', 'Radiator 240mm'], ['tdp', '250W'], ['socket', 'LGA 1700 / AM5']], ['cooler'], { reviews: 7 }),
+  product('components', 'Tản nhiệt nước AIO Corsair iCUE LINK H150i RGB 360mm', 'cooler-1.jpg', 5490000, 6190000,
+    [['radiator', 'Radiator 360mm'], ['tdp', '350W'], ['socket', 'LGA 1851 / AM5']], ['cooler'], { reviews: 6 }),
+
+  /* Case */
+  product('components', 'Case Xigmatek Gaming X 3FX (kèm 3 fan RGB)', 'case-2.jpg', 790000, 950000,
+    [['form', 'Mid Tower, ATX'], ['fan', '3 fan RGB'], ['material', 'Kính cường lực']], ['case'], { reviews: 41 }),
+  product('components', 'Case MSI MAG Forge 120A Airflow', 'case-2.jpg', 1090000, 1290000,
+    [['form', 'Mid Tower, ATX'], ['fan', '6 fan ARGB'], ['material', 'Kính cường lực']], ['case'], { reviews: 23 }),
+  product('components', 'Case Corsair 4000D Airflow', 'case-1.jpg', 2090000, 2390000,
+    [['form', 'Mid Tower, ATX'], ['fan', '2 fan'], ['material', 'Kính cường lực']], ['case'], { reviews: 19 }),
+  product('components', 'Case NZXT H5 Flow (2024)', 'case-1.jpg', 2190000, 2490000,
+    [['form', 'Mid Tower, ATX'], ['fan', '3 fan'], ['material', 'Kính cường lực']], ['case'], { reviews: 12, label: 'Bán chạy' }),
+  product('components', 'Case DeepCool CH560 Digital', 'case-3.jpg', 2290000, 2590000,
+    [['form', 'Mid Tower, E-ATX'], ['fan', '4 fan ARGB'], ['material', 'Kính cường lực']], ['case'], { reviews: 8 }),
+  product('components', 'Case Lian Li O11 Dynamic EVO', 'case-3.jpg', 3990000, 4490000,
+    [['form', 'Mid Tower, E-ATX'], ['fan', 'Không kèm fan'], ['material', 'Nhôm + kính']], ['case'], { reviews: 10 }),
+
+  /* PC */
+  product('pc', 'PC MKPC Gaming i3 12100F - RTX 3050 6GB', 'pc-1.jpg', 11990000, 13490000,
+    [['cpu', 'i3-12100F'], ['gpu', 'RTX 3050'], ['ram', '16GB DDR4'], ['ssd', '500GB NVMe']], ['gaming', 'intel'], { gift: 'Tặng lót chuột', reviews: 29 }),
+  product('pc', 'PC MKPC Gaming i5 12400F - RTX 5060 8GB', 'pc-4.jpg', 17490000, 19290000,
+    [['cpu', 'i5-12400F'], ['gpu', 'RTX 5060'], ['ram', '16GB DDR4'], ['ssd', '500GB NVMe']], ['gaming', 'intel'], { gift: 'Tặng bàn phím + chuột', reviews: 16, label: 'Mới' }),
+  product('pc', 'PC MKPC Gaming Ryzen 7 7700 - RTX 5070 Ti 16GB', 'pc-3.jpg', 44990000, 48990000,
+    [['cpu', 'Ryzen 7 7700'], ['gpu', 'RTX 5070 Ti'], ['ram', '32GB DDR5'], ['ssd', '1TB NVMe']], ['gaming', 'amd'], { reviews: 6 }),
+  product('pc', 'PC MKPC Workstation i9 14900K - RTX 4080 Super', 'pc-2.jpg', 79990000, 86990000,
+    [['cpu', 'i9-14900K'], ['gpu', 'RTX 4080 S'], ['ram', '64GB DDR5'], ['ssd', '2TB NVMe']], ['design', 'intel'], { reviews: 3 }),
+  product('pc', 'PC MKPC Office i5 12400 - 16GB - SSD 512GB', 'pc-office.jpg', 9990000, 10990000,
+    [['cpu', 'i5-12400'], ['gpu', 'UHD 730'], ['ram', '16GB DDR4'], ['ssd', '512GB NVMe']], ['office', 'intel'], { reviews: 20 }),
+  product('pc', 'PC MKPC Mini Ryzen 5 8600G - 16GB DDR5', 'setup-1.jpg', 10490000, 11490000,
+    [['cpu', 'Ryzen 5 8600G'], ['gpu', 'Radeon 760M'], ['ram', '16GB DDR5'], ['ssd', '512GB NVMe']], ['office', 'amd'], { reviews: 8 }),
+
+  /* Laptop gaming */
+  product('laptop-gaming', 'Laptop gaming ASUS TUF Gaming A15 FA507NUR', 'laptop-gaming-2.jpg', 21990000, 24990000,
+    [['cpu', 'Ryzen 7 7435HS'], ['gpu', 'RTX 4050'], ['ram', '16GB'], ['ssd', '512GB'], ['screen', '15.6" 144Hz']], ['asus'], { gift: 'Tặng balo', reviews: 23 }),
+  product('laptop-gaming', 'Laptop gaming Acer Nitro V 16 ANV16-41', 'laptop-gaming-1.jpg', 27490000, 30990000,
+    [['cpu', 'Ryzen 7 8845HS'], ['gpu', 'RTX 4060'], ['ram', '16GB'], ['ssd', '512GB'], ['screen', '16" 165Hz']], ['acer'], { reviews: 12, label: 'Mới' }),
+  product('laptop-gaming', 'Laptop gaming MSI Thin 15 B13UC', 'laptop-gaming-4.jpg', 15990000, 18990000,
+    [['cpu', 'i5-13420H'], ['gpu', 'RTX 3050'], ['ram', '8GB'], ['ssd', '512GB'], ['screen', '15.6" 144Hz']], ['msi'], { reviews: 30 }),
+  product('laptop-gaming', 'Laptop gaming Dell G15 5530', 'laptop-gaming-3.jpg', 29990000, 33990000,
+    [['cpu', 'i7-13650HX'], ['gpu', 'RTX 4060'], ['ram', '16GB'], ['ssd', '512GB'], ['screen', '15.6" 165Hz']], ['dell'], { reviews: 10 }),
+  product('laptop-gaming', 'Laptop gaming Lenovo Legion Pro 7 16IRX9H', 'laptop-gaming-2.jpg', 69990000, 74990000,
+    [['cpu', 'i9-14900HX'], ['gpu', 'RTX 4080'], ['ram', '32GB'], ['ssd', '1TB'], ['screen', '16" 240Hz']], ['lenovo'], { gift: 'Tặng chuột Legion', reviews: 4 }),
+
+  /* Laptop văn phòng */
+  product('laptop', 'Laptop Apple MacBook Air 13 M3 8GB 256GB', 'laptop-office-2.jpg', 24990000, 27990000,
+    [['cpu', 'Apple M3'], ['gpu', 'GPU 8 nhân'], ['ram', '8GB'], ['ssd', '256GB'], ['screen', '13.6" Liquid Retina']], ['apple'], { reviews: 25, label: 'Bán chạy' }),
+  product('laptop', 'Laptop HP 15-fd0234TU', 'laptop-office-3.jpg', 13490000, 15490000,
+    [['cpu', 'i5-1334U'], ['gpu', 'Iris Xe'], ['ram', '8GB'], ['ssd', '512GB'], ['screen', '15.6" FHD']], ['hp'], { reviews: 34 }),
+  product('laptop', 'Laptop Lenovo IdeaPad Slim 3 15IAH8', 'laptop-office-1.jpg', 12990000, 14990000,
+    [['cpu', 'i5-12450H'], ['gpu', 'UHD Graphics'], ['ram', '16GB'], ['ssd', '512GB'], ['screen', '15.6" FHD']], ['lenovo'], { reviews: 41 }),
+  product('laptop', 'Laptop Dell Vostro 3530', 'laptop-office-4.jpg', 15290000, 16990000,
+    [['cpu', 'i5-1335U'], ['gpu', 'Iris Xe'], ['ram', '8GB'], ['ssd', '512GB'], ['screen', '15.6" FHD 120Hz']], ['dell'], { reviews: 15 }),
+  product('laptop', 'Laptop ASUS Vivobook S14 OLED S5406MA', 'laptop-office-1.jpg', 21990000, 23990000,
+    [['cpu', 'Ultra 5 125H'], ['gpu', 'Intel Arc'], ['ram', '16GB'], ['ssd', '512GB'], ['screen', '14" 3K OLED']], ['asus'], { gift: 'Tặng túi chống sốc', reviews: 9 }),
+  product('laptop', 'Laptop Acer Aspire Lite 15 AL15-51M', 'laptop-office-2.jpg', 10990000, 12490000,
+    [['cpu', 'i5-1155G7'], ['gpu', 'Iris Xe'], ['ram', '8GB'], ['ssd', '512GB'], ['screen', '15.6" FHD']], ['acer'], { reviews: 47 }),
+
+  /* Màn hình */
+  product('monitor', 'Màn hình ViewSonic VA2432-H 24" IPS 100Hz', 'monitor-1.jpg', 2290000, 2690000,
+    [['size', '23.8 inch'], ['panel', 'IPS'], ['hz', '100Hz'], ['res', 'Full HD']], ['viewsonic'], { reviews: 66 }),
+  product('monitor', 'Màn hình LG UltraGear 32GS75Q-B 32" 2K 180Hz', 'monitor-4.jpg', 7990000, 9290000,
+    [['size', '31.5 inch'], ['panel', 'IPS'], ['hz', '180Hz'], ['res', '2K QHD']], ['lg'], { reviews: 12 }),
+  product('monitor', 'Màn hình ASUS ProArt PA278CV 27" 2K đồ họa', 'monitor-5.jpg', 8490000, 9490000,
+    [['size', '27 inch'], ['panel', 'IPS 100% sRGB'], ['hz', '75Hz'], ['res', '2K QHD']], ['asus'], { reviews: 8 }),
+  product('monitor', 'Màn hình Samsung Odyssey G6 OLED 27" 2K 360Hz', 'monitor-3.jpg', 18990000, 22990000,
+    [['size', '27 inch'], ['panel', 'QD-OLED'], ['hz', '360Hz'], ['res', '2K QHD']], ['samsung'], { reviews: 5, label: 'Mới' }),
+  product('monitor', 'Màn hình MSI MAG 341CQP QD-OLED 34" cong', 'monitor-2.jpg', 21990000, 24990000,
+    [['size', '34 inch cong'], ['panel', 'QD-OLED'], ['hz', '175Hz'], ['res', 'UWQHD']], ['msi'], { reviews: 4 }),
+
+  /* Bàn phím */
+  product('keyboard', 'Bàn phím văn phòng Logitech K120', 'keyboard-5.jpg', 190000, 250000,
+    [['switch', 'Membrane'], ['layout', 'Full size'], ['wired', 'Có dây']], ['logitech'], { reviews: 150 }),
+  product('keyboard', 'Bàn phím cơ E-Dra EK387 Pro', 'keyboard-3.jpg', 690000, 890000,
+    [['switch', 'Huano Red'], ['layout', 'TKL'], ['wired', 'Có dây']], ['edra'], { reviews: 72 }),
+  product('keyboard', 'Bàn phím cơ Akko 3087 v2 DS Horizon', 'keyboard-2.jpg', 1190000, 1390000,
+    [['switch', 'Akko V3 Pink'], ['layout', 'TKL'], ['wired', 'Có dây']], ['akko'], { reviews: 37 }),
+  product('keyboard', 'Bàn phím không dây Logitech MX Keys S', 'keyboard-6.jpg', 2590000, 2990000,
+    [['switch', 'Phím chiclet'], ['layout', 'Full size'], ['wireless', 'Bluetooth + Bolt']], ['logitech'], { reviews: 20 }),
+  product('keyboard', 'Bàn phím Razer Huntsman V3 Pro TKL', 'keyboard-4.jpg', 5290000, 5990000,
+    [['switch', 'Analog Optical'], ['layout', 'TKL'], ['wired', 'Có dây']], ['razer'], { reviews: 6 }),
+
+  /* Chuột */
+  product('mouse', 'Chuột văn phòng Logitech B100', 'mouse-3.jpg', 120000, 150000,
+    [['dpi', '800 DPI'], ['wired', 'Có dây'], ['weight', '90g']], ['logitech'], { reviews: 210 }),
+  product('mouse', 'Chuột gaming E-Dra EM624', 'mouse-5.jpg', 290000, 390000,
+    [['dpi', '12.400 DPI'], ['wired', 'Có dây'], ['weight', '73g']], ['edra'], { reviews: 84 }),
+  product('mouse', 'Chuột Razer Basilisk V3', 'mouse-4.jpg', 1190000, 1490000,
+    [['dpi', '26.000 DPI'], ['wired', 'Có dây'], ['weight', '101g']], ['razer'], { reviews: 25 }),
+  product('mouse', 'Chuột không dây Logitech MX Master 3S', 'mouse-1.jpg', 2290000, 2590000,
+    [['dpi', '8.000 DPI'], ['wireless', 'Bluetooth + Bolt'], ['weight', '141g']], ['logitech'], { reviews: 38, label: 'Bán chạy' }),
+  product('mouse', 'Lót chuột Corsair MM300 Extended', 'mouse-2.jpg', 590000, 690000,
+    [['size', '930 x 300mm'], ['material', 'Vải dệt chống sờn']], ['corsair', 'mousepad'], { reviews: 30 }),
+
+  /* Tai nghe */
+  product('headset', 'Tai nghe Razer BlackShark V2 X', 'headset-1.jpg', 990000, 1290000,
+    [['driver', '50mm'], ['wired', 'Có dây']], ['razer'], { reviews: 57, label: 'Bán chạy' }),
+  product('headset', 'Tai nghe Logitech G435 Lightspeed', 'headset-2.jpg', 1290000, 1690000,
+    [['driver', '40mm'], ['wireless', 'Không dây + Bluetooth']], ['logitech'], { reviews: 44 }),
+  product('headset', 'Tai nghe Corsair HS80 RGB Wireless', 'headset-1.jpg', 2990000, 3490000,
+    [['driver', '50mm'], ['wireless', 'Không dây']], ['corsair'], { reviews: 13 }),
+  product('headset', 'Tai nghe Sony INZONE H5', 'headset-2.jpg', 3490000, 3990000,
+    [['driver', '40mm'], ['wireless', 'Không dây']], ['sony'], { reviews: 9 }),
+  product('headset', 'Tai nghe SteelSeries Arctis Nova 7 Wireless', 'headset-1.jpg', 3990000, 4590000,
+    [['driver', '40mm'], ['wireless', 'Không dây + Bluetooth']], ['steelseries'], { reviews: 7 }),
+  product('headset', 'Tai nghe HyperX Cloud Alpha Wireless', 'headset-2.jpg', 3990000, 4690000,
+    [['driver', '50mm'], ['wireless', 'Pin 300 giờ']], ['hyperx'], { reviews: 11 }),
+
+  /* Ghế */
+  product('chair', 'Ghế gaming E-Dra Mars EGC202', 'chair-1.jpg', 2490000, 3190000,
+    [['material', 'Da PU'], ['weight', 'Tải 130kg']], ['edra'], { reviews: 33 }),
+  product('chair', 'Ghế công thái học Warrior WEC501 lưng lưới', 'chair-3.jpg', 2790000, 3490000,
+    [['material', 'Lưới thoáng khí'], ['weight', 'Tải 120kg']], ['warrior'], { reviews: 18 }),
+  product('chair', 'Ghế công thái học E-Dra Ergo có tựa đầu', 'chair-2.jpg', 3990000, 4790000,
+    [['material', 'Lưới + đệm mút'], ['weight', 'Tải 150kg']], ['edra'], { reviews: 10 }),
+  product('chair', 'Ghế gaming Cooler Master Caliber R3', 'chair-1.jpg', 5490000, 6290000,
+    [['material', 'Da PU cao cấp'], ['weight', 'Tải 150kg']], ['coolermaster'], { reviews: 5 }),
+
+  /* Bàn */
+  product('desk', 'Bàn gaming chữ K MKPC 1m2', 'desk-2.jpg', 1290000, 1590000,
+    [['size', '120 x 60cm'], ['material', 'Thép sơn tĩnh điện']], ['mkpc'], { reviews: 27 }),
+  product('desk', 'Bàn gaming E-Dra EGT1460 chữ Z có LED 1m4', 'desk-1.jpg', 1990000, 2490000,
+    [['size', '140 x 60cm'], ['material', 'Mặt carbon, khung thép']], ['edra'], { reviews: 19, label: 'Bán chạy' }),
+  product('desk', 'Bàn gaming E-Dra EGT1680 1m6', 'desk-2.jpg', 2890000, 3390000,
+    [['size', '160 x 70cm'], ['material', 'Mặt carbon, khung thép']], ['edra'], { reviews: 8 }),
+  product('desk', 'Bàn nâng hạ điện Warrior WGT301 1m2', 'desk-1.jpg', 4990000, 5990000,
+    [['size', '120 x 60cm'], ['material', 'Motor điện, 3 nút nhớ']], ['warrior'], { reviews: 6, label: 'Mới' }),
+
+  /* Phần mềm bản quyền */
+  product('software', 'Microsoft Windows 11 Home bản quyền (key điện tử)', 'software-1.jpg', 3190000, 3690000,
+    [['license', 'Vĩnh viễn, 1 PC'], ['platform', 'Windows']], ['microsoft'], { reviews: 22 }),
+  product('software', 'Microsoft Windows 11 Pro bản quyền (key điện tử)', 'software-3.jpg', 4290000, 4990000,
+    [['license', 'Vĩnh viễn, 1 PC'], ['platform', 'Windows']], ['microsoft'], { reviews: 35, label: 'Bán chạy' }),
+  product('software', 'Microsoft Office Home 2024 (vĩnh viễn)', 'software-2.jpg', 3490000, 3990000,
+    [['license', 'Vĩnh viễn, 1 PC/Mac'], ['platform', 'Windows / macOS']], ['microsoft'], { reviews: 14 }),
+  product('software', 'Microsoft 365 Personal 12 tháng', 'software-3.jpg', 1290000, 1590000,
+    [['license', '12 tháng, 1 người'], ['platform', 'Windows / macOS / Mobile']], ['microsoft'], { reviews: 28 }),
+  product('software', 'Phần mềm diệt virus Kaspersky Plus 1 PC 1 năm', 'software-1.jpg', 290000, 390000,
+    [['license', '12 tháng, 1 thiết bị'], ['platform', 'Windows / macOS / Android']], ['kaspersky'], { reviews: 41 }),
+  product('software', 'Adobe Photoshop bản quyền 12 tháng', 'software-4.jpg', 5490000, 5990000,
+    [['license', '12 tháng, 1 người'], ['platform', 'Windows / macOS']], ['adobe'], { reviews: 6 }),
+
+  /* Thiết bị mạng */
+  product('network', 'Bộ phát WiFi 6 Mercusys MR70X AX1800', 'router-3.jpg', 790000, 990000,
+    [['wifi', 'WiFi 6 AX1800'], ['ports', '4 cổng Gigabit']], ['mercusys'], { reviews: 52 }),
+  product('network', 'Router WiFi 6 TP-Link Archer AX23 AX1800', 'router-1.jpg', 1190000, 1390000,
+    [['wifi', 'WiFi 6 AX1800'], ['ports', '5 cổng Gigabit']], ['tplink'], { reviews: 38, label: 'Bán chạy' }),
+  product('network', 'Router WiFi 6 ASUS RT-AX55 AX1800', 'router-3.jpg', 1690000, 1990000,
+    [['wifi', 'WiFi 6 AX1800'], ['ports', '5 cổng Gigabit']], ['asus'], { reviews: 17 }),
+  product('network', 'Bộ WiFi Mesh TP-Link Deco X20 (2 cục)', 'router-2.jpg', 3290000, 3790000,
+    [['wifi', 'WiFi 6 Mesh AX1800'], ['ports', '2 cổng Gigabit/cục']], ['tplink'], { reviews: 12 }),
+  product('network', 'Switch TP-Link TL-SG1005D 5 cổng Gigabit', 'switch-1.jpg', 290000, 350000,
+    [['ports', '5 cổng Gigabit'], ['wifi', 'Không quản lý, cắm là chạy']], ['tplink'], { reviews: 64 }),
+  product('network', 'Switch TP-Link TL-SG1016D 16 cổng Gigabit', 'switch-2.jpg', 1290000, 1490000,
+    [['ports', '16 cổng Gigabit'], ['wifi', 'Gắn tủ rack 19"']], ['tplink'], { reviews: 9 }),
+  product('network', 'Cáp mạng Cat6 UGREEN 5m bấm sẵn', 'switch-1.jpg', 150000, 190000,
+    [['ports', 'Cat6, 1000Mbps'], ['size', 'Dài 5m']], ['ugreen'], { reviews: 47 }),
+
+  /* Hàng cũ (đã kiểm tra, bảo hành tại cửa hàng) */
+  product('components', 'Card màn hình ASUS Dual GeForce RTX 3060 12GB (Cũ - Like new)', 'vga-2.jpg', 4990000, 7490000,
+    [['gpu', '12GB GDDR6'], ['condition', 'Like new 98%'], ['fan', '2 quạt']], ['vga', 'used'], { reviews: 14, label: 'Hàng cũ', warranty: 3 }),
+  product('components', 'Card màn hình MSI GeForce RTX 3070 Ti Gaming X Trio 8GB (Cũ)', 'vga-3.jpg', 7490000, 10990000,
+    [['gpu', '8GB GDDR6X'], ['condition', 'Đẹp 95%'], ['fan', '3 quạt']], ['vga', 'used'], { reviews: 6, label: 'Hàng cũ', warranty: 3 }),
+  product('components', 'CPU Intel Core i5-12400F (Cũ - tray)', 'cpu-3.jpg', 1890000, 2590000,
+    [['cpu', '6C / 12T'], ['condition', 'Like new 99%'], ['socket', 'LGA 1700']], ['cpu', 'used'], { reviews: 9, label: 'Hàng cũ', warranty: 3 }),
+  product('pc', 'PC văn phòng Dell OptiPlex 7060 SFF i5-8500 (Cũ)', 'pc-office.jpg', 3990000, 5490000,
+    [['cpu', 'i5-8500'], ['ram', '8GB DDR4'], ['ssd', '256GB SSD'], ['condition', 'Đẹp 95%']], ['office', 'used'], { reviews: 31, label: 'Hàng cũ', warranty: 6 }),
+  product('laptop-gaming', 'Laptop gaming Acer Nitro 5 AN515-57 (Cũ)', 'laptop-gaming-4.jpg', 11990000, 16990000,
+    [['cpu', 'i5-11400H'], ['gpu', 'RTX 3050'], ['ram', '16GB'], ['condition', 'Đẹp 95%']], ['acer', 'used', 'laptop'], { reviews: 12, label: 'Hàng cũ', warranty: 6 }),
+  product('laptop', 'Laptop Dell Latitude 7490 i5-8350U (Cũ)', 'laptop-office-4.jpg', 5490000, 7990000,
+    [['cpu', 'i5-8350U'], ['ram', '8GB'], ['ssd', '256GB'], ['condition', 'Đẹp 95%']], ['dell', 'used', 'laptop'], { reviews: 26, label: 'Hàng cũ', warranty: 6 }),
+  product('monitor', 'Màn hình Dell P2419H 24" IPS (Cũ)', 'monitor-5.jpg', 1890000, 2990000,
+    [['size', '23.8 inch'], ['panel', 'IPS'], ['res', 'Full HD'], ['condition', 'Like new 98%']], ['dell', 'used'], { reviews: 18, label: 'Hàng cũ', warranty: 3 }),
+  product('mouse', 'Chuột Logitech G Pro Wireless (Cũ)', 'mouse-1.jpg', 1290000, 2190000,
+    [['dpi', '25.600 DPI'], ['wireless', 'Không dây'], ['condition', 'Đẹp 95%']], ['logitech', 'used'], { reviews: 7, label: 'Hàng cũ', warranty: 1 }),
+  product('chair', 'Ghế gaming Corsair T3 Rush (Cũ)', 'chair-2.jpg', 2990000, 4990000,
+    [['material', 'Vải thoáng'], ['condition', 'Đẹp 90%']], ['corsair', 'used'], { reviews: 4, label: 'Hàng cũ', warranty: 1 }),
 ];
 
 /* Flash sale: danh sách id sản phẩm */
@@ -389,10 +710,10 @@ const QUICK_CATS = [
   { name: 'Laptop', img: 'laptop-office-2.jpg', href: 'category.html?cat=laptop' },
   { name: 'PC', img: 'pc-1.jpg', href: 'category.html?cat=pc' },
   { name: 'Màn hình', img: 'monitor-2.jpg', href: 'category.html?cat=monitor' },
-  { name: 'Ghế', img: 'chair-3.jpg', href: 'category.html?cat=chair' },
-  { name: 'CPU', img: 'cpu-1.jpg', href: 'category.html?cat=components&q=CPU' },
+  { name: 'Bàn ghế', img: 'chair-3.jpg', href: 'category.html?cat=furniture' },
+  { name: 'CPU', img: 'cpu-1.jpg', href: 'category.html?cat=cpu' },
   { name: 'VGA', img: 'vga-1.jpg', href: 'category.html?cat=vga' },
-  { name: 'RAM', img: 'ram-2.jpg', href: 'category.html?cat=storage&q=RAM' },
+  { name: 'RAM', img: 'ram-2.jpg', href: 'category.html?cat=ram' },
   { name: 'Ổ cứng', img: 'ssd-1.jpg', href: 'category.html?cat=storage' },
   { name: 'Chuột', img: 'mouse-4.jpg', href: 'category.html?cat=mouse' },
   { name: 'Bàn phím', img: 'keyboard-3.jpg', href: 'category.html?cat=keyboard' },
@@ -413,7 +734,7 @@ const MID_BANNERS = {
     items: [
       { theme: 'dark', tag: 'Màn hình chính hãng', title: 'Giảm sốc <em>đến 35%</em>', desc: 'Màn hình 2K 180Hz chỉ từ 4.590.000đ — ASUS, LG, Samsung, MSI', cta: 'Mua ngay', img: 'monitor-5.jpg', href: 'category.html?cat=monitor' },
       { theme: 'light', tag: 'Combo', title: 'Combo gear <em>đẹp cả đôi</em>', img: 'keyboard-4.jpg', href: 'category.html?cat=keyboard' },
-      { theme: 'red', tag: 'Góc gaming', title: 'Deal bàn ghế <em>thả ga lựa chọn</em>', img: 'chair-2.jpg', href: 'category.html?cat=chair' },
+      { theme: 'red', tag: 'Góc gaming', title: 'Deal bàn ghế <em>thả ga lựa chọn</em>', img: 'chair-2.jpg', href: 'category.html?cat=furniture' },
     ],
   },
 };
@@ -435,7 +756,17 @@ const HOME_SECTIONS = [
   { type: 'products', id: 'monitor', title: 'Màn hình chính hãng', tag: { icon: 'shield-check', text: 'Bảo hành 36 tháng' },
     tabs: [['all', 'Tất cả'], ['asus', 'ASUS'], ['lg', 'LG'], ['samsung', 'Samsung'], ['msi', 'MSI'], ['dell', 'Dell']] },
   { type: 'products', id: 'components', title: 'Linh kiện máy tính', tag: { icon: 'wrench', text: 'Lắp đặt miễn phí' },
-    tabs: [['all', 'Tất cả'], ['vga', 'VGA'], ['cpu', 'CPU'], ['ram', 'RAM'], ['ssd', 'SSD']] },
+    tabs: [['all', 'Tất cả'], ['vga', 'VGA'], ['cpu', 'CPU'], ['mainboard', 'Mainboard'], ['ram', 'RAM'], ['ssd', 'SSD'], ['hdd', 'HDD'], ['psu', 'Nguồn'], ['cooler', 'Tản nhiệt'], ['case', 'Case']] },
+  { type: 'products', id: 'headset', title: 'Tai nghe gaming', tag: { icon: 'shield-check', text: 'Bảo hành 12 tháng' },
+    tabs: [['all', 'Tất cả'], ['hyperx', 'HyperX'], ['logitech', 'Logitech'], ['razer', 'Razer'], ['corsair', 'Corsair']] },
+  { type: 'products', id: 'furniture', rule: 'furniture', title: 'Bàn ghế gaming', tag: { icon: 'truck', text: 'Giao & lắp tận nơi' },
+    tabs: [['all', 'Tất cả'], ['edra', 'E-Dra'], ['warrior', 'Warrior'], ['corsair', 'Corsair'], ['mkpc', 'MKPC']] },
+  { type: 'products', id: 'network', title: 'Thiết bị mạng', tag: { icon: 'wifi', text: 'Hỗ trợ cài đặt miễn phí' },
+    tabs: [['all', 'Tất cả'], ['tplink', 'TP-Link'], ['asus', 'ASUS'], ['mercusys', 'Mercusys']] },
+  { type: 'products', id: 'software', title: 'Phần mềm bản quyền', tag: { icon: 'key-round', text: 'Giao key qua email' },
+    tabs: [['all', 'Tất cả'], ['microsoft', 'Microsoft'], ['kaspersky', 'Kaspersky'], ['adobe', 'Adobe']] },
+  { type: 'products', id: 'used', rule: 'used', title: 'Hàng cũ giá tốt', tag: { icon: 'badge-check', text: 'Kiểm tra kỹ, có bảo hành' },
+    tabs: [['all', 'Tất cả'], ['vga', 'VGA'], ['cpu', 'CPU'], ['laptop', 'Laptop'], ['office', 'PC']] },
 ];
 
 

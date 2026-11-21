@@ -54,7 +54,7 @@ function renderCompare() {
             ${row('Giá bán', items.map((p) => `<td class="${p.price === minPrice && items.length > 1 ? 'is-best' : ''}">${formatPrice(p.price)}${p.price === minPrice && items.length > 1 ? '<small>Giá tốt nhất</small>' : ''}</td>`))}
             ${row('Thương hiệu', items.map((p) => `<td>${p.brand}</td>`))}
             ${types.map((t) => row(SPEC_LABELS[t] || t, items.map((p) => `<td>${spec(p, t)}</td>`))).join('')}
-            ${row('Bảo hành', items.map((p) => `<td>${SHOP.warranty[p.cat] || 12} tháng</td>`))}
+            ${row('Bảo hành', items.map((p) => `<td>${p.warranty} tháng</td>`))}
             ${row('Đánh giá', items.map((p) => `<td class="${p.rating === bestRating && items.length > 1 ? 'is-best' : ''}">${icon('star')} ${p.rating.toFixed(1)}/5</td>`))}
             ${row('Tình trạng', items.map((p) => `<td>${p.stock > 0 ? `<span class="compare__stock">${icon('circle-check')}Còn hàng</span>` : 'Hết hàng'}</td>`))}
             ${row('Quà tặng', items.map((p) => `<td>${p.gift || '—'}</td>`))}

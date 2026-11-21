@@ -24,6 +24,9 @@ const SPEC_ICONS = {
   dpi: 'crosshair', wireless: 'wifi', wired: 'cable', weight: 'weight',
   switch: 'keyboard', layout: 'layout-grid', size: 'maximize', panel: 'layers', hz: 'activity', res: 'scan',
   driver: 'audio-lines', material: 'armchair',
+  chipset: 'microchip', form: 'box', watt: 'zap', cert: 'badge-check', radiator: 'snowflake', tdp: 'thermometer',
+  capacity: 'database', rpm: 'disc', wifi: 'router', ports: 'ethernet-port', license: 'key-round', platform: 'app-window',
+  condition: 'sparkles',
 };
 
 /* Tên thông số (trang chi tiết, so sánh) */
@@ -33,6 +36,9 @@ const SPEC_LABELS = {
   dpi: 'Cảm biến', wireless: 'Kết nối', wired: 'Kết nối', weight: 'Trọng lượng / tải trọng',
   switch: 'Switch', layout: 'Layout', size: 'Kích thước', panel: 'Tấm nền', hz: 'Tần số quét', res: 'Độ phân giải',
   driver: 'Driver', material: 'Chất liệu',
+  chipset: 'Chipset', form: 'Chuẩn / kích thước', watt: 'Công suất', cert: 'Chứng nhận', radiator: 'Kiểu tản', tdp: 'TDP hỗ trợ',
+  capacity: 'Dung lượng', rpm: 'Tốc độ quay', wifi: 'Chuẩn kết nối', ports: 'Cổng kết nối', license: 'Bản quyền', platform: 'Hệ điều hành',
+  condition: 'Tình trạng',
 };
 
 const LOGO_MARK = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 46V18h6l12 15 12-15h6v28h-7V30L32 43 21 30v16z" fill="currentColor"/></svg>';

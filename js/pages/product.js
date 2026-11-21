@@ -6,7 +6,7 @@ const CAT_FOR_PRODUCT = {
   pc: (p) => (p.tags.includes('gaming') ? 'pc' : 'pc-office'),
   'laptop-gaming': () => 'laptop-gaming',
   laptop: () => 'laptop',
-  components: () => 'components',
+  components: (p) => (p.tags.includes('used') ? 'used' : ['vga', 'cpu', 'mainboard', 'ram', 'psu', 'cooler', 'case'].find((t) => p.tags.includes(t)) || (p.tags.some((t) => t === 'ssd' || t === 'hdd') ? 'storage' : 'components')),
   monitor: () => 'monitor',
   keyboard: () => 'keyboard',
   mouse: () => 'mouse',
@@ -27,13 +27,18 @@ function describe(p) {
     mouse: `${p.name} với cảm biến ${spec('dpi')}, kết nối ${spec('wireless') || spec('wired')} và trọng lượng ${spec('weight')} giúp thao tác chính xác, thoải mái trong thời gian dài.`,
     headset: `${p.name} cho âm thanh sống động, đeo êm tai, phù hợp chơi game, học online và giải trí.`,
     chair: `${p.name} thiết kế công thái học, chất liệu ${spec('material')}, hỗ trợ ngồi lâu thoải mái khi chơi game và làm việc.`,
+    desk: `${p.name} kích thước ${spec('size')}, ${String(spec('material') || '').toLowerCase()} — mặt bàn rộng, chắc chắn, đủ chỗ cho màn hình, PC và gear.`,
+    software: `${p.name} — bản quyền ${String(spec('license') || '').toLowerCase()}, dùng cho ${spec('platform')}. Key được gửi qua email sau khi thanh toán, nhân viên hỗ trợ kích hoạt từ xa miễn phí.`,
+    network: `${p.name} (${spec('wifi')}, ${spec('ports')}) giúp mạng gia đình, văn phòng ổn định. Minh Khôi PC hỗ trợ tư vấn và cài đặt miễn phí.`,
   }[p.cat] || p.name;
+  const used = p.tags.includes('used');
+  const usedIntro = `${p.name} là hàng đã qua sử dụng, được kỹ thuật ${COMPANY.name} kiểm tra, vệ sinh và chạy thử kỹ trước khi bán. Tình trạng: ${spec('condition') || 'đã kiểm tra'}.`;
   return [
-    ['p', intro],
+    ['p', used ? usedIntro : intro],
     ['h', 'Điểm nổi bật'],
     ['ul', [
-      'Sản phẩm chính hãng, mới 100%.',
-      `Bảo hành ${SHOP.warranty[p.cat] || 12} tháng tại ${COMPANY.name}.`,
+      used ? 'Hàng cũ đã kiểm tra kỹ thuật, hoạt động ổn định.' : 'Sản phẩm chính hãng, mới 100%.',
+      `Bảo hành ${p.warranty} tháng tại ${COMPANY.name}.`,
       p.gift ? `Quà tặng: ${p.gift}.` : 'Hỗ trợ kỹ thuật trọn đời sản phẩm.',
       'Giao hàng toàn quốc, kiểm tra hàng trước khi thanh toán.',
     ]],
@@ -91,14 +96,14 @@ function renderProduct(p) {
   const discount = discountPercent(p.price, p.oldPrice);
   const catId = CAT_FOR_PRODUCT[p.cat]?.(p) || p.cat;
   const catName = CATEGORY_RULES[catId]?.name || 'Sản phẩm';
-  const warranty = SHOP.warranty[p.cat] || 12;
+  const { warranty } = p;
   const related = PRODUCTS.filter((x) => x.cat === p.cat && x.id !== p.id).slice(0, 10);
   const recent = Recent.list(p.id).slice(0, 10);
   const specRows = [
     ['Thương hiệu', p.brand],
     ...p.specs.map(([type, value]) => [SPEC_LABELS[type] || type, value]),
     ['Bảo hành', `${warranty} tháng`],
-    ['Tình trạng', 'Mới 100%, nguyên seal'],
+    ...(p.tags.includes('used') ? [] : [['Tình trạng', p.cat === 'software' ? 'Key bản quyền chính hãng' : 'Mới 100%, nguyên seal']]),
   ];
 
   return `
@@ -163,8 +168,8 @@ function renderProduct(p) {
 
         <ul class="pd__commits">
           <li>${icon('shield-check')}Bảo hành ${warranty} tháng</li>
-          <li>${icon('badge-check')}Hàng chính hãng 100%</li>
-          <li>${icon('refresh-ccw')}Đổi mới trong 7 ngày nếu lỗi</li>
+          <li>${icon('badge-check')}${p.tags.includes('used') ? 'Đã kiểm tra kỹ thuật' : 'Hàng chính hãng 100%'}</li>
+          <li>${icon('refresh-ccw')}${p.tags.includes('used') ? 'Đổi trả trong 7 ngày nếu lỗi' : 'Đổi mới trong 7 ngày nếu lỗi'}</li>
           <li>${icon('truck')}Giao hàng toàn quốc</li>
         </ul>
 
@@ -270,7 +275,7 @@ function initPage() {
     return;
   }
   document.title = `${p.name} | ${COMPANY.name}`;
-  $('meta[name="description"]').setAttribute('content', `${p.name} giá ${formatPrice(p.price)} — chính hãng, bảo hành ${SHOP.warranty[p.cat] || 12} tháng tại ${COMPANY.name}.`);
+  $('meta[name="description"]').setAttribute('content', `${p.name} giá ${formatPrice(p.price)} — ${p.tags.includes('used') ? 'hàng cũ đã kiểm tra' : 'chính hãng'}, bảo hành ${p.warranty} tháng tại ${COMPANY.name}.`);
   root.innerHTML = renderProduct(p);
   addProductSchema(p);
   Recent.add(p.id);
@@ -291,6 +296,7 @@ function addProductSchema(p) {
       priceCurrency: 'VND',
       price: p.price,
       availability: p.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      itemCondition: p.tags.includes('used') ? 'https://schema.org/UsedCondition' : 'https://schema.org/NewCondition',
       url: location.href,
       seller: { '@type': 'Organization', name: COMPANY.name },
     },
