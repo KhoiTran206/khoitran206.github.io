@@ -23,9 +23,9 @@ function initPage() {
         <span class="contact-card__icon">${icon('mail')}</span>
         <span><b>Email</b><small>${COMPANY.email}</small></span>
       </a>
-      <a class="contact-card" href="${COMPANY.socials.zalo}" target="_blank" rel="noopener">
-        <span class="contact-card__icon">${icon('message-circle')}</span>
-        <span><b>Chat Zalo</b><small>Nhắn tin tư vấn nhanh</small></span>
+      <a class="contact-card" href="${COMPANY.socials.facebook}" target="_blank" rel="noopener">
+        <span class="contact-card__icon">${icon('facebook')}</span>
+        <span><b>Facebook</b><small>Theo dõi khuyến mãi mới nhất</small></span>
       </a>
     </div>
 

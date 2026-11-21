@@ -9,8 +9,8 @@ const COMPANY = {
   phone: '0937805704',
   phoneDisplay: '0937 805 704',
   email: 'tranngminhkhoi062@gmail.com',
-  // TODO (chủ shop): cập nhật link mạng xã hội thật
-  socials: { facebook: '#', youtube: '#', tiktok: '#', zalo: 'https://zalo.me/0937805704' },
+  // Mạng xã hội — đang để trang chủ chung, chủ shop thay bằng link trang của shop
+  socials: { facebook: 'https://facebook.com/', tiktok: 'https://www.tiktok.com/', youtube: 'https://www.youtube.com/', github: 'https://github.com/' },
 };
 
 const IMG = 'assets/images/photos/'; // Ảnh chụp thật (Pexels, giấy phép miễn phí thương mại)

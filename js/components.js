@@ -232,10 +232,10 @@ function renderFooter() {
           <p class="footer-brand__slogan">“${COMPANY.slogan}”</p>
           <h3 class="footer-col__title footer-col__title--spaced">Kết nối với chúng tôi</h3>
           <div class="socials">
-            <a href="${COMPANY.socials.facebook}" aria-label="Facebook">${icon('facebook')}</a>
-            <a href="${COMPANY.socials.youtube}" aria-label="YouTube">${icon('youtube')}</a>
-            <a href="${COMPANY.socials.tiktok}" aria-label="TikTok">${icon('music-2')}</a>
-            <a href="${COMPANY.socials.zalo}" aria-label="Zalo" target="_blank" rel="noopener">Z</a>
+            <a href="${COMPANY.socials.facebook}" aria-label="Facebook" target="_blank" rel="noopener">${icon('facebook')}</a>
+            <a href="${COMPANY.socials.tiktok}" aria-label="TikTok" target="_blank" rel="noopener">${icon('music-2')}</a>
+            <a href="${COMPANY.socials.youtube}" aria-label="YouTube" target="_blank" rel="noopener">${icon('youtube')}</a>
+            <a href="${COMPANY.socials.github}" aria-label="GitHub" target="_blank" rel="noopener">${icon('github')}</a>
           </div>
         </div>
         <div>
@@ -269,7 +269,7 @@ function renderFooter() {
     </footer>
     <div class="floating">
       <a class="floating__btn floating__btn--call" href="tel:${COMPANY.phone}" aria-label="Gọi hotline ${COMPANY.phoneDisplay}">${icon('phone')}</a>
-      <a class="floating__btn" href="${COMPANY.socials.zalo}" target="_blank" rel="noopener" aria-label="Chat Zalo">${icon('message-circle')}</a>
+      <a class="floating__btn" href="contact.html#contact-form" aria-label="Gửi tin nhắn cho cửa hàng">${icon('message-circle')}</a>
       <button class="floating__btn floating__btn--top" type="button" data-back-top aria-label="Lên đầu trang">${icon('arrow-up')}</button>
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>`;
