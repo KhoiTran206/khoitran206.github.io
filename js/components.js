@@ -142,12 +142,15 @@ function renderAccountMenu(user) {
   }
   const words = user.name.trim().split(/\s+/);
   const given = words[words.length - 1];
+  const isAdmin = Auth.isAdmin(user);
   return `
-    <button class="header-login header-login--user" type="button" data-account-toggle aria-expanded="false" aria-haspopup="true" aria-label="Tài khoản của ${esc(user.name)}">
-      <b class="header-login__avatar">${esc(given.charAt(0).toUpperCase())}</b><span>${esc(given)}</span>${icon('chevron-down', 'header-login__chevron')}
+    <button class="header-login header-login--user" type="button" data-account-toggle aria-expanded="false" aria-haspopup="true" aria-label="Tài khoản của ${esc(user.name)}${isAdmin ? ' (quản trị viên)' : ''}">
+      <b class="header-login__avatar">${esc(given.charAt(0).toUpperCase())}</b><span>${esc(given)}</span>
+      ${isAdmin ? `<small class="header-login__badge" aria-hidden="true">${icon('shield-check')}<i>Quản trị</i></small>` : ''}
+      ${icon('chevron-down', 'header-login__chevron')}
     </button>
     <div class="account-dropdown" role="menu">
-      <div class="account-dropdown__head"><b>${esc(user.name)}</b><small>${esc(user.email)}</small></div>
+      <div class="account-dropdown__head"><b>${esc(user.name)}</b><small>${esc(user.email)}</small>${isAdmin ? `<em class="account-dropdown__role">${icon('shield-check')}Quản trị viên</em>` : ''}</div>
       <a href="account.html" role="menuitem">${icon('user-round')}Tài khoản của tôi</a>
       <a href="account.html#don-hang" role="menuitem">${icon('shopping-bag')}Đơn hàng của tôi</a>
       <a href="wishlist.html" role="menuitem">${icon('heart')}Sản phẩm yêu thích</a>

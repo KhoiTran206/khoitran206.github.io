@@ -416,6 +416,59 @@
   color: var(--color-text-muted);
 }
 
+/* Nhãn "Quản trị" — chỉ hiện với email quản trị viên.
+   Mobile: huy hiệu khiên ở góc nút (giống số giỏ hàng); từ 769px: chữ "Quản trị" cạnh tên */
+.header-login--user {
+  position: relative;
+}
+
+.header-login__badge {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  background: var(--color-warning);
+  color: var(--color-text);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.header-login .header-login__badge .lucide {
+  font-size: 12px;
+}
+
+.header-login__badge i {
+  display: none;
+  font-style: normal;
+}
+
+.account-dropdown__role {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: var(--fs-xs);
+  font-style: normal;
+  font-weight: 600;
+}
+
+.account-dropdown__role .lucide {
+  font-size: 14px;
+}
+
 .account-dropdown a,
 .account-dropdown button {
   width: 100%;
@@ -568,6 +621,17 @@
 
   .header-login .header-login__chevron {
     display: inline-block;
+  }
+
+  .header-login__badge {
+    position: static;
+    padding: 3px 6px;
+    border: 0;
+    border-radius: var(--radius-badge);
+  }
+
+  .header-login__badge i {
+    display: inline;
   }
 }
 
