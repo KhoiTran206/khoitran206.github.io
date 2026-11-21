@@ -5,7 +5,7 @@
    - Không đụng tới Firebase, FormSubmit, Google Fonts (tên miền khác)
    Đổi VERSION khi muốn xóa sạch bộ nhớ đệm cũ của mọi khách.
    ========================================================== */
-const VERSION = 'mkpc-v1';
+const VERSION = 'mkpc-v2';
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGE_CACHE = `${VERSION}-pages`;
 const OFFLINE_URL = 'offline.html';
@@ -44,10 +44,11 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Trang HTML: mạng trước
+  // Trang HTML: mạng trước, luôn hỏi lại máy chủ (bỏ qua bộ đệm 10 phút của GitHub Pages)
+  // → khách thấy bản cập nhật ngay; không đổi thì máy chủ chỉ trả 304 rất nhẹ
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request)
+      fetch(request.url, { cache: 'no-cache', credentials: 'same-origin', redirect: 'follow' })
         .then((response) => {
           if (response.ok) {
             const copy = response.clone();
