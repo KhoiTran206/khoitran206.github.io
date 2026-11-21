@@ -34,13 +34,5 @@
       <a class="outline" href="tel:0937805704">Gọi 0937 805 704</a>
     </div>
   </main>
-  <script>
-    // Trên GitHub Pages dạng /ten-repo/, đưa link về đúng thư mục gốc của site
-    (function () {
-      var seg = location.pathname.split('/').filter(Boolean)[0];
-      var isProjectSite = /github\.io$/.test(location.hostname) && seg;
-      document.getElementById('home-link').href = isProjectSite ? '/' + seg + '/' : '/';
-    })();
-  </script>
 </body>
 </html>
