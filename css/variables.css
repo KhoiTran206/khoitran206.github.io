@@ -74,5 +74,6 @@
   --z-mega: 90;
   --z-float: 110;
   --z-drawer: 200;
+  --z-modal: 250;
   --z-toast: 300;
 }

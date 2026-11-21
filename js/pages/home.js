@@ -156,14 +156,19 @@ function initCountdown() {
     end = new Date();
     end.setHours(23, 59, 59, 999);
   }
-  const units = { d: $('[data-cd="d"]'), h: $('[data-cd="h"]'), m: $('[data-cd="m"]'), s: $('[data-cd="s"]') };
   const pad = (n) => String(n).padStart(2, '0');
+  // Cập nhật mọi đồng hồ [data-cd] trên trang (Flash Sale + pop-up khuyến mãi)
   const tick = () => {
     const diff = Math.max(0, end - Date.now());
-    units.d.textContent = Math.floor(diff / 8.64e7);
-    units.h.textContent = pad(Math.floor((diff % 8.64e7) / 3.6e6));
-    units.m.textContent = pad(Math.floor((diff % 3.6e6) / 6e4));
-    units.s.textContent = pad(Math.floor((diff % 6e4) / 1000));
+    const values = {
+      d: Math.floor(diff / 8.64e7),
+      h: pad(Math.floor((diff % 8.64e7) / 3.6e6)),
+      m: pad(Math.floor((diff % 3.6e6) / 6e4)),
+      s: pad(Math.floor((diff % 6e4) / 1000)),
+    };
+    $$('[data-cd]').forEach((el) => {
+      el.textContent = values[el.dataset.cd];
+    });
   };
   tick();
   setInterval(tick, 1000);
@@ -198,4 +203,115 @@ function initPage() {
   initHeroSlider();
   initCountdown();
   initTabs();
+  initPromoPopup();
+}
+
+/* ---------- Pop-up khuyến mãi (cấu hình PROMO_POPUP trong data.js) ----------
+   Thẻ chia đôi: ảnh thật + mã giảm giá dạng vé (bấm để sao chép/tự áp dụng) + đếm ngược.
+   Mobile: ngăn trượt từ dưới lên. Mỗi khách thấy tối đa 1 lần/ngày. */
+const POPUP_SEEN_KEY = 'mkpc-popup-seen';
+
+function promoPopupHTML(cfg) {
+  const coupon = SHOP.coupons[cfg.coupon];
+  const stamp = coupon && (coupon.type === 'percent' ? `-${coupon.value}%` : `-${Math.round(coupon.value / 1000)}K`);
+  return `
+    <div class="promo-pop" id="promo-pop" role="dialog" aria-modal="true" aria-labelledby="promo-pop-title">
+      <div class="promo-pop__backdrop" data-pop-close></div>
+      <div class="promo-pop__card">
+        <button class="promo-pop__close" type="button" data-pop-close aria-label="Đóng">${icon('x')}</button>
+        <div class="promo-pop__media">
+          <img src="${IMG}${cfg.img}" alt="Góc máy tính gaming tại ${COMPANY.name}" width="400" height="600">
+          ${stamp ? `<span class="promo-pop__stamp"><b>${stamp}</b><small>thêm</small></span>` : ''}
+        </div>
+        <div class="promo-pop__body">
+          <span class="promo-pop__tag">${icon('zap')}${cfg.tag}</span>
+          <h2 class="promo-pop__title" id="promo-pop-title">${cfg.title}</h2>
+          <p class="promo-pop__desc">${cfg.desc}</p>
+          ${coupon ? `
+          <div class="promo-pop__ticket">
+            <span class="promo-pop__code"><small>Mã giảm giá</small><b>${cfg.coupon}</b></span>
+            <button class="promo-pop__copy" type="button" data-pop-copy>${icon('copy')}Sao chép</button>
+          </div>` : ''}
+          <div class="promo-pop__timer">
+            <span>${icon('clock')}Kết thúc sau</span>
+            <span class="promo-pop__clock"><b data-cd="d">0</b>ngày<b data-cd="h">00</b>:<b data-cd="m">00</b>:<b data-cd="s">00</b></span>
+          </div>
+          <ul class="promo-pop__perks">${cfg.perks.map((p) => `<li>${icon('circle-check')}${p}</li>`).join('')}</ul>
+          <div class="promo-pop__actions">
+            <a class="btn btn--primary btn--lg" href="${cfg.cta.href}" data-pop-apply>${cfg.cta.text}${icon('arrow-right')}</a>
+            <button class="promo-pop__later" type="button" data-pop-close>Để sau</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function initPromoPopup() {
+  const cfg = typeof PROMO_POPUP !== 'undefined' ? PROMO_POPUP : null;
+  const today = new Date().toDateString();
+  if (!cfg?.enabled || Store.get(POPUP_SEEN_KEY, '') === today) return;
+
+  const open = () => {
+    // Khách đang mở menu/drawer → đợi thêm
+    if (document.body.classList.contains('is-locked')) {
+      setTimeout(open, 2000);
+      return;
+    }
+    Store.set(POPUP_SEEN_KEY, today);
+    document.body.insertAdjacentHTML('beforeend', promoPopupHTML(cfg));
+    const pop = $('#promo-pop');
+    const lastFocus = document.activeElement;
+    document.body.classList.add('is-locked');
+    requestAnimationFrame(() => pop.classList.add('is-open'));
+    $('.promo-pop__close', pop).focus({ preventScroll: true });
+
+    const applyCoupon = () => Store.set('mkpc-coupon', cfg.coupon); // giỏ hàng/thanh toán tự điền mã
+    let onKey;
+    const close = () => {
+      pop.classList.remove('is-open');
+      document.body.classList.remove('is-locked');
+      document.removeEventListener('keydown', onKey);
+      setTimeout(() => pop.parentNode?.removeChild(pop), 300);
+      lastFocus?.focus?.({ preventScroll: true });
+    };
+    // Esc để đóng; Tab chỉ chạy vòng trong pop-up
+    onKey = (e) => {
+      if (e.key === 'Escape') close();
+      if (e.key !== 'Tab') return;
+      const items = $$('a[href], button', pop);
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+
+    pop.addEventListener('click', async (e) => {
+      if (e.target.closest('[data-pop-close]')) {
+        close();
+        return;
+      }
+      if (e.target.closest('[data-pop-apply]')) {
+        applyCoupon();
+        return;
+      }
+      const copyBtn = e.target.closest('[data-pop-copy]');
+      if (!copyBtn) return;
+      applyCoupon();
+      try {
+        await navigator.clipboard.writeText(cfg.coupon);
+      } catch {
+        /* trình duyệt chặn clipboard — mã vẫn được tự áp dụng */
+      }
+      copyBtn.innerHTML = `${icon('check')}Đã lưu mã`;
+      copyBtn.classList.add('is-done');
+      showToast(`Đã lưu mã ${cfg.coupon} — tự áp dụng khi bạn vào giỏ hàng`);
+    });
+  };
+  setTimeout(open, cfg.delay || 2500);
 }

@@ -77,6 +77,7 @@
 - Thêm trang mới: chép một trang có sẵn, đổi `<title>`/description/id/script, cập nhật khối `<!-- SEO -->` và `sitemap.xml`.
 - Tài khoản khách: **Firebase Authentication** (email/mật khẩu + Google), cấu hình `FIREBASE_CONFIG` trong `data.js`. `Auth` trong `app.js`: `Auth.current()` đọc tức thì bản sao `mkpc-user` (localStorage), `Auth.ready()` chờ Firebase xác nhận phiên (tải SDK khi cần), sự kiện `auth:change` khi đăng nhập/xuất. SDK chỉ tải khi đã đăng nhập hoặc ở trang cần (khách vãng lai không tải). Nút tài khoản trên header do `renderAccountMenu()` vẽ, gọi `updateAccountLabel()`.
 - Dữ liệu trên mạng: **Firestore** (`Cloud.db()` tải lười) — `users/{uid}` (hồ sơ) và `orders/{code}` (đơn, có `uid` nếu đã đăng nhập). Quyền đọc/ghi do `firestore.rules` quyết định: sửa xong phải dán lại vào Firebase Console → Firestore → Rules → Publish. Quản trị viên = `SHOP.adminEmails` **và** danh sách trong `isAdmin()` của rules (email phải đã xác minh — nên đăng nhập bằng Google). Trang `admin.html`: thống kê, đổi trạng thái đơn, danh sách khách.
+- Pop-up khuyến mãi trang chủ: cấu hình `PROMO_POPUP` trong `data.js` (bật/tắt, mã giảm giá, ảnh, nội dung); mỗi khách thấy tối đa 1 lần/ngày (`mkpc-popup-seen`). Thiết kế riêng (thẻ chia đôi + mã dạng vé), không chép pop-up của trang khác.
 - Mọi dữ liệu người dùng nhập khi hiển thị lại phải qua `esc()`.
 
 ## 3. Quy tắc thiết kế

@@ -355,6 +355,19 @@ const FLASH_SALE = ['mk010', 'mk017', 'mk001', 'mk034', 'mk039', 'mk046', 'mk053
 /* Flash sale kết thúc vào Black Friday (nếu đã qua thì đếm đến hết ngày) */
 const FLASH_END = '2026-11-27T23:59:59+07:00';
 const FLASH_TITLE = 'Black Friday giảm sốc - Bỏ vào giỏ ngay!';
+/* Pop-up khuyến mãi ở trang chủ (mỗi khách thấy tối đa 1 lần/ngày). Tắt: enabled: false.
+   coupon phải là mã có trong SHOP.coupons; đồng hồ đếm ngược tới FLASH_END. */
+const PROMO_POPUP = {
+  enabled: true,
+  delay: 2500, // hiện sau 2,5 giây
+  tag: 'Black Friday · Ưu đãi có hạn',
+  title: 'Giảm thêm 5% cho mọi đơn hàng',
+  desc: 'Áp dụng toàn bộ sản phẩm, tối đa 500.000đ — cộng dồn cùng giá Flash Sale.',
+  coupon: 'BLACKFRIDAY',
+  img: 'setup-1.jpg',
+  perks: ['Trả góp 0% qua thẻ tín dụng', 'Giao nhanh 2h nội thành TP.HCM', 'Bảo hành tận nơi'],
+  cta: { text: 'Săn deal ngay', href: 'category.html?sale=1' },
+};
 
 /* Banner */
 const HERO_SLIDES = [
