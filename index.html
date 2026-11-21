@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minh Khôi PC – Nâng tầm trải nghiệm, vững bước tương lai.</title>
+  <meta name="description" content="Minh Khôi PC – Chuyên PC Gaming, laptop, linh kiện máy tính, màn hình và gaming gear chính hãng tại TP.HCM. Trả góp 0%, giao hàng nhanh, bảo hành tận tâm. Hotline 0937 805 704.">
+  <meta name="theme-color" content="#E30019">
+  <link rel="icon" href="assets/logo/logo-mark.svg" type="image/svg+xml">
+
+  <script>document.documentElement.classList.add('js');</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages/home.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Bỏ qua tới nội dung chính</a>
+
+  <!-- Header được render từ js/components.js -->
+  <div id="site-header-slot"></div>
+
+  <main id="main">
+    <h1 class="sr-only">Minh Khôi PC – PC Gaming, Laptop, Linh kiện máy tính chính hãng</h1>
+
+    <!-- Dải nền trắng: hero + danh mục icon -->
+    <div class="home-top">
+      <section class="container hero" aria-label="Khuyến mãi nổi bật">
+        <div class="hero__grid">
+          <div class="hero-slider" id="hero-slider" aria-roledescription="carousel" aria-label="Banner khuyến mãi"></div>
+          <div class="hero__side" id="hero-side"></div>
+        </div>
+      </section>
+
+      <section class="container reveal" aria-label="Danh mục nổi bật">
+        <div class="cat-icons" id="cat-icons"></div>
+      </section>
+    </div>
+
+    <!-- Flash sale -->
+    <section class="container section reveal" id="flash" aria-label="Flash sale">
+      <div class="flash" id="flash-sale"></div>
+    </section>
+
+    <!-- Các khối sản phẩm + banner xen kẽ -->
+    <div id="home-sections"></div>
+
+    <!-- CTA tin tức -->
+    <section class="container section reveal" aria-label="Tin tức công nghệ">
+      <div class="news-cta">
+        <h2 class="news-cta__title">Cập nhật <em>Tin Tức Công Nghệ</em><br>mới nhất cùng Minh Khôi PC</h2>
+        <a class="news-cta__btn" href="news.html">Xem tất cả<i data-lucide="move-right" aria-hidden="true"></i></a>
+      </div>
+    </section>
+
+    <!-- Tin tức -->
+    <section class="container section reveal" id="tin-tuc" aria-label="Bài viết">
+      <div class="news" id="news"></div>
+    </section>
+  </main>
+
+  <!-- Footer + drawer + nút nổi được render từ js/components.js -->
+  <div id="site-footer-slot"></div>
+
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/content.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/pages/home.js"></script>
+</body>
+</html>

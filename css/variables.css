@@ -1,0 +1,76 @@
+/* ==========================================================
+   Minh Khôi PC — Design tokens
+   Mọi màu / spacing / radius / shadow đều lấy từ đây.
+   ========================================================== */
+:root {
+  /* Màu thương hiệu */
+  --color-primary: #E30019;
+  --color-primary-dark: #B80014;
+  --color-primary-darker: #8E0010;
+  --color-primary-light: #FFE8EA;
+
+  /* Nền & bề mặt */
+  --color-bg: #F3F3F3;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F6F6F7;
+  --color-dark: #141416;
+  --color-dark-2: #1F2024;
+  --color-footer: #0E0E0F;
+
+  /* Chữ */
+  --color-text: #111111;
+  --color-text-muted: #6D6E72;
+  --color-text-inverse: #FFFFFF;
+  --color-footer-text: #B4B5B9;
+
+  /* Trạng thái */
+  --color-border: #E5E5E5;
+  --color-success: #24B400;
+  --color-warning: #FF9F00;
+
+  /* Lớp phủ / độ trong suốt */
+  --color-overlay: rgba(0, 0, 0, 0.5);
+  --color-white-10: rgba(255, 255, 255, 0.1);
+  --color-white-20: rgba(255, 255, 255, 0.2);
+  --color-white-70: rgba(255, 255, 255, 0.72);
+  --color-black-30: rgba(0, 0, 0, 0.3);
+
+  /* Typography */
+  --font-base: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-base: 14px;
+  --fs-md: 16px;
+  --fs-lg: 18px;
+  --fs-xl: 22px;
+  --fs-2xl: 28px;
+  --fs-3xl: 36px;
+
+  /* Layout */
+  --container: 1200px;
+  --gutter: 16px;
+  --section-gap: 24px;
+  --gap: 12px;
+
+  /* Bo góc */
+  --radius-card: 8px;
+  --radius-btn: 6px;
+  --radius-badge: 4px;
+  --radius-pill: 999px;
+
+  /* Đổ bóng */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.18);
+
+  /* Chuyển động */
+  --transition: 0.25s ease;
+  --reveal-duration: 0.6s;
+
+  /* Lớp z-index */
+  --z-header: 100;
+  --z-mega: 90;
+  --z-float: 110;
+  --z-drawer: 200;
+  --z-toast: 300;
+}
