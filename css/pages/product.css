@@ -457,3 +457,44 @@
   white-space: normal;
   text-align: center;
 }
+
+/* Yêu thích · So sánh · Chia sẻ */
+.pd__extra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pd__extra-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+}
+
+.pd__extra-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.pd__extra-btn.is-active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.pd__extra-btn[data-wish].is-active .lucide {
+  fill: currentColor;
+}
+
+@media (max-width: 768px) {
+  /* Thanh so sánh nằm trên thanh mua dính đáy */
+  .compare-bar {
+    bottom: 62px;
+  }
+}

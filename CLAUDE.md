@@ -43,6 +43,9 @@
 ├── order.html            # Đặt hàng thành công + tra cứu đơn (?code=)
 ├── login.html            # Đăng nhập / đăng ký / quên mật khẩu (?tab=register|forgot&next=)
 ├── account.html          # Tài khoản (cần đăng nhập): thông tin, đơn hàng, đổi mật khẩu
+├── wishlist.html         # Sản phẩm yêu thích (Wishlist)
+├── compare.html          # So sánh tối đa 3 sản phẩm cùng loại (Compare)
+├── manifest.webmanifest, sitemap.xml, robots.txt, favicon.ico  # SEO + cài như app (tạo lại bằng script khi thêm trang)
 ├── build-pc.html         # Tự chọn cấu hình PC
 ├── news.html, article.html  # Tin tức + bài viết (?id=)
 ├── contact.html          # Liên hệ, bản đồ, form gửi email
@@ -66,6 +69,8 @@
 
 - Thứ tự nạp script mọi trang: `lucide` → `data.js` → `content.js` → `components.js` → `app.js` → `pages/<trang>.js`.
 - Không có backend: giỏ hàng, hồ sơ, đơn hàng lưu `localStorage` (luôn qua `Store` có try/catch); đơn hàng + form liên hệ gửi email qua FormSubmit (`SHOP.orderEndpoint`).
+- Link trang chủ luôn dùng `HOME_URL` (web: `./` → https://khoitran206.github.io/, file trên máy: `index.html`), không viết cứng `index.html`.
+- Thêm trang mới: chép một trang có sẵn, đổi `<title>`/description/id/script, cập nhật khối `<!-- SEO -->` và `sitemap.xml`.
 - Tài khoản khách: `Auth` trong `app.js` (localStorage `mkpc-users` + `mkpc-session`, mật khẩu băm PBKDF2 + salt, không bao giờ lưu mật khẩu gốc). Nút tài khoản trên header do `renderAccountMenu()` vẽ, gọi `updateAccountLabel()` sau khi đăng nhập/đăng xuất.
 - Mọi dữ liệu người dùng nhập khi hiển thị lại phải qua `esc()`.
 

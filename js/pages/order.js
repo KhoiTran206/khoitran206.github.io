@@ -69,7 +69,7 @@ function orderDetailHTML(order, isNew) {
             <div class="totals__grand"><dt>Tổng thanh toán</dt><dd>${formatPrice(order.totals.total)}</dd></div>
           </dl>
           <div class="order-actions">
-            <a class="btn btn--primary btn--block" href="index.html">${icon('house')}Tiếp tục mua sắm</a>
+            <a class="btn btn--primary btn--block" href="${HOME_URL}">${icon('house')}Tiếp tục mua sắm</a>
             <button type="button" class="btn btn--outline btn--block" data-reorder>${icon('rotate-ccw')}Mua lại đơn này</button>
             <a class="btn btn--ghost btn--block" href="tel:${COMPANY.phone}">${icon('phone')}Cần hỗ trợ? ${COMPANY.phoneDisplay}</a>
           </div>

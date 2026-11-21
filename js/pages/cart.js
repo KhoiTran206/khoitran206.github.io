@@ -36,7 +36,7 @@ function render() {
   if (!lines.length) {
     root.innerHTML = `
       ${renderBreadcrumb([['Giỏ hàng', '#']])}
-      <div class="panel">${renderEmpty('shopping-cart', 'Giỏ hàng của bạn đang trống', 'Hãy chọn thêm sản phẩm để mua sắm nhé.', '<a class="btn btn--primary" href="index.html">Về trang chủ mua sắm</a>')}</div>
+      <div class="panel">${renderEmpty('shopping-cart', 'Giỏ hàng của bạn đang trống', 'Hãy chọn thêm sản phẩm để mua sắm nhé.', `<a class="btn btn--primary" href="${HOME_URL}">Về trang chủ mua sắm</a>`)}</div>
       ${suggestionsHTML()}`;
     refreshIcons();
     initSliders(root);

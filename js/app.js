@@ -321,6 +321,173 @@ const Recent = {
   },
 };
 
+/* ---------- Yêu thích & so sánh ---------- */
+const Wishlist = {
+  key: 'mkpc-wishlist',
+  ids() {
+    return Store.get(this.key, []).filter((id) => productById(id));
+  },
+  list() {
+    return this.ids().map(productById);
+  },
+  has(id) {
+    return this.ids().includes(id);
+  },
+  toggle(id) {
+    const ids = this.ids();
+    const added = !ids.includes(id);
+    Store.set(this.key, added ? [id, ...ids] : ids.filter((x) => x !== id));
+    return added;
+  },
+  clear() {
+    Store.remove(this.key);
+  },
+};
+
+/* So sánh tối đa 3 sản phẩm cùng loại (cat) */
+const Compare = {
+  key: 'mkpc-compare',
+  max: 3,
+  ids() {
+    return Store.get(this.key, []).filter((id) => productById(id));
+  },
+  list() {
+    return this.ids().map(productById);
+  },
+  has(id) {
+    return this.ids().includes(id);
+  },
+  toggle(id) {
+    const ids = this.ids();
+    if (ids.includes(id)) {
+      Store.set(this.key, ids.filter((x) => x !== id));
+      return { ok: true, added: false };
+    }
+    const p = productById(id);
+    const first = productById(ids[0]);
+    if (first && first.cat !== p.cat) return { ok: false, message: `Chỉ so sánh được các sản phẩm cùng loại với "${first.name}".` };
+    if (ids.length >= this.max) return { ok: false, message: `Chỉ so sánh tối đa ${this.max} sản phẩm cùng lúc.` };
+    Store.set(this.key, [...ids, id]);
+    return { ok: true, added: true };
+  },
+  remove(id) {
+    Store.set(this.key, this.ids().filter((x) => x !== id));
+  },
+  clear() {
+    Store.remove(this.key);
+  },
+};
+
+/* Đồng bộ trạng thái nút tim / so sánh và số đếm trên toàn trang */
+function syncWishCompare() {
+  const wish = Wishlist.ids();
+  const cmp = Compare.ids();
+  $$('[data-wish-count]').forEach((el) => {
+    el.textContent = wish.length;
+    el.hidden = !wish.length;
+  });
+  $$('[data-wish]').forEach((btn) => {
+    const on = wish.includes(btn.dataset.wish);
+    btn.classList.toggle('is-active', on);
+    btn.setAttribute('aria-pressed', String(on));
+  });
+  $$('[data-compare]').forEach((btn) => {
+    const on = cmp.includes(btn.dataset.compare);
+    btn.classList.toggle('is-active', on);
+    btn.setAttribute('aria-pressed', String(on));
+  });
+  renderCompareBar();
+}
+
+/* Thanh so sánh nổi ở đáy màn hình */
+function renderCompareBar() {
+  let bar = $('#compare-bar');
+  const items = Compare.list();
+  if (!items.length || $('#compare-page')) {
+    bar?.remove();
+    document.body.classList.remove('has-compare-bar');
+    return;
+  }
+  if (!bar) {
+    bar = document.createElement('aside');
+    bar.id = 'compare-bar';
+    bar.className = 'compare-bar';
+    bar.setAttribute('aria-label', 'Sản phẩm đang so sánh');
+    document.body.appendChild(bar);
+  }
+  const slots = Array.from({ length: Compare.max }, (_, i) => items[i]);
+  bar.innerHTML = `
+    <div class="container compare-bar__inner">
+      <ul class="compare-bar__list">
+        ${slots.map((p) => (p ? `
+          <li class="compare-bar__item">
+            <img src="${p.img}" alt="" width="44" height="44">
+            <span>${p.name}</span>
+            <button type="button" data-compare-remove="${p.id}" aria-label="Bỏ ${p.name} khỏi so sánh">${icon('x')}</button>
+          </li>` : `<li class="compare-bar__item compare-bar__item--empty">${icon('plus')}<span>Thêm sản phẩm</span></li>`)).join('')}
+      </ul>
+      <div class="compare-bar__actions">
+        <a class="btn btn--primary" href="compare.html">${icon('git-compare-arrows')}So sánh (${items.length})</a>
+        <button class="btn btn--ghost" type="button" data-compare-clear>Xóa tất cả</button>
+      </div>
+    </div>`;
+  document.body.classList.add('has-compare-bar');
+  refreshIcons();
+}
+
+async function shareLink(title) {
+  const url = location.href;
+  if (navigator.share) {
+    try {
+      await navigator.share({ title, url });
+    } catch {
+      /* người dùng hủy */
+    }
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    showToast('Đã sao chép liên kết');
+  } catch {
+    window.prompt('Sao chép liên kết:', url);
+  }
+}
+
+function initWishCompare() {
+  document.addEventListener('click', (e) => {
+    const wishBtn = e.target.closest('[data-wish]');
+    if (wishBtn) {
+      e.preventDefault();
+      const added = Wishlist.toggle(wishBtn.dataset.wish);
+      showToast(added ? 'Đã thêm vào sản phẩm yêu thích' : 'Đã bỏ khỏi yêu thích');
+      syncWishCompare();
+      document.dispatchEvent(new CustomEvent('wishlist:change'));
+      return;
+    }
+    const cmpBtn = e.target.closest('[data-compare]');
+    if (cmpBtn) {
+      e.preventDefault();
+      const res = Compare.toggle(cmpBtn.dataset.compare);
+      if (!res.ok) showToast(res.message, 'error');
+      syncWishCompare();
+      return;
+    }
+    const removeBtn = e.target.closest('[data-compare-remove]');
+    if (removeBtn) {
+      Compare.remove(removeBtn.dataset.compareRemove);
+      syncWishCompare();
+      return;
+    }
+    if (e.target.closest('[data-compare-clear]')) {
+      Compare.clear();
+      syncWishCompare();
+      return;
+    }
+    const shareBtn = e.target.closest('[data-share]');
+    if (shareBtn) shareLink(shareBtn.dataset.share || document.title);
+  });
+}
+
 /* ---------- Danh mục + tìm kiếm ---------- */
 const Catalog = {
   /* "Dưới 15 triệu", "15 - 20 triệu", "Trên 1 triệu", "500K - 1 triệu" → khoảng giá */
@@ -754,6 +921,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initTopbar();
   initAccountMenu();
+  initWishCompare();
+  syncWishCompare();
   initCategoryDropdown();
   initSearch();
   initSliders();

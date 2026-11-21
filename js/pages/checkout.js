@@ -49,7 +49,7 @@ function render() {
   const root = $('#checkout-page');
   const lines = Cart.lines();
   if (!lines.length) {
-    root.innerHTML = `${renderBreadcrumb([['Thanh toán', '#']])}<div class="panel">${renderEmpty('shopping-cart', 'Chưa có sản phẩm để thanh toán', 'Giỏ hàng của bạn đang trống.', '<a class="btn btn--primary" href="index.html">Tiếp tục mua sắm</a>')}</div>`;
+    root.innerHTML = `${renderBreadcrumb([['Thanh toán', '#']])}<div class="panel">${renderEmpty('shopping-cart', 'Chưa có sản phẩm để thanh toán', 'Giỏ hàng của bạn đang trống.', `<a class="btn btn--primary" href="${HOME_URL}">Tiếp tục mua sắm</a>`)}</div>`;
     return;
   }
   const user = Auth.current();

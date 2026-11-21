@@ -17,11 +17,23 @@ const SPEC_ICONS = {
   driver: 'audio-lines', material: 'armchair',
 };
 
+/* Tên thông số (trang chi tiết, so sánh) */
+const SPEC_LABELS = {
+  cpu: 'CPU', gpu: 'Card đồ họa', ram: 'RAM', ssd: 'Ổ cứng', screen: 'Màn hình',
+  fan: 'Tản nhiệt', power: 'Nguồn đề nghị', speed: 'Tốc độ', socket: 'Socket',
+  dpi: 'Cảm biến', wireless: 'Kết nối', wired: 'Kết nối', weight: 'Trọng lượng / tải trọng',
+  switch: 'Switch', layout: 'Layout', size: 'Kích thước', panel: 'Tấm nền', hz: 'Tần số quét', res: 'Độ phân giải',
+  driver: 'Driver', material: 'Chất liệu',
+};
+
 const LOGO_MARK = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 46V18h6l12 15 12-15h6v28h-7V30L32 43 21 30v16z" fill="currentColor"/></svg>';
+
+/* Link trang chủ: trên web dùng "./" (địa chỉ gọn https://khoitran206.github.io/), mở file trên máy dùng index.html */
+const HOME_URL = location.protocol === 'file:' ? 'index.html' : './';
 
 function renderLogo() {
   return `
-    <a class="logo" href="index.html" aria-label="${COMPANY.name} — Trang chủ">
+    <a class="logo" href="${HOME_URL}" aria-label="${COMPANY.name} — Trang chủ">
       <span class="logo__mark">${LOGO_MARK}</span>
       <span class="logo__text">
         <span class="logo__name">MINH KHÔI</span>
@@ -54,6 +66,9 @@ function renderHeader() {
           <a class="header-action" href="tel:${COMPANY.phone}">${icon('headphones')}<span>Hotline<br><b>${COMPANY.phoneDisplay}</b></span></a>
           <a class="header-action" href="contact.html">${icon('map-pin')}<span>Hệ thống<br>cửa hàng</span></a>
           <a class="header-action" href="order.html">${icon('clipboard-list')}<span>Tra cứu<br>đơn hàng</span></a>
+          <a class="header-cart header-wish" href="wishlist.html" aria-label="Sản phẩm yêu thích" title="Sản phẩm yêu thích">
+            ${icon('heart')}<span class="cart-count" data-wish-count hidden>0</span>
+          </a>
           <a class="header-cart" href="cart.html" aria-label="Giỏ hàng">
             ${icon('shopping-cart')}<span class="cart-count" data-cart-count>0</span>
           </a>
@@ -109,6 +124,9 @@ function renderDrawer() {
             </details>`).join('')}
         </div>
         <div class="drawer__foot">
+          <a href="wishlist.html">${icon('heart')}<span>Sản phẩm yêu thích</span></a>
+          <a href="compare.html">${icon('git-compare-arrows')}<span>So sánh sản phẩm</span></a>
+          <a href="order.html">${icon('clipboard-list')}<span>Tra cứu đơn hàng</span></a>
           <a href="tel:${COMPANY.phone}">${icon('phone')}<span>Hotline: <b>${COMPANY.phoneDisplay}</b></span></a>
           <a href="mailto:${COMPANY.email}">${icon('mail')}<span>${COMPANY.email}</span></a>
           <p>${icon('map-pin')}<span>${COMPANY.address}</span></p>
@@ -132,6 +150,7 @@ function renderAccountMenu(user) {
       <div class="account-dropdown__head"><b>${esc(user.name)}</b><small>${esc(user.email)}</small></div>
       <a href="account.html" role="menuitem">${icon('user-round')}Tài khoản của tôi</a>
       <a href="account.html#don-hang" role="menuitem">${icon('shopping-bag')}Đơn hàng của tôi</a>
+      <a href="wishlist.html" role="menuitem">${icon('heart')}Sản phẩm yêu thích</a>
       <button type="button" role="menuitem" data-logout>${icon('log-out')}Đăng xuất</button>
     </div>`;
 }
@@ -143,6 +162,8 @@ function renderProductCard(p, options = {}) {
   const specs = p.specs.slice(0, 4).map(([type, value]) => `<li>${icon(SPEC_ICONS[type] || 'dot')}<span>${value}</span></li>`).join('');
 
   const compact = !!options.compact;
+  const wished = Wishlist.has(p.id);
+  const compared = Compare.has(p.id);
 
   return `
     <article class="product-card${compact ? ' product-card--compact' : ''} ${options.itemClass || ''}" style="--i:${options.index || 0}">
@@ -151,6 +172,10 @@ function renderProductCard(p, options = {}) {
         ${discount ? `<span class="product-card__discount">Giảm ${discount}%</span>` : ''}
       </a>
       <button class="product-card__cart" type="button" data-add-cart="${p.id}" aria-label="Thêm ${p.name} vào giỏ hàng">${icon('shopping-cart')}</button>
+      <div class="product-card__tools">
+        <button class="product-card__tool${wished ? ' is-active' : ''}" type="button" data-wish="${p.id}" aria-pressed="${wished}" aria-label="Yêu thích ${p.name}" title="Yêu thích">${icon('heart')}</button>
+        <button class="product-card__tool product-card__tool--compare${compared ? ' is-active' : ''}" type="button" data-compare="${p.id}" aria-pressed="${compared}" aria-label="So sánh ${p.name}" title="So sánh">${icon('git-compare-arrows')}</button>
+      </div>
       ${p.label && !compact ? `<span class="product-card__tag">${icon('flame')}${p.label}</span>` : ''}
       <h3 class="product-card__name"><a href="${url}">${p.name}</a></h3>
       ${compact ? '' : `<ul class="product-card__specs" aria-label="Thông số chính">${specs}</ul>`}
@@ -239,7 +264,7 @@ function renderFooter() {
 
 /* ---------- Breadcrumb + tiêu đề trang ---------- */
 function renderBreadcrumb(items) {
-  const all = [['Trang chủ', 'index.html'], ...items];
+  const all = [['Trang chủ', HOME_URL], ...items];
   return `
     <nav class="breadcrumb" aria-label="Đường dẫn">
       <ol>${all.map(([text, href], i) => (i === all.length - 1

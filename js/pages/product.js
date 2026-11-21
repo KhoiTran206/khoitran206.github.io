@@ -2,14 +2,6 @@
    Trang chi tiết sản phẩm — product.html?id=mk001
    ========================================================== */
 
-const SPEC_LABELS = {
-  cpu: 'CPU', gpu: 'Card đồ họa', ram: 'RAM', ssd: 'Ổ cứng', screen: 'Màn hình',
-  fan: 'Tản nhiệt', power: 'Nguồn đề nghị', speed: 'Tốc độ', socket: 'Socket',
-  dpi: 'Cảm biến', wireless: 'Kết nối', wired: 'Kết nối', weight: 'Trọng lượng / tải trọng',
-  switch: 'Switch', layout: 'Layout', size: 'Kích thước', panel: 'Tấm nền', hz: 'Tần số quét', res: 'Độ phân giải',
-  driver: 'Driver', material: 'Chất liệu',
-};
-
 const CAT_FOR_PRODUCT = {
   pc: (p) => (p.tags.includes('gaming') ? 'pc' : 'pc-office'),
   'laptop-gaming': () => 'laptop-gaming',
@@ -163,6 +155,12 @@ function renderProduct(p) {
           <a class="btn btn--dark btn--lg btn--stack" href="policy.html?type=tra-gop">TRẢ GÓP 0%<span class="btn__sub">Duyệt nhanh qua điện thoại</span></a>
         </div>
 
+        <div class="pd__extra">
+          <button class="pd__extra-btn${Wishlist.has(p.id) ? ' is-active' : ''}" type="button" data-wish="${p.id}" aria-pressed="${Wishlist.has(p.id)}">${icon('heart')}<span>Yêu thích</span></button>
+          <button class="pd__extra-btn${Compare.has(p.id) ? ' is-active' : ''}" type="button" data-compare="${p.id}" aria-pressed="${Compare.has(p.id)}">${icon('git-compare-arrows')}<span>So sánh</span></button>
+          <button class="pd__extra-btn" type="button" data-share="${p.name}">${icon('share-2')}<span>Chia sẻ</span></button>
+        </div>
+
         <ul class="pd__commits">
           <li>${icon('shield-check')}Bảo hành ${warranty} tháng</li>
           <li>${icon('badge-check')}Hàng chính hãng 100%</li>
@@ -274,6 +272,31 @@ function initPage() {
   document.title = `${p.name} | ${COMPANY.name}`;
   $('meta[name="description"]').setAttribute('content', `${p.name} giá ${formatPrice(p.price)} — chính hãng, bảo hành ${SHOP.warranty[p.cat] || 12} tháng tại ${COMPANY.name}.`);
   root.innerHTML = renderProduct(p);
+  addProductSchema(p);
   Recent.add(p.id);
   bindProduct(p);
+}
+
+/* Dữ liệu có cấu trúc giúp Google hiển thị giá, tình trạng hàng */
+function addProductSchema(p) {
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: p.name,
+    image: new URL(p.img, location.href).href,
+    sku: p.id,
+    brand: { '@type': 'Brand', name: p.brand },
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'VND',
+      price: p.price,
+      availability: p.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      url: location.href,
+      seller: { '@type': 'Organization', name: COMPANY.name },
+    },
+  };
+  const tag = document.createElement('script');
+  tag.type = 'application/ld+json';
+  tag.textContent = JSON.stringify(data);
+  document.head.appendChild(tag);
 }

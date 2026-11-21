@@ -13,6 +13,8 @@ Web tĩnh (HTML/CSS/JS thuần), không cần máy chủ — chạy được tr�
 - Thanh toán: giao tận nơi / nhận tại cửa hàng, COD / chuyển khoản / trả góp
 - **Đơn hàng được gửi về email chủ shop** (qua dịch vụ miễn phí FormSubmit)
 - Đăng ký / đăng nhập (bằng email hoặc SĐT) / quên mật khẩu; trang tài khoản: sửa thông tin, đổi mật khẩu, đơn hàng của tôi
+- Sản phẩm yêu thích (trái tim), so sánh tối đa 3 sản phẩm cùng loại, nút chia sẻ
+- SEO: ảnh xem trước khi gửi link Zalo/Facebook, sitemap, cài website như ứng dụng trên điện thoại
 - Tra cứu đơn, Build PC, tin tức, liên hệ, chính sách
 
 ## ⚠️ Việc cần làm ngay sau khi website lên mạng

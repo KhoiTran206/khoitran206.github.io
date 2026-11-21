@@ -70,6 +70,7 @@ function render(editing = false) {
         <nav class="account__nav" aria-label="Tài khoản">
           <a href="#thong-tin">${icon('id-card')}Thông tin cá nhân</a>
           <a href="#don-hang">${icon('shopping-bag')}Đơn hàng của tôi</a>
+          <a href="wishlist.html">${icon('heart')}Sản phẩm yêu thích (${Wishlist.ids().length})</a>
           <a href="#mat-khau">${icon('key-round')}Đổi mật khẩu</a>
           <a href="order.html">${icon('search')}Tra cứu đơn hàng</a>
           <a href="cart.html">${icon('shopping-cart')}Giỏ hàng (${Cart.count()})</a>
@@ -92,7 +93,7 @@ function render(editing = false) {
                   <span><b>${esc(o.code)}</b><small>${new Date(o.createdAt).toLocaleString('vi-VN')} · ${esc(o.items.map((i) => i.name).join(', ').slice(0, 80))}…</small></span>
                   <span class="order-list__right"><b>${formatPrice(o.totals.total)}</b><small class="status-tag">${esc(o.status)}</small></span>
                 </a></li>`).join('')}
-            </ul>` : renderEmpty('package-open', 'Bạn chưa có đơn hàng nào', 'Đơn hàng bạn đặt khi đăng nhập sẽ hiển thị tại đây.', '<a class="btn btn--primary" href="index.html">Mua sắm ngay</a>')}
+            </ul>` : renderEmpty('package-open', 'Bạn chưa có đơn hàng nào', 'Đơn hàng bạn đặt khi đăng nhập sẽ hiển thị tại đây.', `<a class="btn btn--primary" href="${HOME_URL}">Mua sắm ngay</a>`)}
         </section>
 
         <section class="panel" id="mat-khau">
