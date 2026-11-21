@@ -669,3 +669,21 @@ a.mini-list__name:hover {
   font-weight: 700;
   text-decoration: underline;
 }
+
+/* Màu theo trạng thái đơn (do cửa hàng cập nhật) */
+.status-tag[data-status="Đã xác nhận"],
+.status-tag[data-status="Đang giao"] {
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+}
+
+.status-tag[data-status="Hoàn thành"] {
+  background: var(--color-success-light);
+  color: var(--color-success-dark);
+}
+
+.status-tag[data-status="Đã hủy"] {
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}

@@ -26,6 +26,8 @@
   /* Trạng thái */
   --color-border: #E5E5E5;
   --color-success: #24B400;
+  --color-success-light: #E9F8E5;
+  --color-success-dark: #1A7F00;
   --color-warning: #FF9F00;
 
   /* Lớp phủ / độ trong suốt */

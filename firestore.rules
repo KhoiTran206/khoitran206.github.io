@@ -1,0 +1,69 @@
+rules_version = '2';
+
+// Quy tắc bảo mật Firestore cho Minh Khôi PC.
+// Cách áp dụng: Firebase Console → Databases and storage → Firestore → tab Rules →
+// xóa hết nội dung cũ, dán toàn bộ file này vào → Publish.
+// Thêm quản trị viên: thêm email vào danh sách trong isAdmin() VÀ SHOP.adminEmails (js/data.js).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Quản trị viên: email trong danh sách + đã xác minh (đăng nhập Google luôn đã xác minh)
+    function isAdmin() {
+      return signedIn()
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in ['tranngminhkhoi062@gmail.com'];
+    }
+
+    function isStr(v, max) {
+      return v is string && v.size() <= max;
+    }
+
+    // ---------- Hồ sơ khách hàng: users/{uid} ----------
+    match /users/{uid} {
+      allow read: if (signedIn() && request.auth.uid == uid) || isAdmin();
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name', 'email', 'phone', 'address', 'provider', 'createdAt', 'updatedAt'])
+        && isStr(request.resource.data.name, 100)
+        && request.resource.data.email == request.auth.token.email
+        && isStr(request.resource.data.phone, 20)
+        && isStr(request.resource.data.address, 300);
+      allow delete: if isAdmin();
+    }
+
+    // ---------- Đơn hàng: orders/{code} ----------
+    match /orders/{code} {
+      // Khách chỉ đọc đơn của mình; quản trị viên đọc tất cả
+      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+
+      // Ai cũng đặt được hàng (kể cả khách không đăng nhập), nhưng dữ liệu phải đúng khuôn
+      allow create: if code.matches('MK[0-9]{6}[0-9A-Z]{1,8}')
+        && request.resource.data.keys().hasOnly(['code', 'createdAt', 'status', 'customer', 'delivery', 'payment', 'note', 'items', 'totals', 'emailSent', 'account', 'uid'])
+        && request.resource.data.code == code
+        && request.resource.data.status == 'Chờ xác nhận'
+        && (request.resource.data.uid == null || (signedIn() && request.resource.data.uid == request.auth.uid))
+        && request.resource.data.items is list
+        && request.resource.data.items.size() > 0
+        && request.resource.data.items.size() <= 50
+        && isStr(request.resource.data.note, 1000)
+        && request.resource.data.customer is map
+        && isStr(request.resource.data.customer.name, 100)
+        && isStr(request.resource.data.customer.phone, 20);
+
+      // Chủ đơn chỉ được đánh dấu "đã gửi email"
+      allow update: if signedIn() && resource.data.uid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['emailSent']);
+
+      // Quản trị viên cập nhật trạng thái đơn
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
+        && request.resource.data.status in ['Chờ xác nhận', 'Đã xác nhận', 'Đang giao', 'Hoàn thành', 'Đã hủy'];
+
+      allow delete: if isAdmin();
+    }
+  }
+}

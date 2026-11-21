@@ -43,6 +43,8 @@
 ├── order.html            # Đặt hàng thành công + tra cứu đơn (?code=)
 ├── login.html            # Đăng nhập / đăng ký / quên mật khẩu (?tab=register|forgot&next=)
 ├── account.html          # Tài khoản (cần đăng nhập): thông tin, đơn hàng, đổi mật khẩu
+├── admin.html            # Quản trị (chỉ email quản trị): đơn hàng, trạng thái, khách hàng
+├── firestore.rules       # Quy tắc bảo mật Firestore (dán vào Firebase Console)
 ├── wishlist.html         # Sản phẩm yêu thích (Wishlist)
 ├── compare.html          # So sánh tối đa 3 sản phẩm cùng loại (Compare)
 ├── manifest.webmanifest, sitemap.xml, robots.txt, favicon.ico  # SEO + cài như app (tạo lại bằng script khi thêm trang)
@@ -72,7 +74,8 @@
 - Không có backend: giỏ hàng, hồ sơ, đơn hàng lưu `localStorage` (luôn qua `Store` có try/catch); đơn hàng + form liên hệ gửi email qua FormSubmit (`SHOP.orderEndpoint`).
 - Link trang chủ luôn dùng `HOME_URL` (web: `./` → https://khoitran206.github.io/, file trên máy: `index.html`), không viết cứng `index.html`.
 - Thêm trang mới: chép một trang có sẵn, đổi `<title>`/description/id/script, cập nhật khối `<!-- SEO -->` và `sitemap.xml`.
-- Tài khoản khách: `Auth` trong `app.js` (localStorage `mkpc-users` + `mkpc-session`, mật khẩu băm PBKDF2 + salt, không bao giờ lưu mật khẩu gốc). Nút tài khoản trên header do `renderAccountMenu()` vẽ, gọi `updateAccountLabel()` sau khi đăng nhập/đăng xuất.
+- Tài khoản khách: **Firebase Authentication** (email/mật khẩu + Google), cấu hình `FIREBASE_CONFIG` trong `data.js`. `Auth` trong `app.js`: `Auth.current()` đọc tức thì bản sao `mkpc-user` (localStorage), `Auth.ready()` chờ Firebase xác nhận phiên (tải SDK khi cần), sự kiện `auth:change` khi đăng nhập/xuất. SDK chỉ tải khi đã đăng nhập hoặc ở trang cần (khách vãng lai không tải). Nút tài khoản trên header do `renderAccountMenu()` vẽ, gọi `updateAccountLabel()`.
+- Dữ liệu trên mạng: **Firestore** (`Cloud.db()` tải lười) — `users/{uid}` (hồ sơ) và `orders/{code}` (đơn, có `uid` nếu đã đăng nhập). Quyền đọc/ghi do `firestore.rules` quyết định: sửa xong phải dán lại vào Firebase Console → Firestore → Rules → Publish. Quản trị viên = `SHOP.adminEmails` **và** danh sách trong `isAdmin()` của rules (email phải đã xác minh — nên đăng nhập bằng Google). Trang `admin.html`: thống kê, đổi trạng thái đơn, danh sách khách.
 - Mọi dữ liệu người dùng nhập khi hiển thị lại phải qua `esc()`.
 
 ## 3. Quy tắc thiết kế

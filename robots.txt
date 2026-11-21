@@ -4,5 +4,6 @@ Disallow: /cart.html
 Disallow: /checkout.html
 Disallow: /account.html
 Disallow: /login.html
+Disallow: /admin.html
 
 Sitemap: https://khoitran206.github.io/sitemap.xml

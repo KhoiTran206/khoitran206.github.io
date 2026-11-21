@@ -25,10 +25,21 @@ function authField(name, label, { type = 'text', placeholder = '', autocomplete 
     </div>`;
 }
 
+/* Nút "Tiếp tục với Google" (logo Google theo hướng dẫn thương hiệu của Google) */
+function googleButton() {
+  return `
+    <button class="btn btn--google btn--lg btn--block" type="button" data-google>
+      <svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2c-2 1.5-4.5 2.4-7.2 2.4-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+      Tiếp tục với Google
+    </button>
+    <p class="auth__or"><span>hoặc</span></p>`;
+}
+
 function loginForm() {
   return `
     <form class="auth__form" id="auth-login" novalidate>
-      ${authField('identifier', 'Email hoặc số điện thoại', { placeholder: 'email@vidu.com hoặc 09xx xxx xxx', autocomplete: 'username' })}
+      ${googleButton()}
+      ${authField('email', 'Email', { type: 'email', placeholder: 'email@vidu.com', autocomplete: 'username' })}
       ${authField('password', 'Mật khẩu', { type: 'password', placeholder: 'Nhập mật khẩu', autocomplete: 'current-password' })}
       <div class="auth__row">
         <label class="check"><input type="checkbox" name="remember" checked>Ghi nhớ đăng nhập</label>
@@ -43,6 +54,7 @@ function loginForm() {
 function registerForm() {
   return `
     <form class="auth__form" id="auth-register" novalidate>
+      ${googleButton()}
       ${authField('name', 'Họ và tên', { placeholder: 'Nguyễn Văn A', autocomplete: 'name' })}
       <div class="form-grid form-grid--2">
         ${authField('phone', 'Số điện thoại', { type: 'tel', placeholder: '09xx xxx xxx', autocomplete: 'tel' })}
@@ -64,13 +76,11 @@ function registerForm() {
 function forgotForm() {
   return `
     <form class="auth__form" id="auth-forgot" novalidate>
-      <p class="auth__desc">Nhập email và số điện thoại đã đăng ký để đặt lại mật khẩu.</p>
+      <p class="auth__desc">Nhập email đã đăng ký, chúng tôi sẽ gửi cho bạn đường link để đặt mật khẩu mới.</p>
       ${authField('email', 'Email đã đăng ký', { type: 'email', placeholder: 'email@vidu.com', autocomplete: 'email' })}
-      ${authField('phone', 'Số điện thoại đã đăng ký', { type: 'tel', placeholder: '09xx xxx xxx', autocomplete: 'tel' })}
-      ${authField('password', 'Mật khẩu mới', { type: 'password', placeholder: 'Tối thiểu 6 ký tự', autocomplete: 'new-password' })}
-      ${authField('confirm', 'Nhập lại mật khẩu mới', { type: 'password', placeholder: 'Nhập lại mật khẩu', autocomplete: 'new-password' })}
       <p class="auth__error" role="alert" hidden></p>
-      <button class="btn btn--primary btn--lg btn--block" type="submit">Đặt lại mật khẩu</button>
+      <p class="alert alert--success auth__sent" role="status" hidden></p>
+      <button class="btn btn--primary btn--lg btn--block" type="submit">Gửi link đặt lại mật khẩu</button>
       <p class="auth__switch">Không nhớ thông tin? Gọi <a href="tel:${COMPANY.phone}">${COMPANY.phoneDisplay}</a> để được hỗ trợ · <a href="login.html" data-tab="login">Quay lại đăng nhập</a></p>
     </form>`;
 }
@@ -108,7 +118,7 @@ function renderAuth(tab) {
           <a class="auth__tab${tab === 'register' ? ' is-active' : ''}" href="login.html?tab=register" data-tab="register" role="tab" aria-selected="${tab === 'register'}">Đăng ký</a>
         </div>`}
         ${view.form()}
-        <p class="auth__note">${icon('info')}<span>Tài khoản được lưu trên trình duyệt của thiết bị này.</span></p>
+        <p class="auth__note">${icon('info')}<span>Tài khoản được bảo mật bởi Google Firebase — đăng nhập được trên mọi thiết bị.</span></p>
       </section>
     </div>`;
   refreshIcons();
@@ -166,11 +176,14 @@ function afterAuth(message) {
 
 const AUTH_HANDLERS = {
   async 'auth-login'(form) {
-    const id = form.identifier.value.trim();
-    setFieldError(form.identifier, id ? '' : 'Vui lòng nhập email hoặc số điện thoại');
+    const email = form.email.value.trim();
+    const okEmail = isValidEmail(email);
+    setFieldError(form.email, okEmail ? '' : 'Vui lòng nhập email hợp lệ');
     setFieldError(form.password, form.password.value ? '' : 'Vui lòng nhập mật khẩu');
-    if (!id || !form.password.value) return;
-    const res = await withLoading(form, () => Auth.login(id, form.password.value, form.remember.checked));
+    if (!okEmail || !form.password.value) return;
+    authBusy = true;
+    const res = await withLoading(form, () => Auth.login(email, form.password.value, form.remember.checked));
+    authBusy = false;
     if (!res.ok) return showFormError(form, res.message);
     afterAuth(`Xin chào, ${res.user.name}!`);
   },
@@ -186,33 +199,54 @@ const AUTH_HANDLERS = {
     const okPw = checkPasswords(form);
     setFieldError(form.agree, form.agree.checked ? '' : 'Vui lòng đồng ý với chính sách bảo mật');
     if (!okName || !okPhone || !okEmail || !okPw || !form.agree.checked) return;
+    authBusy = true;
     const res = await withLoading(form, () => Auth.register({ ...data, password: form.password.value }));
+    authBusy = false;
     if (!res.ok) {
       if (res.field) setFieldError(form[res.field], res.message);
       return showFormError(form, res.message);
     }
     Store.remove(Profile.key); // hồ sơ khách vãng lai đã chuyển vào tài khoản
-    afterAuth('Tạo tài khoản thành công!');
+    afterAuth('Tạo tài khoản thành công! Kiểm tra email để xác minh tài khoản.');
   },
 
   async 'auth-forgot'(form) {
-    const okEmail = isValidEmail(form.email.value.trim());
-    const okPhone = isValidPhone(form.phone.value.trim());
+    const email = form.email.value.trim();
+    const okEmail = isValidEmail(email);
     setFieldError(form.email, okEmail ? '' : 'Email không hợp lệ');
-    setFieldError(form.phone, okPhone ? '' : 'Số điện thoại không hợp lệ');
-    const okPw = checkPasswords(form);
-    if (!okEmail || !okPhone || !okPw) return;
-    const res = await withLoading(form, () => Auth.resetPassword(form.email.value, form.phone.value, form.password.value));
+    if (!okEmail) return;
+    const res = await withLoading(form, () => Auth.resetPassword(email));
     if (!res.ok) return showFormError(form, res.message);
-    afterAuth('Đã đặt lại mật khẩu và đăng nhập');
+    const sent = $('.auth__sent', form);
+    sent.innerHTML = `Nếu <b>${esc(email)}</b> đã đăng ký, bạn sẽ nhận được email đặt lại mật khẩu trong vài phút. Nhớ kiểm tra cả hộp thư <b>Spam</b>.`;
+    sent.hidden = false;
   },
 };
+
+let authBusy = false;
+
+async function googleLogin(btn) {
+  const form = btn.closest('form');
+  showFormError(form, '');
+  btn.classList.add('is-loading');
+  authBusy = true;
+  const res = await Auth.loginGoogle();
+  authBusy = false;
+  btn.classList.remove('is-loading');
+  if (!res.ok) return res.message && showFormError(form, res.message);
+  afterAuth(`Xin chào, ${res.user.name}!`);
+}
 
 function initPage() {
   if (Auth.current()) {
     location.replace(nextUrl());
     return;
   }
+  // Kết nối Firebase sẵn; nếu đã đăng nhập (vd. quay về sau khi đăng nhập Google) → chuyển trang
+  Auth.ready();
+  document.addEventListener('auth:change', () => {
+    if (Auth.current() && !authBusy) location.replace(nextUrl());
+  });
   const root = $('#login-page');
   const tab = AUTH_TABS.includes(params.get('tab')) ? params.get('tab') : 'login';
   renderAuth(tab);
@@ -222,6 +256,11 @@ function initPage() {
     if (tabLink) {
       e.preventDefault();
       switchTab(tabLink.dataset.tab);
+      return;
+    }
+    const google = e.target.closest('[data-google]');
+    if (google) {
+      googleLogin(google);
       return;
     }
     const eye = e.target.closest('[data-toggle-password]');

@@ -115,7 +115,10 @@ function lookupHTML(message = '') {
     </div>`;
 }
 
+let shownOrder = null;
+
 function showOrder(order, isNew) {
+  shownOrder = order;
   const root = $('#order-page');
   root.innerHTML = `${renderBreadcrumb([['Đơn hàng', 'order.html'], [order.code, '#']])}${orderDetailHTML(order, isNew)}`;
   document.title = `Đơn hàng ${order.code} | ${COMPANY.name}`;
@@ -127,14 +130,30 @@ function showLookup(message) {
   refreshIcons();
 }
 
-function initPage() {
+/* Đơn trên thiết bị + bản mới nhất trên máy chủ (trạng thái do cửa hàng cập nhật) */
+async function findOrder(code) {
+  const local = Orders.find(code);
+  if (!Auth.current()) return local;
+  await Auth.ready();
+  const cloud = await Orders.fetch(code);
+  return cloud ? { ...(local || {}), ...cloud } : local;
+}
+
+async function initPage() {
   const root = $('#order-page');
   const code = params.get('code');
+  const isNew = params.get('new') === '1';
   const order = code ? Orders.find(code) : null;
-  if (order) showOrder(order, params.get('new') === '1');
-  else showLookup(code ? `Không tìm thấy đơn hàng <b>${esc(code)}</b> trên thiết bị này.` : '');
+  if (order) showOrder(order, isNew);
+  else showLookup(code ? `Không tìm thấy đơn hàng <b>${esc(code)}</b>.` : '');
 
-  root.addEventListener('submit', (e) => {
+  // Cập nhật trạng thái từ máy chủ (khách đã đăng nhập)
+  if (code && Auth.current()) {
+    const latest = await findOrder(code);
+    if (latest) showOrder(latest, isNew);
+  }
+
+  root.addEventListener('submit', async (e) => {
     if (e.target.id !== 'lookup-form') return;
     e.preventDefault();
     const form = e.target;
@@ -143,12 +162,12 @@ function initPage() {
     setFieldError(form.code, c ? '' : 'Vui lòng nhập mã đơn hàng');
     setFieldError(form.phone, isValidPhone(phone) ? '' : 'Số điện thoại không hợp lệ');
     if (!c || !isValidPhone(phone)) return;
-    const found = Orders.find(c);
+    const found = await findOrder(c);
     if (found && found.customer.phone.replace(/\D/g, '') === phone) {
       history.replaceState(null, '', `order.html?code=${found.code}`);
       showOrder(found, false);
     } else {
-      showLookup(`Không tìm thấy đơn hàng <b>${esc(c)}</b> với số điện thoại này trên thiết bị này.`);
+      showLookup(`Không tìm thấy đơn hàng <b>${esc(c)}</b> với số điện thoại này.${Auth.current() ? '' : ' Nếu đặt hàng trên thiết bị khác, hãy <a href="login.html?next=order.html">đăng nhập</a> tài khoản đã dùng khi đặt, hoặc gọi hotline để được hỗ trợ.'}`);
     }
   });
 
@@ -162,7 +181,7 @@ function initPage() {
         showToast(`Mã đơn hàng: ${copy.dataset.copy}`);
       }
     }
-    const current = Orders.find(params.get('code') || ($('.order-success__code b')?.textContent ?? ''));
+    const current = shownOrder;
     if (e.target.closest('[data-reorder]') && current) {
       current.items.forEach((i) => { if (productById(i.id)) Cart.add(i.id, i.qty); });
       location.href = 'cart.html';
@@ -174,7 +193,8 @@ function initPage() {
       const result = await sendOrderEmail(current);
       if (result.ok) {
         showToast('Đã gửi đơn hàng tới cửa hàng');
-        showOrder(Orders.find(current.code), params.get('new') === '1');
+        Orders.markSent(current.code);
+        showOrder({ ...current, emailSent: true }, params.get('new') === '1');
       } else {
         resend.classList.remove('is-loading');
         resend.textContent = 'Gửi lại đơn hàng';

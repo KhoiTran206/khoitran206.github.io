@@ -151,6 +151,7 @@ function renderAccountMenu(user) {
       <a href="account.html" role="menuitem">${icon('user-round')}Tài khoản của tôi</a>
       <a href="account.html#don-hang" role="menuitem">${icon('shopping-bag')}Đơn hàng của tôi</a>
       <a href="wishlist.html" role="menuitem">${icon('heart')}Sản phẩm yêu thích</a>
+      ${Auth.isAdmin(user) ? `<a href="admin.html" role="menuitem">${icon('layout-dashboard')}Quản trị cửa hàng</a>` : ''}
       <button type="button" role="menuitem" data-logout>${icon('log-out')}Đăng xuất</button>
     </div>`;
 }

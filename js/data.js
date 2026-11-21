@@ -49,7 +49,22 @@ const SHOP = {
   },
   // Bảo hành mẫu theo nhóm hàng (tháng)
   warranty: { pc: 36, 'laptop-gaming': 24, laptop: 24, components: 36, mouse: 24, keyboard: 24, monitor: 36, headset: 12, chair: 12 },
+  // Email quản trị viên: xem toàn bộ đơn hàng + khách hàng ở admin.html.
+  // Thêm/bớt email ở đây VÀ trong firestore.rules (hàm isAdmin) rồi dán lại Rules trên Firebase.
+  adminEmails: ['tranngminhkhoi062@gmail.com'],
 };
+
+/* Firebase (tài khoản + đơn hàng trên mạng). Cấu hình web này là công khai theo thiết kế của Firebase —
+   bảo mật dữ liệu nằm ở firestore.rules. */
+const FIREBASE_CONFIG = {
+  apiKey: 'AIzaSyCCUcjCtpoTOGvDWc2-1Dyq2p80Wzm-WiI',
+  authDomain: 'minhkhoi-pc.firebaseapp.com',
+  projectId: 'minhkhoi-pc',
+  storageBucket: 'minhkhoi-pc.firebasestorage.app',
+  messagingSenderId: '1042786037845',
+  appId: '1:1042786037845:web:7127f793d192961e47e4dc',
+};
+const FIREBASE_SDK = 'https://www.gstatic.com/firebasejs/13.4.0/';
 
 const BRANDS = ['MKPC', 'ASUS', 'Acer', 'MSI', 'Lenovo', 'Dell', 'HP', 'Logitech', 'Razer', 'Corsair', 'Akko', 'AULA', 'LG', 'Samsung', 'Kingston', 'WD', 'Intel', 'AMD', 'HyperX', 'E-Dra'];
 

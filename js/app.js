@@ -112,181 +112,364 @@ function calcTotals(lines, couponCode, delivery = 'ship') {
   return { subtotal, discount, shipping, total: Math.max(0, subtotal - discount + shipping), coupon };
 }
 
-/* ---------- Đơn hàng, hồ sơ, sản phẩm đã xem ---------- */
+/* ---------- Firebase: tài khoản + dữ liệu trên mạng ----------
+   SDK chỉ được tải khi cần (đã đăng nhập, hoặc trang đăng nhập/tài khoản/đặt hàng/quản trị)
+   → khách vãng lai không phải tải thêm gì. */
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error(`Không tải được ${src}`));
+    document.head.appendChild(s);
+  });
+}
+
+const withTimeout = (promise, ms) => Promise.race([promise, new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms))]);
+
+const Cloud = {
+  _auth: null,
+  _db: null,
+  /* Tải firebase-app + firebase-auth (1 lần) → firebase.auth() */
+  auth() {
+    if (!this._auth) {
+      this._auth = (async () => {
+        if (!window.firebase?.auth) {
+          if (!window.firebase) await loadScript(`${FIREBASE_SDK}firebase-app-compat.js`);
+          await loadScript(`${FIREBASE_SDK}firebase-auth-compat.js`);
+        }
+        if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        const auth = firebase.auth();
+        auth.languageCode = 'vi';
+        return auth;
+      })();
+      this._auth.catch(() => (this._auth = null)); // lỗi mạng → lần sau thử lại
+    }
+    return this._auth;
+  },
+  /* Firestore nặng hơn → chỉ tải ở trang cần dữ liệu */
+  async db() {
+    await this.auth();
+    if (!firebase.firestore) await loadScript(`${FIREBASE_SDK}firebase-firestore-compat.js`);
+    if (!this._db) this._db = firebase.firestore();
+    return this._db;
+  },
+};
+
+/* ---------- Đơn hàng ----------
+   Lưu 1 bản trên thiết bị (để khách vãng lai tra cứu) + 1 bản trên Firestore (khách đăng nhập
+   xem trên mọi máy, chủ shop xem ở admin.html). */
+const ORDER_STATUSES = ['Chờ xác nhận', 'Đã xác nhận', 'Đang giao', 'Hoàn thành', 'Đã hủy'];
+
 const Orders = {
   key: 'mkpc-orders',
   all() {
     return Store.get(this.key, []);
   },
   save(order) {
-    const list = this.all();
+    const list = this.all().filter((o) => o.code !== order.code);
     list.unshift(order);
     Store.set(this.key, list.slice(0, 50));
   },
   find(code) {
     return this.all().find((o) => o.code.toUpperCase() === String(code).trim().toUpperCase());
   },
-  /* Đơn của tài khoản đang đăng nhập (kể cả đơn đặt trước đó bằng cùng SĐT trên thiết bị này) */
-  mine() {
-    const user = Auth.current();
-    if (!user) return [];
-    const phone = normalizePhone(user.phone);
-    return this.all().filter((o) => o.account === user.email || (!o.account && normalizePhone(o.customer?.phone) === phone));
-  },
-};
-
-/* ---------- Tài khoản khách hàng (đăng ký / đăng nhập) ----------
-   Web tĩnh không có máy chủ: tài khoản lưu trong trình duyệt của khách.
-   Mật khẩu KHÔNG lưu dạng gốc — băm PBKDF2-SHA256 + salt ngẫu nhiên. */
-const normalizePhone = (phone) => String(phone || '').replace(/\D/g, '').replace(/^84/, '0');
-
-const Auth = {
-  usersKey: 'mkpc-users',
-  sessionKey: 'mkpc-session',
-
-  users() {
-    return Store.get(this.usersKey, {});
-  },
-  saveUsers(users) {
-    Store.set(this.usersKey, users);
-  },
-
-  /* "Ghi nhớ đăng nhập" lưu localStorage, ngược lại chỉ giữ trong phiên (sessionStorage) */
-  sessionEmail() {
-    const saved = Store.get(this.sessionKey, null);
-    if (saved) return saved;
+  async saveCloud(order) {
     try {
-      return sessionStorage.getItem(this.sessionKey);
+      const db = await Cloud.db();
+      await withTimeout(db.collection('orders').doc(order.code).set(order), 8000);
+      return true;
+    } catch (e) {
+      console.warn('Chưa lưu được đơn lên máy chủ:', e.message);
+      return false;
+    }
+  },
+  /* Đơn trên máy chủ (chỉ chủ đơn hoặc quản trị viên đọc được) */
+  async fetch(code) {
+    if (!Auth.current()) return null;
+    try {
+      const db = await Cloud.db();
+      const snap = await db.collection('orders').doc(String(code).trim().toUpperCase()).get();
+      return snap.exists ? snap.data() : null;
     } catch {
       return null;
     }
   },
-  startSession(email, remember) {
-    this.endSession();
-    if (remember) Store.set(this.sessionKey, email);
-    else {
-      try {
-        sessionStorage.setItem(this.sessionKey, email);
-      } catch {
-        Store.set(this.sessionKey, email);
-      }
+  async markSent(code) {
+    if (!Auth.current()) return;
+    try {
+      const db = await Cloud.db();
+      await db.collection('orders').doc(code).update({ emailSent: true });
+    } catch {
+      /* không sao — email đã tới shop */
     }
+  },
+  /* Đơn của tài khoản đang đăng nhập: trên máy chủ + đơn trên thiết bị này chưa đồng bộ */
+  async mine() {
+    const user = Auth.current();
+    if (!user) return [];
+    const local = this.all().filter((o) => o.uid === user.uid);
+    try {
+      const db = await Cloud.db();
+      const snap = await db.collection('orders').where('uid', '==', user.uid).get();
+      const cloud = snap.docs.map((d) => d.data());
+      const codes = new Set(cloud.map((o) => o.code));
+      return [...cloud, ...local.filter((o) => !codes.has(o.code))].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    } catch (e) {
+      console.warn('Không tải được đơn hàng:', e.message);
+      return local;
+    }
+  },
+};
+
+/* ---------- Tài khoản khách hàng (Firebase Authentication) ----------
+   Mật khẩu do Firebase (Google) quản lý — web không bao giờ thấy/lưu mật khẩu.
+   Hồ sơ (SĐT, địa chỉ) lưu ở Firestore users/{uid}; bản sao nhẹ lưu localStorage
+   'mkpc-user' để header hiện ngay tên khách khi mở trang. */
+const AUTH_ERRORS = {
+  'auth/email-already-in-use': 'Email này đã được đăng ký. Vui lòng đăng nhập.',
+  'auth/invalid-email': 'Email không hợp lệ.',
+  'auth/invalid-credential': 'Email hoặc mật khẩu không đúng.',
+  'auth/invalid-login-credentials': 'Email hoặc mật khẩu không đúng.',
+  'auth/wrong-password': 'Mật khẩu không đúng.',
+  'auth/user-not-found': 'Email hoặc mật khẩu không đúng.',
+  'auth/user-disabled': 'Tài khoản này đã bị khóa. Vui lòng liên hệ cửa hàng.',
+  'auth/weak-password': 'Mật khẩu quá yếu (tối thiểu 6 ký tự).',
+  'auth/too-many-requests': 'Bạn thử quá nhiều lần. Vui lòng đợi vài phút rồi thử lại.',
+  'auth/network-request-failed': 'Mất kết nối mạng. Vui lòng kiểm tra Internet và thử lại.',
+  'auth/popup-closed-by-user': 'Bạn đã đóng cửa sổ đăng nhập Google.',
+  'auth/cancelled-popup-request': 'Bạn đã đóng cửa sổ đăng nhập Google.',
+  'auth/unauthorized-domain': 'Tên miền này chưa được phép đăng nhập Google (thêm vào Authorized domains trên Firebase).',
+  'auth/operation-not-allowed': 'Hình thức đăng nhập này chưa được bật trên Firebase.',
+  'auth/requires-recent-login': 'Vui lòng đăng xuất rồi đăng nhập lại để thực hiện thao tác này.',
+  'auth/account-exists-with-different-credential': 'Email này đã đăng ký bằng mật khẩu. Vui lòng đăng nhập bằng email + mật khẩu.',
+};
+const authError = (e) => AUTH_ERRORS[e?.code] || (e?.message === 'timeout' || /Không tải được/.test(e?.message || '') ? AUTH_ERRORS['auth/network-request-failed'] : 'Có lỗi xảy ra, vui lòng thử lại.');
+
+const Auth = {
+  cacheKey: 'mkpc-user',
+  _ready: null,
+
+  /* Thông tin tài khoản đang đăng nhập (đọc tức thì từ bản sao trên máy) */
+  current() {
+    return Store.get(this.cacheKey, null);
+  },
+  isAdmin(user = this.current()) {
+    return !!user && !!user.emailVerified && SHOP.adminEmails.includes(user.email);
+  },
+  setCache(data) {
+    if (data) Store.set(this.cacheKey, data);
+    else Store.remove(this.cacheKey);
     updateAccountLabel();
   },
-  endSession() {
-    Store.remove(this.sessionKey);
-    try {
-      sessionStorage.removeItem(this.sessionKey);
-    } catch {
-      /* bỏ qua */
+
+  /* Đồng bộ bản sao từ tài khoản Firebase */
+  sync(u) {
+    if (!u) {
+      if (this.current()) this.setCache(null);
+      return null;
     }
+    const prev = this.current();
+    const p = prev?.uid === u.uid ? prev : {};
+    this.setCache({
+      uid: u.uid,
+      email: u.email || '',
+      emailVerified: !!u.emailVerified,
+      provider: u.providerData?.[0]?.providerId || 'password',
+      name: p.nameSet ? p.name : u.displayName || p.name || (u.email || 'Khách').split('@')[0],
+      nameSet: !!p.nameSet,
+      phone: p.phone || '',
+      address: p.address || '',
+      createdAt: p.createdAt || new Date(u.metadata?.creationTime || Date.now()).toISOString(),
+    });
+    return this.current();
   },
 
-  /* Thông tin công khai của tài khoản đang đăng nhập (không kèm mật khẩu băm) */
-  current() {
-    const email = this.sessionEmail();
-    const user = email && this.users()[email];
+  /* Chờ Firebase xác định trạng thái đăng nhập (lần đầu gọi sẽ tải SDK) → user | null */
+  ready() {
+    if (!this._ready) {
+      this._ready = Cloud.auth()
+        .then((auth) => new Promise((resolve) => {
+          let first = true;
+          auth.onAuthStateChanged((u) => {
+            this.sync(u);
+            document.dispatchEvent(new CustomEvent('auth:change'));
+            if (first) {
+              first = false;
+              resolve(this.current());
+            }
+          });
+        }))
+        .catch((e) => {
+          console.warn('Không kết nối được Firebase:', e.message);
+          this._ready = null;
+          return this.current();
+        });
+    }
+    return this._ready;
+  },
+
+  /* Hồ sơ trên Firestore: tải về (tạo mới nếu chưa có) */
+  async loadProfile() {
+    const user = this.current();
     if (!user) return null;
-    const { hash, salt, ...info } = user;
-    return info;
-  },
-
-  /* Tìm tài khoản theo email hoặc số điện thoại */
-  findKey(identifier) {
-    const id = String(identifier || '').trim().toLowerCase();
-    const users = this.users();
-    if (users[id]) return id;
-    const phone = normalizePhone(id);
-    if (phone.length < 9) return null;
-    return Object.keys(users).find((k) => normalizePhone(users[k].phone) === phone) || null;
-  },
-
-  async hash(password, salt) {
-    const enc = new TextEncoder();
-    if (window.crypto?.subtle) {
-      const key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
-      const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: enc.encode(salt), iterations: 100000, hash: 'SHA-256' }, key, 256);
-      return 'p2$' + [...new Uint8Array(bits)].map((b) => b.toString(16).padStart(2, '0')).join('');
+    try {
+      const db = await Cloud.db();
+      const snap = await db.collection('users').doc(user.uid).get();
+      if (snap.exists) {
+        const d = snap.data();
+        this.setCache({ ...this.current(), name: d.name || user.name, nameSet: true, phone: d.phone || '', address: d.address || '' });
+      } else {
+        await this.saveProfile();
+      }
+    } catch (e) {
+      console.warn('Không tải được hồ sơ:', e.message);
     }
-    // Dự phòng cho trình duyệt cũ / trang không chạy HTTPS
-    let h = 2166136261;
-    const s = salt + password;
-    for (let r = 0; r < 2000; r += 1) {
-      for (let i = 0; i < s.length; i += 1) h = Math.imul(h ^ s.charCodeAt(i), 16777619) >>> 0;
-    }
-    return 'f1$' + h.toString(16);
+    return this.current();
   },
-  randomSalt() {
-    const bytes = new Uint8Array(16);
-    crypto.getRandomValues(bytes);
-    return [...bytes].map((b) => b.toString(16).padStart(2, '0')).join('');
+  async saveProfile() {
+    const u = this.current();
+    if (!u) return;
+    const db = await Cloud.db();
+    await db.collection('users').doc(u.uid).set({
+      name: u.name,
+      email: u.email,
+      phone: u.phone || '',
+      address: u.address || '',
+      provider: u.provider,
+      createdAt: u.createdAt,
+      updatedAt: new Date().toISOString(),
+    });
   },
 
   async register({ name, email, phone, password }) {
-    const key = email.trim().toLowerCase();
-    const users = this.users();
-    if (users[key]) return { ok: false, field: 'email', message: 'Email này đã được đăng ký. Vui lòng đăng nhập.' };
-    if (this.findKey(phone)) return { ok: false, field: 'phone', message: 'Số điện thoại này đã được đăng ký.' };
-    const salt = this.randomSalt();
-    users[key] = { name: name.trim(), email: key, phone: phone.trim(), address: '', createdAt: new Date().toISOString(), salt, hash: await this.hash(password, salt) };
-    this.saveUsers(users);
-    this.startSession(key, true);
-    return { ok: true };
-  },
-
-  async login(identifier, password, remember = true) {
-    const key = this.findKey(identifier);
-    const user = key && this.users()[key];
-    if (!user || (await this.hash(password, user.salt)) !== user.hash) {
-      return { ok: false, message: 'Email/số điện thoại hoặc mật khẩu không đúng.' };
+    try {
+      const auth = await Cloud.auth();
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      const cred = await auth.createUserWithEmailAndPassword(email.trim(), password);
+      await cred.user.updateProfile({ displayName: name.trim() });
+      this.sync(cred.user);
+      this.setCache({ ...this.current(), name: name.trim(), nameSet: true, phone: phone.trim() });
+      cred.user.sendEmailVerification().catch(() => {});
+      await this.saveProfile().catch((e) => console.warn('Chưa lưu được hồ sơ:', e.message));
+      return { ok: true, user: this.current() };
+    } catch (e) {
+      const field = { 'auth/email-already-in-use': 'email', 'auth/invalid-email': 'email', 'auth/weak-password': 'password' }[e.code];
+      return { ok: false, field, message: authError(e) };
     }
-    this.startSession(key, remember);
-    return { ok: true, user };
   },
 
-  logout() {
-    this.endSession();
-    updateAccountLabel();
+  async login(email, password, remember = true) {
+    try {
+      const auth = await Cloud.auth();
+      await auth.setPersistence(remember ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION);
+      const cred = await auth.signInWithEmailAndPassword(email.trim(), password);
+      this.sync(cred.user);
+      await this.loadProfile();
+      return { ok: true, user: this.current() };
+    } catch (e) {
+      return { ok: false, message: authError(e) };
+    }
   },
 
-  update(fields) {
-    const email = this.sessionEmail();
-    const users = this.users();
-    if (!users[email]) return false;
-    const allowed = ['name', 'phone', 'address'];
-    allowed.forEach((k) => {
-      if (fields[k] !== undefined) users[email][k] = String(fields[k]).trim();
+  async loginGoogle() {
+    try {
+      const auth = await Cloud.auth();
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      let cred;
+      try {
+        cred = await auth.signInWithPopup(provider);
+      } catch (e) {
+        if (e.code !== 'auth/popup-blocked') throw e;
+        await auth.signInWithRedirect(provider); // trình duyệt chặn popup → chuyển trang
+        return { ok: false, message: '' };
+      }
+      this.sync(cred.user);
+      await this.loadProfile();
+      return { ok: true, user: this.current() };
+    } catch (e) {
+      return { ok: false, message: authError(e) };
+    }
+  },
+
+  async logout() {
+    try {
+      const auth = await withTimeout(Cloud.auth(), 5000);
+      await auth.signOut();
+    } catch {
+      /* vẫn xóa phiên trên máy */
+    }
+    this.setCache(null);
+  },
+
+  /* Cập nhật hồ sơ (họ tên, SĐT, địa chỉ) — đổi ngay trên máy, lưu lên máy chủ ở nền */
+  async update(fields) {
+    const user = this.current();
+    if (!user) return { ok: false };
+    const next = { ...user, nameSet: true };
+    ['name', 'phone', 'address'].forEach((k) => {
+      if (fields[k] !== undefined) next[k] = String(fields[k]).trim();
     });
-    this.saveUsers(users);
-    updateAccountLabel();
-    return true;
+    this.setCache(next);
+    try {
+      const auth = await Cloud.auth();
+      if (auth.currentUser && next.name !== auth.currentUser.displayName) await auth.currentUser.updateProfile({ displayName: next.name });
+      await withTimeout(this.saveProfile(), 8000);
+      return { ok: true };
+    } catch (e) {
+      console.warn('Chưa lưu được hồ sơ lên máy chủ:', e.message);
+      return { ok: false, message: 'Đã lưu trên máy này, chưa đồng bộ được lên máy chủ.' };
+    }
   },
 
   async changePassword(oldPassword, newPassword) {
-    const email = this.sessionEmail();
-    const users = this.users();
-    const user = users[email];
-    if (!user) return { ok: false, message: 'Bạn chưa đăng nhập.' };
-    if ((await this.hash(oldPassword, user.salt)) !== user.hash) return { ok: false, field: 'old', message: 'Mật khẩu hiện tại không đúng.' };
-    user.salt = this.randomSalt();
-    user.hash = await this.hash(newPassword, user.salt);
-    this.saveUsers(users);
-    return { ok: true };
+    try {
+      const auth = await Cloud.auth();
+      const u = auth.currentUser;
+      if (!u) return { ok: false, message: 'Bạn chưa đăng nhập.' };
+      await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email, oldPassword));
+      await u.updatePassword(newPassword);
+      return { ok: true };
+    } catch (e) {
+      const wrong = ['auth/wrong-password', 'auth/invalid-credential', 'auth/invalid-login-credentials'].includes(e.code);
+      return { ok: false, field: wrong ? 'old' : 'password', message: wrong ? 'Mật khẩu hiện tại không đúng.' : authError(e) };
+    }
   },
 
-  /* Quên mật khẩu: xác minh bằng email + SĐT đã đăng ký */
-  async resetPassword(email, phone, newPassword) {
-    const key = email.trim().toLowerCase();
-    const users = this.users();
-    const user = users[key];
-    if (!user || normalizePhone(user.phone) !== normalizePhone(phone)) {
-      return { ok: false, message: 'Email và số điện thoại không khớp với tài khoản nào trên thiết bị này.' };
+  /* Quên mật khẩu: Firebase gửi email chứa link đặt lại */
+  async resetPassword(email) {
+    try {
+      const auth = await Cloud.auth();
+      await auth.sendPasswordResetEmail(email.trim());
+      return { ok: true };
+    } catch (e) {
+      if (e.code === 'auth/user-not-found') return { ok: true }; // không tiết lộ email có tồn tại hay không
+      return { ok: false, message: authError(e) };
     }
-    user.salt = this.randomSalt();
-    user.hash = await this.hash(newPassword, user.salt);
-    this.saveUsers(users);
-    this.startSession(key, true);
-    return { ok: true };
+  },
+
+  async sendVerification() {
+    try {
+      const auth = await Cloud.auth();
+      await auth.currentUser.sendEmailVerification();
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, message: authError(e) };
+    }
+  },
+  /* Sau khi khách bấm link xác minh trong email */
+  async refresh() {
+    try {
+      const auth = await Cloud.auth();
+      if (!auth.currentUser) return this.current();
+      await auth.currentUser.reload();
+      await auth.currentUser.getIdToken(true);
+      return this.sync(auth.currentUser);
+    } catch {
+      return this.current();
+    }
   },
 };
 
@@ -657,10 +840,11 @@ function initAccountMenu() {
       return;
     }
     if (e.target.closest('[data-logout]')) {
-      Auth.logout();
       closeAccountMenu();
-      showToast('Bạn đã đăng xuất');
-      if ($('#account-page')) setTimeout(() => (location.href = 'login.html'), 600);
+      Auth.logout().then(() => {
+        showToast('Bạn đã đăng xuất');
+        if ($('#account-page, #admin-page')) setTimeout(() => (location.href = 'login.html'), 600);
+      });
       return;
     }
     if (!e.target.closest('[data-account-slot]')) closeAccountMenu();
@@ -921,6 +1105,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initTopbar();
   initAccountMenu();
+  // Đã đăng nhập → kết nối Firebase ở nền để kiểm tra phiên còn hiệu lực
+  if (Auth.current()) Auth.ready();
+  // Dọn dữ liệu tài khoản kiểu cũ (lưu trên trình duyệt) — nay dùng Firebase
+  Store.remove('mkpc-users');
+  Store.remove('mkpc-session');
   initWishCompare();
   syncWishCompare();
   initCategoryDropdown();

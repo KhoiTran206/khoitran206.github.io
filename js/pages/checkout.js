@@ -182,11 +182,14 @@ async function placeOrder(form) {
     totals: { subtotal: totals.subtotal, discount: totals.discount, couponCode: totals.coupon.code || '', shipping: totals.shipping, total: totals.total },
     emailSent: false,
     account: Auth.current()?.email || '',
+    uid: Auth.current()?.uid || null,
   };
 
   if (form.remember.checked) Profile.set({ ...(Profile.get() || {}), ...customer, address: form.address.value.trim() });
   Orders.save(order);
-  await sendOrderEmail(order);
+  // Gửi email cho shop, rồi lưu đơn lên máy chủ (để shop xem ở trang quản trị, khách xem trên mọi máy)
+  const mail = await sendOrderEmail(order);
+  await Orders.saveCloud({ ...order, emailSent: mail.ok });
 
   Cart.clear();
   Store.remove(CHECKOUT_COUPON_KEY);
@@ -197,6 +200,16 @@ function initPage() {
   render();
   const form = $('#checkout-form');
   if (!form) return;
+
+  // Đã đăng nhập → lấy hồ sơ mới nhất trên máy chủ, điền vào các ô còn trống
+  if (Auth.current()) {
+    Auth.ready().then(() => Auth.loadProfile()).then((user) => {
+      if (!user) return;
+      ['name', 'phone', 'email', 'address'].forEach((k) => {
+        if (form[k] && !form[k].value && user[k]) form[k].value = user[k];
+      });
+    });
+  }
 
   form.addEventListener('change', (e) => {
     if (e.target.name === 'delivery') {
