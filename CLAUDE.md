@@ -68,6 +68,7 @@
 ```
 
 - Thứ tự nạp script mọi trang: `lucide` → `data.js` → `content.js` → `components.js` → `app.js` → `pages/<trang>.js`.
+- Mọi link CSS/JS nội bộ có hậu tố `?v=<phiên bản>` để trình duyệt (nhất là Safari iPhone) lấy bản mới ngay. **Mỗi lần sửa CSS/JS rồi đẩy lên, đổi số phiên bản ở tất cả trang** (thay hàng loạt bằng sed).
 - Không có backend: giỏ hàng, hồ sơ, đơn hàng lưu `localStorage` (luôn qua `Store` có try/catch); đơn hàng + form liên hệ gửi email qua FormSubmit (`SHOP.orderEndpoint`).
 - Link trang chủ luôn dùng `HOME_URL` (web: `./` → https://khoitran206.github.io/, file trên máy: `index.html`), không viết cứng `index.html`.
 - Thêm trang mới: chép một trang có sẵn, đổi `<title>`/description/id/script, cập nhật khối `<!-- SEO -->` và `sitemap.xml`.
