@@ -12,7 +12,8 @@ Web tĩnh (HTML/CSS/JS thuần), không cần máy chủ — chạy được tr�
 - Giỏ hàng: đổi số lượng, mã giảm giá, tính phí giao hàng
 - Thanh toán: giao tận nơi / nhận tại cửa hàng, COD / chuyển khoản / trả góp
 - **Đơn hàng được gửi về email chủ shop** (qua dịch vụ miễn phí FormSubmit)
-- Tra cứu đơn, tài khoản khách (lưu trên thiết bị), Build PC, tin tức, liên hệ, chính sách
+- Đăng ký / đăng nhập (bằng email hoặc SĐT) / quên mật khẩu; trang tài khoản: sửa thông tin, đổi mật khẩu, đơn hàng của tôi
+- Tra cứu đơn, Build PC, tin tức, liên hệ, chính sách
 
 ## ⚠️ Việc cần làm ngay sau khi website lên mạng
 
@@ -39,6 +40,7 @@ Sau khi sửa: commit và push lên GitHub, khoảng 1–2 phút sau website t�
 ## Lưu ý
 
 - Giỏ hàng, tài khoản, lịch sử đơn được lưu **trên trình duyệt của khách** (không có máy chủ).
+  Tài khoản tạo trên máy nào chỉ đăng nhập được trên trình duyệt của máy đó. Muốn tài khoản dùng chung mọi thiết bị cần thêm dịch vụ đăng nhập (vd. Firebase Authentication — miễn phí).
   Chủ shop quản lý đơn qua email; cập nhật trạng thái cho khách qua điện thoại/Zalo.
 - Giá, tồn kho, đánh giá, nội dung chính sách hiện là **dữ liệu mẫu** — cần rà soát trước khi bán thật.
 - Ảnh sản phẩm là ảnh Pexels theo loại sản phẩm (giấy phép miễn phí thương mại), chưa phải ảnh đúng từng model.

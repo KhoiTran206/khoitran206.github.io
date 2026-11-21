@@ -126,15 +126,181 @@ const Orders = {
   find(code) {
     return this.all().find((o) => o.code.toUpperCase() === String(code).trim().toUpperCase());
   },
+  /* Đơn của tài khoản đang đăng nhập (kể cả đơn đặt trước đó bằng cùng SĐT trên thiết bị này) */
+  mine() {
+    const user = Auth.current();
+    if (!user) return [];
+    const phone = normalizePhone(user.phone);
+    return this.all().filter((o) => o.account === user.email || (!o.account && normalizePhone(o.customer?.phone) === phone));
+  },
 };
 
+/* ---------- Tài khoản khách hàng (đăng ký / đăng nhập) ----------
+   Web tĩnh không có máy chủ: tài khoản lưu trong trình duyệt của khách.
+   Mật khẩu KHÔNG lưu dạng gốc — băm PBKDF2-SHA256 + salt ngẫu nhiên. */
+const normalizePhone = (phone) => String(phone || '').replace(/\D/g, '').replace(/^84/, '0');
+
+const Auth = {
+  usersKey: 'mkpc-users',
+  sessionKey: 'mkpc-session',
+
+  users() {
+    return Store.get(this.usersKey, {});
+  },
+  saveUsers(users) {
+    Store.set(this.usersKey, users);
+  },
+
+  /* "Ghi nhớ đăng nhập" lưu localStorage, ngược lại chỉ giữ trong phiên (sessionStorage) */
+  sessionEmail() {
+    const saved = Store.get(this.sessionKey, null);
+    if (saved) return saved;
+    try {
+      return sessionStorage.getItem(this.sessionKey);
+    } catch {
+      return null;
+    }
+  },
+  startSession(email, remember) {
+    this.endSession();
+    if (remember) Store.set(this.sessionKey, email);
+    else {
+      try {
+        sessionStorage.setItem(this.sessionKey, email);
+      } catch {
+        Store.set(this.sessionKey, email);
+      }
+    }
+    updateAccountLabel();
+  },
+  endSession() {
+    Store.remove(this.sessionKey);
+    try {
+      sessionStorage.removeItem(this.sessionKey);
+    } catch {
+      /* bỏ qua */
+    }
+  },
+
+  /* Thông tin công khai của tài khoản đang đăng nhập (không kèm mật khẩu băm) */
+  current() {
+    const email = this.sessionEmail();
+    const user = email && this.users()[email];
+    if (!user) return null;
+    const { hash, salt, ...info } = user;
+    return info;
+  },
+
+  /* Tìm tài khoản theo email hoặc số điện thoại */
+  findKey(identifier) {
+    const id = String(identifier || '').trim().toLowerCase();
+    const users = this.users();
+    if (users[id]) return id;
+    const phone = normalizePhone(id);
+    if (phone.length < 9) return null;
+    return Object.keys(users).find((k) => normalizePhone(users[k].phone) === phone) || null;
+  },
+
+  async hash(password, salt) {
+    const enc = new TextEncoder();
+    if (window.crypto?.subtle) {
+      const key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+      const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: enc.encode(salt), iterations: 100000, hash: 'SHA-256' }, key, 256);
+      return 'p2$' + [...new Uint8Array(bits)].map((b) => b.toString(16).padStart(2, '0')).join('');
+    }
+    // Dự phòng cho trình duyệt cũ / trang không chạy HTTPS
+    let h = 2166136261;
+    const s = salt + password;
+    for (let r = 0; r < 2000; r += 1) {
+      for (let i = 0; i < s.length; i += 1) h = Math.imul(h ^ s.charCodeAt(i), 16777619) >>> 0;
+    }
+    return 'f1$' + h.toString(16);
+  },
+  randomSalt() {
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    return [...bytes].map((b) => b.toString(16).padStart(2, '0')).join('');
+  },
+
+  async register({ name, email, phone, password }) {
+    const key = email.trim().toLowerCase();
+    const users = this.users();
+    if (users[key]) return { ok: false, field: 'email', message: 'Email này đã được đăng ký. Vui lòng đăng nhập.' };
+    if (this.findKey(phone)) return { ok: false, field: 'phone', message: 'Số điện thoại này đã được đăng ký.' };
+    const salt = this.randomSalt();
+    users[key] = { name: name.trim(), email: key, phone: phone.trim(), address: '', createdAt: new Date().toISOString(), salt, hash: await this.hash(password, salt) };
+    this.saveUsers(users);
+    this.startSession(key, true);
+    return { ok: true };
+  },
+
+  async login(identifier, password, remember = true) {
+    const key = this.findKey(identifier);
+    const user = key && this.users()[key];
+    if (!user || (await this.hash(password, user.salt)) !== user.hash) {
+      return { ok: false, message: 'Email/số điện thoại hoặc mật khẩu không đúng.' };
+    }
+    this.startSession(key, remember);
+    return { ok: true, user };
+  },
+
+  logout() {
+    this.endSession();
+    updateAccountLabel();
+  },
+
+  update(fields) {
+    const email = this.sessionEmail();
+    const users = this.users();
+    if (!users[email]) return false;
+    const allowed = ['name', 'phone', 'address'];
+    allowed.forEach((k) => {
+      if (fields[k] !== undefined) users[email][k] = String(fields[k]).trim();
+    });
+    this.saveUsers(users);
+    updateAccountLabel();
+    return true;
+  },
+
+  async changePassword(oldPassword, newPassword) {
+    const email = this.sessionEmail();
+    const users = this.users();
+    const user = users[email];
+    if (!user) return { ok: false, message: 'Bạn chưa đăng nhập.' };
+    if ((await this.hash(oldPassword, user.salt)) !== user.hash) return { ok: false, field: 'old', message: 'Mật khẩu hiện tại không đúng.' };
+    user.salt = this.randomSalt();
+    user.hash = await this.hash(newPassword, user.salt);
+    this.saveUsers(users);
+    return { ok: true };
+  },
+
+  /* Quên mật khẩu: xác minh bằng email + SĐT đã đăng ký */
+  async resetPassword(email, phone, newPassword) {
+    const key = email.trim().toLowerCase();
+    const users = this.users();
+    const user = users[key];
+    if (!user || normalizePhone(user.phone) !== normalizePhone(phone)) {
+      return { ok: false, message: 'Email và số điện thoại không khớp với tài khoản nào trên thiết bị này.' };
+    }
+    user.salt = this.randomSalt();
+    user.hash = await this.hash(newPassword, user.salt);
+    this.saveUsers(users);
+    this.startSession(key, true);
+    return { ok: true };
+  },
+};
+
+/* Hồ sơ dùng để tự điền form: lấy từ tài khoản nếu đã đăng nhập, không thì lưu cho khách vãng lai */
 const Profile = {
   key: 'mkpc-profile',
   get() {
+    const user = Auth.current();
+    if (user) return { name: user.name, phone: user.phone, email: user.email, address: user.address || '' };
     return Store.get(this.key, null);
   },
   set(data) {
-    Store.set(this.key, data);
+    if (Auth.current()) Auth.update(data);
+    else Store.set(this.key, data);
     updateAccountLabel();
   },
   clear() {
@@ -297,10 +463,43 @@ function updateCartCount(bump = false) {
   });
 }
 
+/* Vẽ lại nút tài khoản trên header (Đăng nhập ↔ avatar + tên + menu) */
 function updateAccountLabel() {
-  const profile = Profile.get();
-  $$('[data-account-label]').forEach((el) => {
-    el.textContent = profile?.name ? profile.name.split(' ').slice(-1)[0] : 'Tài khoản';
+  $$('[data-account-slot]').forEach((el) => {
+    el.innerHTML = renderAccountMenu(Auth.current());
+  });
+  refreshIcons();
+}
+
+function closeAccountMenu() {
+  $$('[data-account-slot]').forEach((el) => {
+    el.classList.remove('is-open');
+    $('[data-account-toggle]', el)?.setAttribute('aria-expanded', 'false');
+  });
+}
+
+function initAccountMenu() {
+  document.addEventListener('click', (e) => {
+    const toggle = e.target.closest('[data-account-toggle]');
+    if (toggle) {
+      const slot = toggle.closest('[data-account-slot]');
+      const open = !slot.classList.contains('is-open');
+      closeAccountMenu();
+      slot.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      return;
+    }
+    if (e.target.closest('[data-logout]')) {
+      Auth.logout();
+      closeAccountMenu();
+      showToast('Bạn đã đăng xuất');
+      if ($('#account-page')) setTimeout(() => (location.href = 'login.html'), 600);
+      return;
+    }
+    if (!e.target.closest('[data-account-slot]')) closeAccountMenu();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAccountMenu();
   });
 }
 
@@ -554,6 +753,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateAccountLabel();
 
   initTopbar();
+  initAccountMenu();
   initCategoryDropdown();
   initSearch();
   initSliders();

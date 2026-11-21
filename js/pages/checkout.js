@@ -52,8 +52,11 @@ function render() {
     root.innerHTML = `${renderBreadcrumb([['Thanh toán', '#']])}<div class="panel">${renderEmpty('shopping-cart', 'Chưa có sản phẩm để thanh toán', 'Giỏ hàng của bạn đang trống.', '<a class="btn btn--primary" href="index.html">Tiếp tục mua sắm</a>')}</div>`;
     return;
   }
+  const user = Auth.current();
   const profile = Profile.get() || {};
   const totals = calcTotals(lines, Store.get(CHECKOUT_COUPON_KEY, ''), 'ship');
+  const loginHint = user ? '' : `
+    <p class="alert alert--info checkout__login">${icon('user-round')}<span>Đã có tài khoản? <a href="login.html?next=checkout.html">Đăng nhập</a> để điền nhanh và theo dõi đơn hàng, hoặc <a href="login.html?tab=register&amp;next=checkout.html">đăng ký</a>.</span></p>`;
 
   root.innerHTML = `
     ${renderBreadcrumb([['Giỏ hàng', 'cart.html'], ['Thanh toán', '#']])}
@@ -66,6 +69,7 @@ function render() {
       <div>
         <section class="panel">
           <h2 class="panel__title">${icon('user-round')}Thông tin người mua</h2>
+          ${loginHint}
           <div class="form-grid form-grid--2">
             ${field('name', 'Họ và tên', { required: true, placeholder: 'Nguyễn Văn A', value: profile.name, autocomplete: 'name' })}
             ${field('phone', 'Số điện thoại', { type: 'tel', required: true, placeholder: '09xx xxx xxx', value: profile.phone, autocomplete: 'tel' })}
@@ -100,7 +104,7 @@ function render() {
             <label class="sr-only" for="f-note">Ghi chú đơn hàng</label>
             <textarea class="textarea" id="f-note" name="note" maxlength="500" placeholder="Ví dụ: giao giờ hành chính, xuất hóa đơn công ty, gọi trước khi giao..."></textarea>
           </div>
-          <label class="check check--spaced"><input type="checkbox" name="remember" ${profile.name ? 'checked' : ''}>Lưu thông tin cho lần mua sau (trên thiết bị này)</label>
+          <label class="check check--spaced"><input type="checkbox" name="remember" ${profile.name ? 'checked' : ''}>${user ? 'Cập nhật thông tin này vào tài khoản của tôi' : 'Lưu thông tin cho lần mua sau (trên thiết bị này)'}</label>
         </section>
       </div>
 
@@ -177,6 +181,7 @@ async function placeOrder(form) {
     items: lines.map(({ p, qty }) => ({ id: p.id, name: p.name, price: p.price, qty, img: p.img })),
     totals: { subtotal: totals.subtotal, discount: totals.discount, couponCode: totals.coupon.code || '', shipping: totals.shipping, total: totals.total },
     emailSent: false,
+    account: Auth.current()?.email || '',
   };
 
   if (form.remember.checked) Profile.set({ ...(Profile.get() || {}), ...customer, address: form.address.value.trim() });

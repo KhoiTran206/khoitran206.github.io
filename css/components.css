@@ -339,6 +339,115 @@
   transform: translateY(-1px);
 }
 
+/* Đã đăng nhập: avatar chữ cái + tên + menu thả xuống */
+.account-menu {
+  position: relative;
+}
+
+.header-login--user {
+  border: 0;
+  color: var(--color-text-inverse);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.header-login__avatar {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-dark);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+.header-login span {
+  max-width: 110px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.header-login .header-login__chevron {
+  display: none;
+  font-size: 16px;
+  transition: transform var(--transition);
+}
+
+.account-menu.is-open .header-login__chevron {
+  transform: rotate(180deg);
+}
+
+.account-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: var(--z-float);
+  width: 260px;
+  padding: 6px 0;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity var(--transition), transform var(--transition), visibility var(--transition);
+}
+
+.account-menu.is-open .account-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+.account-dropdown__head {
+  display: grid;
+  gap: 2px;
+  padding: 10px 16px 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.account-dropdown__head small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text-muted);
+}
+
+.account-dropdown a,
+.account-dropdown button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: var(--fs-sm);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+
+.account-dropdown button {
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.account-dropdown a:hover,
+.account-dropdown button:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.account-dropdown .lucide {
+  font-size: 18px;
+}
+
 /* Sub nav dưới header: nút Danh mục + link chữ */
 .subnav {
   position: relative;
@@ -448,6 +557,10 @@
 
   .header-login span {
     display: inline;
+  }
+
+  .header-login .header-login__chevron {
+    display: inline-block;
   }
 }
 

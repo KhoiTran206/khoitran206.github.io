@@ -612,3 +612,227 @@
     top: 90px;
   }
 }
+
+/* ---------- Đăng nhập / đăng ký ---------- */
+.auth {
+  display: grid;
+  gap: var(--gap);
+  max-width: 960px;
+  margin-inline: auto;
+}
+
+.auth__intro {
+  position: relative;
+  display: none;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--color-dark);
+  color: var(--color-text-inverse);
+}
+
+.auth__intro img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.45;
+}
+
+.auth__intro-body {
+  position: relative;
+  display: grid;
+  align-content: end;
+  gap: 16px;
+  height: 100%;
+  padding: 28px;
+  background: linear-gradient(180deg, transparent 20%, rgba(0, 0, 0, 0.85));
+}
+
+.auth__intro h2 {
+  font-size: var(--fs-xl);
+  line-height: 1.35;
+}
+
+.auth__intro ul {
+  display: grid;
+  gap: 10px;
+  font-size: var(--fs-sm);
+}
+
+.auth__intro li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.auth__intro li .lucide {
+  font-size: 18px;
+  color: var(--color-primary);
+}
+
+.auth__card {
+  margin-top: 0;
+  padding: 24px 20px;
+}
+
+.auth__title {
+  margin-bottom: 16px;
+  font-size: var(--fs-xl);
+}
+
+.auth__tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.auth__tab {
+  position: relative;
+  padding: 12px;
+  text-align: center;
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  transition: color var(--transition);
+}
+
+.auth__tab::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--color-primary);
+  transform: scaleX(0);
+  transition: transform var(--transition);
+}
+
+.auth__tab:hover,
+.auth__tab.is-active {
+  color: var(--color-primary);
+}
+
+.auth__tab.is-active::after {
+  transform: scaleX(1);
+}
+
+.auth__form {
+  display: grid;
+  gap: 14px;
+}
+
+.auth__desc {
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
+}
+
+.auth__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.auth__link,
+.auth__switch a,
+.auth__form .check a {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.auth__link:hover,
+.auth__switch a:hover,
+.auth__form .check a:hover {
+  text-decoration: underline;
+}
+
+.auth__switch {
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
+}
+
+.auth__error {
+  padding: 10px 12px;
+  border-radius: var(--radius-btn);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: var(--fs-sm);
+}
+
+.auth__note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 16px;
+  font-size: var(--fs-xs);
+  color: var(--color-text-muted);
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field .input {
+  padding-right: 44px;
+}
+
+.password-field__toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  color: var(--color-text-muted);
+  font-size: 18px;
+  transition: color var(--transition);
+}
+
+.password-field__toggle:hover {
+  color: var(--color-primary);
+}
+
+/* Thanh độ mạnh mật khẩu: 4 mức */
+.password-meter {
+  height: 4px;
+  margin-top: -6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-border);
+  overflow: hidden;
+}
+
+.password-meter span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--color-primary);
+  transition: width var(--transition), background var(--transition);
+}
+
+.password-meter[data-level='1'] span { width: 25%; }
+.password-meter[data-level='2'] span { width: 50%; background: var(--color-warning); }
+.password-meter[data-level='3'] span { width: 75%; background: var(--color-success); }
+.password-meter[data-level='4'] span { width: 100%; background: var(--color-success); }
+
+@media (min-width: 769px) {
+  .auth {
+    grid-template-columns: 1fr 1.1fr;
+  }
+
+  .auth__intro {
+    display: block;
+    min-height: 520px;
+  }
+
+  .auth__card {
+    padding: 32px;
+  }
+}

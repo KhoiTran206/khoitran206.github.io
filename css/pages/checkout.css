@@ -659,3 +659,13 @@ a.mini-list__name:hover {
   background: var(--color-primary-light);
   color: var(--color-primary);
 }
+
+/* Gợi ý đăng nhập ở form thanh toán */
+.checkout__login {
+  margin-bottom: 14px;
+}
+
+.checkout__login a {
+  font-weight: 700;
+  text-decoration: underline;
+}

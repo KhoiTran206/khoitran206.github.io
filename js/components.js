@@ -57,7 +57,7 @@ function renderHeader() {
           <a class="header-cart" href="cart.html" aria-label="Giỏ hàng">
             ${icon('shopping-cart')}<span class="cart-count" data-cart-count>0</span>
           </a>
-          <a class="header-login" href="account.html" aria-label="Tài khoản">${icon('user-round')}<span data-account-label>Tài khoản</span></a>
+          <div class="account-menu" data-account-slot>${renderAccountMenu(Auth.current())}</div>
         </nav>
       </div>
     </header>
@@ -114,6 +114,25 @@ function renderDrawer() {
           <p>${icon('map-pin')}<span>${COMPANY.address}</span></p>
         </div>
       </aside>
+    </div>`;
+}
+
+/* ---------- Nút tài khoản trên header ---------- */
+function renderAccountMenu(user) {
+  if (!user) {
+    return `<a class="header-login" href="login.html" aria-label="Đăng nhập">${icon('user-round')}<span>Đăng nhập</span></a>`;
+  }
+  const words = user.name.trim().split(/\s+/);
+  const given = words[words.length - 1];
+  return `
+    <button class="header-login header-login--user" type="button" data-account-toggle aria-expanded="false" aria-haspopup="true" aria-label="Tài khoản của ${esc(user.name)}">
+      <b class="header-login__avatar">${esc(given.charAt(0).toUpperCase())}</b><span>${esc(given)}</span>${icon('chevron-down', 'header-login__chevron')}
+    </button>
+    <div class="account-dropdown" role="menu">
+      <div class="account-dropdown__head"><b>${esc(user.name)}</b><small>${esc(user.email)}</small></div>
+      <a href="account.html" role="menuitem">${icon('user-round')}Tài khoản của tôi</a>
+      <a href="account.html#don-hang" role="menuitem">${icon('shopping-bag')}Đơn hàng của tôi</a>
+      <button type="button" role="menuitem" data-logout>${icon('log-out')}Đăng xuất</button>
     </div>`;
 }
 
