@@ -2553,3 +2553,312 @@ body.has-compare-bar .site-footer {
     padding-bottom: 150px;
   }
 }
+
+/* ==========================================================
+   Cài app (PWA): dải gợi ý trên điện thoại, nút footer, mục drawer, bảng hướng dẫn
+   Đã cài (html.is-app) → ẩn mọi lối vào cài app
+   ========================================================== */
+.is-app [data-install],
+.is-app [data-install-wrap],
+.app-banner.is-hidden {
+  display: none;
+}
+
+.app-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px 8px 6px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.app-banner__close {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  transition: background var(--transition), color var(--transition);
+}
+
+.app-banner__close:hover {
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+}
+
+.app-banner__close .lucide {
+  font-size: 18px;
+}
+
+.app-banner__icon {
+  flex-shrink: 0;
+  border-radius: 10px;
+}
+
+.app-banner__text {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  line-height: 1.3;
+}
+
+.app-banner__text b {
+  font-size: var(--fs-sm);
+}
+
+.app-banner__text small {
+  overflow: hidden;
+  font-size: var(--fs-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.app-banner__btn {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.app-banner__btn:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+
+/* Nút "Tải ứng dụng" ở footer */
+.footer-app {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  padding: 8px 14px 8px 8px;
+  border: 1px solid var(--color-dark-2);
+  border-radius: var(--radius-card);
+  background: var(--color-dark-2);
+  color: var(--color-text-inverse);
+  text-align: left;
+  transition: border-color var(--transition), transform var(--transition);
+}
+
+.footer-app:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.footer-app img {
+  border-radius: 8px;
+}
+
+.footer-app span {
+  display: grid;
+  line-height: 1.3;
+}
+
+.footer-app b {
+  font-size: var(--fs-sm);
+}
+
+.footer-app small {
+  font-size: var(--fs-xs);
+  opacity: 0.75;
+}
+
+.footer-app .lucide {
+  margin-left: 6px;
+  font-size: 18px;
+  color: var(--color-primary);
+}
+
+/* Mục "Tải app" trong drawer */
+.drawer__install {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 0;
+  font-size: inherit;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-align: left;
+  transition: color var(--transition);
+}
+
+.drawer__install:hover {
+  color: var(--color-primary-dark);
+}
+
+.drawer__install .lucide {
+  margin-top: 3px;
+}
+
+/* Bảng hướng dẫn cài: mobile trượt từ đáy, desktop ở giữa */
+.app-guide {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.app-guide__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--color-overlay);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.app-guide__card {
+  position: relative;
+  width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  display: grid;
+  gap: 16px;
+  padding: 24px 16px 20px;
+  border-radius: 16px 16px 0 0;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.app-guide.is-open .app-guide__backdrop {
+  opacity: 1;
+}
+
+.app-guide.is-open .app-guide__card {
+  transform: none;
+}
+
+.app-guide__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  transition: background var(--transition), color var(--transition);
+}
+
+.app-guide__close:hover {
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+}
+
+.app-guide__head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-right: 32px;
+}
+
+.app-guide__head img {
+  flex-shrink: 0;
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.app-guide__title {
+  font-size: var(--fs-lg);
+  font-weight: 800;
+}
+
+.app-guide__head p {
+  font-size: var(--fs-xs);
+  color: var(--color-text-muted);
+}
+
+.app-guide__steps {
+  display: grid;
+  gap: 10px;
+  counter-reset: none;
+}
+
+.app-guide__steps li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--radius-card);
+  background: var(--color-surface-alt);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+}
+
+.app-guide__steps li > b {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.app-guide__steps .lucide {
+  display: inline-block;
+  vertical-align: -3px;
+  font-size: 18px;
+  color: var(--color-primary);
+}
+
+.app-guide__note {
+  display: flex;
+  gap: 8px;
+  font-size: var(--fs-xs);
+  color: var(--color-text-muted);
+}
+
+.app-guide__note .lucide {
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.app-banner__close:focus-visible,
+.app-banner__btn:focus-visible,
+.footer-app:focus-visible,
+.drawer__install:focus-visible,
+.app-guide__close:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (min-width: 769px) {
+  .app-guide {
+    align-items: center;
+    padding: 24px;
+  }
+
+  .app-guide__card {
+    max-width: 440px;
+    padding: 28px 24px 24px;
+    border-radius: 16px;
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+  }
+
+  .app-guide.is-open .app-guide__card {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-guide__card,
+  .app-guide__backdrop {
+    transition: none;
+  }
+}

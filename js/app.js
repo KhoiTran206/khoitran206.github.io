@@ -1120,6 +1120,150 @@ function initReveal(root = document) {
   items.forEach((el) => revealObserver.observe(el));
 }
 
+/* ---------- Cài app Minh Khôi PC (PWA — cài từ website, miễn phí) ----------
+   Mọi nút có [data-install] đều mở luồng cài:
+   - Android / Chrome / Edge: hộp cài đặt của trình duyệt (beforeinstallprompt)
+   - iPhone / iPad hoặc trình duyệt không hỗ trợ: bảng hướng dẫn từng bước
+   Đã cài (mở bằng icon) → html.is-app, mọi nút cài tự ẩn. */
+const InstallApp = {
+  bannerKey: 'mkpc-app-banner',
+  prompt: null,
+  isStandalone: () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true,
+  isIOS: () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1),
+  isMobile: () => /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent) || InstallApp.isIOS(),
+};
+
+function installStepsHTML() {
+  if (InstallApp.isIOS()) {
+    const safari = /safari/i.test(navigator.userAgent) && !/crios|fxios|edgios/i.test(navigator.userAgent);
+    return `
+      <ol class="app-guide__steps">
+        <li><b>1</b><span>Bấm nút <strong>Chia sẻ</strong> ${icon('share')} ${safari ? 'ở thanh dưới cùng của Safari' : 'trên thanh địa chỉ'}</span></li>
+        <li><b>2</b><span>Kéo xuống, chọn <strong>Thêm vào MH chính</strong> ${icon('square-plus')}</span></li>
+        <li><b>3</b><span>Bấm <strong>Thêm</strong> — icon Minh Khôi PC sẽ nằm trên màn hình chính</span></li>
+      </ol>
+      ${safari ? '' : `<p class="app-guide__note">${icon('info')}Nếu không thấy mục "Thêm vào MH chính", hãy mở trang này bằng <strong>Safari</strong>.</p>`}`;
+  }
+  if (InstallApp.isMobile()) {
+    return `
+      <ol class="app-guide__steps">
+        <li><b>1</b><span>Bấm nút <strong>menu</strong> ${icon('ellipsis-vertical')} ở góc trên trình duyệt</span></li>
+        <li><b>2</b><span>Chọn <strong>Cài đặt ứng dụng</strong> hoặc <strong>Thêm vào màn hình chính</strong></span></li>
+        <li><b>3</b><span>Bấm <strong>Cài đặt</strong> — icon Minh Khôi PC sẽ nằm trên màn hình chính</span></li>
+      </ol>`;
+  }
+  return `
+    <ol class="app-guide__steps">
+      <li><b>1</b><span>Mở trang bằng <strong>Chrome</strong> hoặc <strong>Edge</strong></span></li>
+      <li><b>2</b><span>Bấm biểu tượng <strong>Cài đặt</strong> ${icon('monitor-down')} ở cuối thanh địa chỉ (hoặc menu ${icon('ellipsis-vertical')} → <strong>Cài đặt Minh Khôi PC</strong>)</span></li>
+      <li><b>3</b><span>Hoặc dùng điện thoại: quét/mở <strong>${location.host}</strong> và cài từ trình duyệt</span></li>
+    </ol>`;
+}
+
+function openInstallGuide() {
+  if ($('#app-guide')) return;
+  document.body.insertAdjacentHTML('beforeend', `
+    <div class="app-guide" id="app-guide" role="dialog" aria-modal="true" aria-labelledby="app-guide-title">
+      <div class="app-guide__backdrop" data-guide-close></div>
+      <div class="app-guide__card">
+        <button class="app-guide__close" type="button" data-guide-close aria-label="Đóng">${icon('x')}</button>
+        <div class="app-guide__head">
+          <img src="assets/icons/icon-192.png" alt="" width="64" height="64">
+          <div>
+            <h2 class="app-guide__title" id="app-guide-title">Cài app ${COMPANY.name}</h2>
+            <p>Miễn phí · Mở nhanh từ màn hình chính · Không tốn dung lượng</p>
+          </div>
+        </div>
+        ${installStepsHTML()}
+        <button class="btn btn--primary btn--lg btn--block" type="button" data-guide-close>Đã hiểu</button>
+      </div>
+    </div>`);
+  const guide = $('#app-guide');
+  const lastFocus = document.activeElement;
+  document.body.classList.add('is-locked');
+  requestAnimationFrame(() => guide.classList.add('is-open'));
+  $('.app-guide__close', guide).focus({ preventScroll: true });
+  const close = () => {
+    guide.classList.remove('is-open');
+    document.body.classList.remove('is-locked');
+    document.removeEventListener('keydown', onKey);
+    setTimeout(() => guide.parentNode?.removeChild(guide), 300);
+    lastFocus?.focus?.({ preventScroll: true });
+  };
+  const onKey = (e) => {
+    if (e.key === 'Escape') close();
+  };
+  document.addEventListener('keydown', onKey);
+  guide.addEventListener('click', (e) => {
+    if (e.target.closest('[data-guide-close]')) close();
+  });
+}
+
+function hideInstallEntries() {
+  document.documentElement.classList.add('is-app');
+  $('[data-app-banner]')?.classList.add('is-hidden');
+}
+
+async function installApp() {
+  // iPhone không có hộp cài tự động → luôn hiện hướng dẫn
+  if (InstallApp.prompt && !InstallApp.isIOS()) {
+    try {
+      InstallApp.prompt.prompt();
+      const { outcome } = await InstallApp.prompt.userChoice;
+      InstallApp.prompt = null;
+      if (outcome === 'accepted') hideInstallEntries();
+      return;
+    } catch {
+      InstallApp.prompt = null; // hộp cài bị trình duyệt chặn → dùng hướng dẫn
+    }
+  }
+  openInstallGuide();
+}
+
+function initInstallApp() {
+  // Bộ nhớ đệm + trang offline (chỉ chạy trên https / localhost)
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  }
+  if (InstallApp.isStandalone()) {
+    hideInstallEntries();
+    return;
+  }
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    InstallApp.prompt = e;
+  });
+  window.addEventListener('appinstalled', () => {
+    hideInstallEntries();
+    showToast(`Đã cài app ${COMPANY.name} — mở từ màn hình chính nhé!`);
+  });
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-install]')) {
+      e.preventDefault();
+      installApp();
+    }
+    if (e.target.closest('[data-app-banner-close]')) {
+      Store.set(InstallApp.bannerKey, Date.now());
+      $('[data-app-banner]')?.classList.add('is-hidden');
+    }
+  });
+
+  // Dải gợi ý cài app trên điện thoại (ẩn 7 ngày sau khi bấm ✕)
+  const hiddenAt = Number(Store.get(InstallApp.bannerKey, 0)) || 0;
+  if (InstallApp.isMobile() && Date.now() - hiddenAt > 7 * 864e5) {
+    const banner = `
+      <div class="app-banner" data-app-banner>
+        <button class="app-banner__close" type="button" data-app-banner-close aria-label="Ẩn gợi ý cài app">${icon('x')}</button>
+        <img class="app-banner__icon" src="assets/icons/icon-192.png" alt="" width="40" height="40">
+        <span class="app-banner__text"><b>App ${COMPANY.name}</b><small>Miễn phí · Mở nhanh từ màn hình chính</small></span>
+        <button class="app-banner__btn" type="button" data-install>Cài app</button>
+      </div>`;
+    const skip = $('.skip-link');
+    if (skip) skip.insertAdjacentHTML('afterend', banner);
+    else document.body.insertAdjacentHTML('afterbegin', banner);
+  }
+}
+
 /* ---------- Khởi động ---------- */
 document.addEventListener('DOMContentLoaded', () => {
   const headerSlot = $('#site-header-slot');
@@ -1135,6 +1279,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initTopbar();
   initAccountMenu();
+  initInstallApp();
   // Đã đăng nhập → kết nối Firebase ở nền để kiểm tra phiên còn hiệu lực
   if (Auth.current()) Auth.ready();
   // Dọn dữ liệu tài khoản kiểu cũ (lưu trên trình duyệt) — nay dùng Firebase

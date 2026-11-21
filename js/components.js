@@ -136,6 +136,7 @@ function renderDrawer() {
           <a href="wishlist.html">${icon('heart')}<span>Sản phẩm yêu thích</span></a>
           <a href="compare.html">${icon('git-compare-arrows')}<span>So sánh sản phẩm</span></a>
           <a href="order.html">${icon('clipboard-list')}<span>Tra cứu đơn hàng</span></a>
+          <button class="drawer__install" type="button" data-install>${icon('smartphone')}<span>Tải app ${COMPANY.name}</span></button>
           <a href="tel:${COMPANY.phone}">${icon('phone')}<span>Hotline: <b>${COMPANY.phoneDisplay}</b></span></a>
           <a href="mailto:${COMPANY.email}">${icon('mail')}<span>${COMPANY.email}</span></a>
           <p>${icon('map-pin')}<span>${COMPANY.address}</span></p>
@@ -237,6 +238,12 @@ function renderFooter() {
             <a href="${COMPANY.socials.youtube}" aria-label="YouTube" target="_blank" rel="noopener">${icon('youtube')}</a>
             <a href="${COMPANY.socials.github}" aria-label="GitHub" target="_blank" rel="noopener">${icon('github')}</a>
           </div>
+          <h3 class="footer-col__title footer-col__title--spaced" data-install-wrap>Tải ứng dụng</h3>
+          <button class="footer-app" type="button" data-install>
+            <img src="assets/icons/icon-192.png" alt="" width="36" height="36" loading="lazy">
+            <span><b>App ${COMPANY.name}</b><small>Android &amp; iPhone · Miễn phí</small></span>
+            ${icon('download')}
+          </button>
         </div>
         <div>
           <h3 class="footer-col__title">Tổng đài hỗ trợ</h3>
