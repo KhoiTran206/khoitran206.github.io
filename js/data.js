@@ -32,7 +32,7 @@ const SUB_NAV = [
   { text: 'Tin tức - Review', href: 'news.html' },
   { text: 'Tra cứu đơn hàng', href: 'order.html' },
   { text: 'Chính sách bảo hành', href: 'policy.html?type=bao-hanh' },
-  { text: 'Thu cũ đổi mới', href: 'policy.html?type=thu-cu-doi-moi' },
+  { text: 'Thu cũ đổi mới', href: 'thu-cu-doi-moi.html' },
   { text: 'Build PC', href: 'build-pc.html' },
   { text: 'Trả góp 0%', href: 'policy.html?type=tra-gop' },
 ];
@@ -129,7 +129,7 @@ const CATEGORIES = [
       { title: 'Theo CPU', links: ['Intel Core i3', 'Intel Core i5', 'Intel Core i7', 'Intel Core Ultra', 'AMD Ryzen 5', 'AMD Ryzen 7'] },
       { title: 'Theo VGA', links: ['GTX 1650', 'RTX 3050', 'RTX 4060', 'RTX 5060', 'RTX 5070', 'RTX 5080', 'RX 7600'] },
       { title: 'Theo nhu cầu', links: ['Esport', 'Streaming', 'AAA 2K', 'Đồ họa - Render'] },
-      { title: 'Dịch vụ', links: [['Build PC theo yêu cầu', 'build-pc.html'], ['Bảo hành tận nơi', 'policy.html?type=bao-hanh'], ['Thu cũ đổi mới', 'policy.html?type=thu-cu-doi-moi'], ['Trả góp 0%', 'policy.html?type=tra-gop']] },
+      { title: 'Dịch vụ', links: [['Build PC theo yêu cầu', 'build-pc.html'], ['Bảo hành tận nơi', 'policy.html?type=bao-hanh'], ['Thu cũ đổi mới', 'thu-cu-doi-moi.html'], ['Trả góp 0%', 'policy.html?type=tra-gop']] },
     ],
   },
   {
@@ -1033,7 +1033,7 @@ const HERO_SLIDES = [
 
 const HERO_SIDE = [
   { theme: 'dark', tag: 'Miễn phí', title: 'Build PC <em>theo yêu cầu</em>', img: 'setup-3.jpg', href: 'build-pc.html' },
-  { theme: 'light', tag: 'Trợ giá', title: 'Thu cũ đổi mới <em>đến 2 triệu</em>', img: 'laptop-office-3.jpg', href: 'policy.html?type=thu-cu-doi-moi' },
+  { theme: 'light', tag: 'Trợ giá', title: 'Thu cũ đổi mới <em>đến 2 triệu</em>', img: 'laptop-office-3.jpg', href: 'thu-cu-doi-moi.html' },
 ];
 
 /* Hàng icon danh mục nhanh dưới hero */

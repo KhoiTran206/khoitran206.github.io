@@ -16,7 +16,7 @@ const { PRODUCTS, NEWS, POLICIES, CATEGORY_RULES } = ctx.__d;
 const today = new Date().toISOString().slice(0, 10);
 const urls = [
   [BASE, '1.0', 'daily'],
-  ...['category.html', 'build-pc.html', 'news.html', 'contact.html'].map((f) => [BASE + f, '0.8', 'weekly']),
+  ...['category.html', 'build-pc.html', 'thu-cu-doi-moi.html', 'news.html', 'contact.html'].map((f) => [BASE + f, '0.8', 'weekly']),
   ...Object.keys(CATEGORY_RULES).map((k) => [`${BASE}category.html?cat=${k}`, '0.8', 'daily']),
   ...PRODUCTS.map((p) => [`${BASE}product.html?id=${p.id}`, '0.7', 'weekly']),
   ...NEWS.map((n) => [`${BASE}article.html?id=${n.id}`, '0.5', 'monthly']),

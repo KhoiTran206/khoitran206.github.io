@@ -50,6 +50,7 @@
 ├── compare.html          # So sánh tối đa 3 sản phẩm cùng loại (Compare)
 ├── manifest.webmanifest, sitemap.xml, robots.txt, favicon.ico  # SEO + cài như app (tạo lại bằng script khi thêm trang)
 ├── build-pc.html         # Tự chọn cấu hình PC
+├── thu-cu-doi-moi.html   # Thu cũ đổi mới: định giá online (bảng giá TRADE_IN đầu file js/pages/trade-in.js), chính sách thu, gửi yêu cầu qua email
 ├── news.html, article.html  # Tin tức + bài viết (?id=)
 ├── contact.html          # Liên hệ, bản đồ, form gửi email
 ├── policy.html           # Chính sách (?type=bao-hanh...)

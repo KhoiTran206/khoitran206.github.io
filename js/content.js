@@ -142,14 +142,14 @@ const POLICIES = {
     body: [
       ['p', 'Mang thiết bị cũ (laptop, PC, linh kiện, màn hình) đến cửa hàng để được định giá và trợ giá khi lên đời sản phẩm mới.'],
       ['ul', ['Định giá miễn phí, nhanh chóng.', 'Trợ giá thêm khi đổi sang sản phẩm mới tại cửa hàng.', 'Giá thu phụ thuộc tình trạng thực tế của thiết bị.']],
-      ['p', `Liên hệ ${COMPANY.phoneDisplay} để được báo giá sơ bộ.`],
+      ['p', `Định giá online ngay tại trang <a href="thu-cu-doi-moi.html">Thu cũ đổi mới</a> hoặc liên hệ ${COMPANY.phoneDisplay} để được báo giá sơ bộ.`],
     ],
   },
   'bao-mat': {
     title: 'Chính sách bảo mật thông tin',
     body: [
       ['p', 'Thông tin khách hàng (họ tên, số điện thoại, email, địa chỉ) chỉ được dùng để xử lý đơn hàng, giao hàng và chăm sóc khách hàng.'],
-      ['ul', ['Không chia sẻ thông tin cho bên thứ ba ngoài mục đích giao hàng.', 'Khách hàng có thể yêu cầu chỉnh sửa hoặc xóa thông tin bất cứ lúc nào.', 'Thông tin tài khoản trên website được lưu trên chính thiết bị của bạn.']],
+      ['ul', ['Không chia sẻ thông tin cho bên thứ ba ngoài mục đích giao hàng.', 'Khách hàng có thể yêu cầu chỉnh sửa hoặc xóa thông tin bất cứ lúc nào.', 'Tài khoản được quản lý bởi Firebase Authentication (Google): website không lưu và không xem được mật khẩu của bạn.']],
     ],
   },
 };
