@@ -145,6 +145,20 @@ async function findOrder(code) {
   return cloud ? { ...(local || {}), ...cloud } : local;
 }
 
+let stopWatch = () => {};
+
+async function watchOrder(code, isNew) {
+  stopWatch();
+  await Auth.ready();
+  let first = true;
+  stopWatch = await Orders.watch(code, (cloud) => {
+    const prev = shownOrder?.code === cloud.code ? shownOrder.status : null;
+    showOrder({ ...(Orders.find(cloud.code) || {}), ...cloud }, isNew);
+    if (!first && prev && prev !== cloud.status) showToast(`Đơn hàng ${cloud.code}: ${cloud.status}`);
+    first = false;
+  });
+}
+
 async function initPage() {
   const root = $('#order-page');
   const code = params.get('code');
@@ -153,11 +167,8 @@ async function initPage() {
   if (order) showOrder(order, isNew);
   else showLookup(code ? `Không tìm thấy đơn hàng <b>${esc(code)}</b>.` : '');
 
-  // Cập nhật trạng thái từ máy chủ (khách đã đăng nhập)
-  if (code && Auth.current()) {
-    const latest = await findOrder(code);
-    if (latest) showOrder(latest, isNew);
-  }
+  // Khách đã đăng nhập: theo dõi đơn trên máy chủ — cửa hàng đổi trạng thái là trang tự cập nhật
+  if (code && Auth.current()) watchOrder(code, isNew);
 
   root.addEventListener('submit', async (e) => {
     if (e.target.id !== 'lookup-form') return;
@@ -172,6 +183,7 @@ async function initPage() {
     if (found && found.customer.phone.replace(/\D/g, '') === phone) {
       history.replaceState(null, '', `order.html?code=${found.code}`);
       showOrder(found, false);
+      if (Auth.current()) watchOrder(found.code, false);
     } else {
       showLookup(`Không tìm thấy đơn hàng <b>${esc(c)}</b> với số điện thoại này.${Auth.current() ? '' : ' Nếu đặt hàng trên thiết bị khác, hãy <a href="login.html?next=order.html">đăng nhập</a> tài khoản đã dùng khi đặt, hoặc gọi hotline để được hỗ trợ.'}`);
     }

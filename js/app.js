@@ -195,6 +195,20 @@ const Orders = {
       return null;
     }
   },
+  /* Theo dõi 1 đơn theo thời gian thực (chủ đơn / quản trị) → gọi onChange(order) mỗi khi đơn đổi.
+     Trả về hàm hủy theo dõi. */
+  async watch(code, onChange) {
+    if (!Auth.current()) return () => {};
+    try {
+      const db = await Cloud.db();
+      return db.collection('orders').doc(String(code).trim().toUpperCase()).onSnapshot(
+        (snap) => snap.exists && onChange(snap.data()),
+        () => {}, // không có quyền (đơn của người khác / khách vãng lai) → bỏ qua
+      );
+    } catch {
+      return () => {};
+    }
+  },
   async markSent(code) {
     if (!Auth.current()) return;
     try {
