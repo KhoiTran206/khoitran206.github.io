@@ -95,7 +95,7 @@ function renderReviews(p) {
 
 function renderProduct(p) {
   const discount = discountPercent(p.price, p.oldPrice);
-  const catId = CAT_FOR_PRODUCT[p.cat]?.(p) || p.cat;
+  const catId = p.tags.includes('used') ? 'used' : CAT_FOR_PRODUCT[p.cat]?.(p) || p.cat;
   const catName = CATEGORY_RULES[catId]?.name || 'Sản phẩm';
   const { warranty } = p;
   const related = PRODUCTS.filter((x) => x.cat === p.cat && x.id !== p.id).slice(0, 10);
