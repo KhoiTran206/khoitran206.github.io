@@ -61,7 +61,7 @@ function orderRowHTML(o) {
           ${o.updatedAt ? `<div><dt>Cập nhật</dt><dd>${fmtDate(o.updatedAt)}</dd></div>` : ''}
         </dl>
         <ul class="admin-order__items">
-          ${o.items.map((i) => `<li><img src="${esc(i.img)}" alt="" width="48" height="48" loading="lazy"><span>${esc(i.name)}<small>${i.qty} × ${formatPrice(i.price)}</small></span><b>${formatPrice(i.qty * i.price)}</b></li>`).join('')}
+          ${o.items.map((i) => `<li><img src="${esc(thumb(i.img))}" alt="" width="48" height="48" loading="lazy"><span>${esc(i.name)}<small>${i.qty} × ${formatPrice(i.price)}</small></span><b>${formatPrice(i.qty * i.price)}</b></li>`).join('')}
         </ul>
         <p class="admin-order__sum">Tạm tính ${formatPrice(o.totals?.subtotal || 0)}${o.totals?.discount ? ` · Giảm ${formatPrice(o.totals.discount)} (${esc(o.totals.couponCode)})` : ''} · Ship ${o.totals?.shipping ? formatPrice(o.totals.shipping) : 'miễn phí'} · <b>Tổng ${formatPrice(o.totals?.total || 0)}</b></p>
       </div>

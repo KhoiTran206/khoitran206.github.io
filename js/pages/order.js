@@ -47,7 +47,7 @@ function orderDetailHTML(order, isNew) {
           <ul class="mini-list mini-list--lg">
             ${order.items.map((i) => `
               <li>
-                <span class="mini-list__img"><img src="${i.img}" alt="" width="64" height="64"><b>${i.qty}</b></span>
+                <span class="mini-list__img"><img src="${thumb(i.img)}" alt="" width="64" height="64"><b>${i.qty}</b></span>
                 <a class="mini-list__name" href="product.html?id=${i.id}">${esc(i.name)}<small>${formatPrice(i.price)} × ${i.qty}</small></a>
                 <span class="mini-list__price">${formatPrice(i.price * i.qty)}</span>
               </li>`).join('')}

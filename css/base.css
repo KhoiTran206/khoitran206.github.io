@@ -138,7 +138,7 @@ h1, h2, h3, h4 {
   opacity: 0;
   transform: translateY(16px);
   transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-  transition-delay: calc(var(--i, 0) * 60ms);
+  transition-delay: calc(min(var(--i, 0), 5) * 60ms); /* tối đa 0.3s để không phải chờ lâu */
 }
 
 .js .reveal.reveal--visible .reveal-item {

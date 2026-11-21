@@ -18,7 +18,7 @@ function renderCategoryIcons() {
     <a class="cat-icon reveal-item" style="--i:${i}" href="${c.href}">
       ${c.special
         ? `<span class="cat-icon__img cat-icon__img--special">${icon('flame')}<b>BLACK<br>FRIDAY</b></span>`
-        : `<span class="cat-icon__img"><img src="${IMG}${c.img}" alt="" loading="lazy" width="64" height="64"></span>`}
+        : `<span class="cat-icon__img"><img src="${thumb(IMG + c.img)}" alt="" loading="lazy" width="64" height="64"></span>`}
       <span class="cat-icon__label">${c.name}</span>
     </a>`).join('');
 }

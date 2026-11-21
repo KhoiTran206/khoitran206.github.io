@@ -26,7 +26,7 @@ function summaryBox(totals, lines) {
     <ul class="mini-list">
       ${lines.map(({ p, qty, total }) => `
         <li>
-          <span class="mini-list__img"><img src="${p.img}" alt="" width="56" height="56"><b>${qty}</b></span>
+          <span class="mini-list__img"><img src="${thumb(p.img)}" alt="" width="56" height="56"><b>${qty}</b></span>
           <span class="mini-list__name">${p.name}</span>
           <span class="mini-list__price">${formatPrice(total)}</span>
         </li>`).join('')}

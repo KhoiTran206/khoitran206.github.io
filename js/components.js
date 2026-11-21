@@ -6,7 +6,16 @@
 const priceFormatter = new Intl.NumberFormat('vi-VN');
 const formatPrice = (value) => `${priceFormatter.format(value)}đ`;
 const discountPercent = (price, oldPrice) => (oldPrice > price ? Math.round((1 - price / oldPrice) * 100) : 0);
-const icon = (name, extraClass = '') => `<i data-lucide="${name}"${extraClass ? ` class="${extraClass}"` : ''} aria-hidden="true"></i>`;
+/* Icon Lucide → chuỗi SVG, lấy từ js/icons.js (chỉ các icon web dùng, tự sinh bởi tools/build-icons.mjs).
+   Không tải thư viện Lucide từ CDN, không phải quét DOM → trang hiện nhanh hơn. */
+const icon = (name, extraClass = '') => {
+  const inner = LUCIDE_ICONS[name];
+  if (!inner) {
+    console.warn(`Thiếu icon "${name}" — chạy: node tools/build-icons.mjs`);
+    return '';
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-${name}${extraClass ? ` ${extraClass}` : ''}" aria-hidden="true">${inner}</svg>`;
+};
 const slugify = (text) => text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
 const SPEC_ICONS = {
@@ -172,7 +181,7 @@ function renderProductCard(p, options = {}) {
   return `
     <article class="product-card${compact ? ' product-card--compact' : ''} ${options.itemClass || ''}" style="--i:${options.index || 0}">
       <a class="product-card__media" href="${url}" tabindex="-1" aria-hidden="true">
-        <img src="${p.img}" alt="${p.name}" loading="lazy" width="200" height="200">
+        <img src="${thumb(p.img)}" alt="${p.name}" loading="lazy" width="200" height="200">
         ${discount ? `<span class="product-card__discount">Giảm ${discount}%</span>` : ''}
       </a>
       <button class="product-card__cart" type="button" data-add-cart="${p.id}" aria-label="Thêm ${p.name} vào giỏ hàng">${icon('shopping-cart')}</button>

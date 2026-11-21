@@ -38,7 +38,7 @@ function initPage() {
           <ul class="side-news">
             ${others.map((n) => `
               <li><a href="article.html?id=${n.id}">
-                <img src="${IMG}${n.img}" alt="" width="88" height="66" loading="lazy">
+                <img src="${thumb(IMG + n.img)}" alt="" width="88" height="66" loading="lazy">
                 <span><b>${n.title}</b><small>${n.date}</small></span>
               </a></li>`).join('')}
           </ul>

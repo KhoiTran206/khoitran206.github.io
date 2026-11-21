@@ -67,7 +67,7 @@
 
   /* Chuyển động */
   --transition: 0.25s ease;
-  --reveal-duration: 0.6s;
+  --reveal-duration: 0.5s;
 
   /* Lớp z-index */
   --z-header: 100;

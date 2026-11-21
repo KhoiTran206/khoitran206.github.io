@@ -14,6 +14,9 @@ const COMPANY = {
 };
 
 const IMG = 'assets/images/photos/'; // Ảnh chụp thật (Pexels, giấy phép miễn phí thương mại)
+/* Ảnh thu nhỏ 400px (photos/thumb/) cho ô sản phẩm, giỏ hàng, danh sách — nhẹ hơn ~3,5 lần.
+   Thêm ảnh mới: đặt bản gốc vào photos/ và bản rộng 400px cùng tên vào photos/thumb/. */
+const thumb = (src) => String(src || '').replace('/photos/', '/photos/thumb/');
 
 const PROMO_MESSAGES = [
   { icon: 'flame', text: 'BLACK FRIDAY — Giảm đến 50% toàn bộ gaming gear' },

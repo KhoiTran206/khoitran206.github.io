@@ -40,7 +40,7 @@ function renderCompare() {
                 <th scope="col">
                   <div class="compare__product">
                     <button class="compare__remove" type="button" data-compare-remove="${p.id}" aria-label="Bỏ ${p.name}">${icon('x')}</button>
-                    <a href="product.html?id=${p.id}"><img src="${p.img}" alt="${p.name}" width="160" height="160"></a>
+                    <a href="product.html?id=${p.id}"><img src="${thumb(p.img)}" alt="${p.name}" width="160" height="160"></a>
                     <a class="compare__name" href="product.html?id=${p.id}">${p.name}</a>
                     <strong class="compare__price">${formatPrice(p.price)}</strong>
                     ${p.oldPrice > p.price ? `<del>${formatPrice(p.oldPrice)}</del>` : ''}

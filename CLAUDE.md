@@ -27,9 +27,10 @@
 - **HTML5 + CSS3 + JavaScript thuần (vanilla)** — không framework, không cần build, mở `index.html` là chạy.
 - CSS dùng **CSS Variables** cho màu/spacing, layout bằng **Flexbox + CSS Grid**.
 - Font: **Be Vietnam Pro** (Google Fonts) — hỗ trợ tiếng Việt tốt. Fallback: `system-ui, sans-serif`.
-- Icon: **Lucide** hoặc **Font Awesome** qua CDN.
+- Icon: **Lucide** — KHÔNG tải cả thư viện từ CDN; `js/icons.js` chỉ chứa icon web dùng (tự sinh bằng `node tools/build-icons.mjs`, chạy lại khi dùng icon mới). Dùng `icon(name, class)` → trả SVG.
 - Dữ liệu sản phẩm để trong `js/data.js` (mảng object), render bằng JS — sau này dễ thay bằng API.
 - Ảnh: **chỉ dùng ảnh chụp thật**, không dùng hình vẽ minh họa. Hiện dùng ảnh Pexels (miễn phí thương mại) lưu tại `assets/images/photos/`, sẽ thay bằng ảnh chụp đúng model khi chủ shop cung cấp.
+- Ảnh nhỏ (ô sản phẩm, giỏ hàng, danh sách) dùng `thumb(src)` → bản rộng 400px trong `assets/images/photos/thumb/` (cùng tên). Thêm ảnh mới: thêm cả bản gốc lẫn bản thumb.
 
 ### Cấu trúc thư mục
 
@@ -69,7 +70,7 @@
     └── logo/             # Logo Minh Khoi PC
 ```
 
-- Thứ tự nạp script mọi trang: `lucide` → `data.js` → `content.js` → `components.js` → `app.js` → `pages/<trang>.js`.
+- Thứ tự nạp script mọi trang: `icons.js` → `data.js` → `content.js` → `components.js` → `app.js` → `pages/<trang>.js`.
 - Mọi link CSS/JS nội bộ có hậu tố `?v=<phiên bản>` để trình duyệt (nhất là Safari iPhone) lấy bản mới ngay. **Mỗi lần sửa CSS/JS rồi đẩy lên, đổi số phiên bản ở tất cả trang** (thay hàng loạt bằng sed).
 - Không có backend: giỏ hàng, hồ sơ, đơn hàng lưu `localStorage` (luôn qua `Store` có try/catch); đơn hàng + form liên hệ gửi email qua FormSubmit (`SHOP.orderEndpoint`).
 - Link trang chủ luôn dùng `HOME_URL` (web: `./` → https://khoitran206.github.io/, file trên máy: `index.html`), không viết cứng `index.html`.

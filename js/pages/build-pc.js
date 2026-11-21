@@ -55,7 +55,7 @@ function render() {
               <span class="build-row__slot">${icon(s.icon)}${s.name}</span>
               ${sel ? `
                 <div class="build-row__item">
-                  <img src="${sel.img}" alt="" width="56" height="56">
+                  <img src="${thumb(sel.img)}" alt="" width="56" height="56">
                   <div>
                     <a href="product.html?id=${sel.id}" class="build-row__name">${sel.name}</a>
                     <b>${formatPrice(sel.price)}</b>
@@ -120,7 +120,7 @@ function renderPickList() {
   const chosen = readBuild()[slot.id]?.id;
   $('#pick-list').innerHTML = list.length ? list.map((p) => `
     <li class="pick-item${p.id === chosen ? ' is-chosen' : ''}">
-      <img src="${p.img}" alt="" width="72" height="72">
+      <img src="${thumb(p.img)}" alt="" width="72" height="72">
       <div class="pick-item__info">
         <a href="product.html?id=${p.id}" target="_blank" rel="noopener">${p.name}</a>
         <p>${p.specs.map((s) => s[1]).join(' · ')}</p>

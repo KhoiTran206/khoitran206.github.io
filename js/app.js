@@ -618,7 +618,7 @@ function renderCompareBar() {
       <ul class="compare-bar__list">
         ${slots.map((p) => (p ? `
           <li class="compare-bar__item">
-            <img src="${p.img}" alt="" width="44" height="44">
+            <img src="${thumb(p.img)}" alt="" width="44" height="44">
             <span>${p.name}</span>
             <button type="button" data-compare-remove="${p.id}" aria-label="Bỏ ${p.name} khỏi so sánh">${icon('x')}</button>
           </li>` : `<li class="compare-bar__item compare-bar__item--empty">${icon('plus')}<span>Thêm sản phẩm</span></li>`)).join('')}
@@ -881,8 +881,11 @@ function showToast(message, type = 'success') {
 }
 
 /* Lucide chỉ thay các thẻ <i data-lucide> chưa được chuyển thành SVG */
+/* icon() đã trả về SVG sẵn; chỉ còn vài <i data-lucide="..."> viết tay trong HTML cần đổi sang SVG */
 function refreshIcons() {
-  if (window.lucide) lucide.createIcons();
+  $$('i[data-lucide]').forEach((el) => {
+    el.outerHTML = icon(el.dataset.lucide, el.getAttribute('class') || '');
+  });
 }
 
 function sliderHTML(itemsHTML) {
@@ -907,19 +910,30 @@ function updateSliderButtons(slider) {
   $('.slider__btn--next', slider).disabled = track.scrollLeft >= max;
 }
 
+/* Cập nhật nút của nhiều slider: đo hết trước rồi mới đổi nút → trình duyệt chỉ tính bố cục 1 lần */
+function updateAllSliderButtons(sliders) {
+  const states = sliders.map((slider) => {
+    const track = $('.slider__track', slider);
+    return [slider, track.scrollLeft <= 2, track.scrollLeft >= track.scrollWidth - track.clientWidth - 2];
+  });
+  states.forEach(([slider, atStart, atEnd]) => {
+    $('.slider__btn--prev', slider).disabled = atStart;
+    $('.slider__btn--next', slider).disabled = atEnd;
+  });
+}
+
 function initSliders(root = document) {
-  $$('[data-slider]', root).forEach((slider) => {
-    if (slider.dataset.ready) {
-      updateSliderButtons(slider);
-      return;
-    }
+  const sliders = $$('[data-slider]', root);
+  sliders.forEach((slider) => {
+    if (slider.dataset.ready) return;
     slider.dataset.ready = '1';
     const track = $('.slider__track', slider);
     $('.slider__btn--prev', slider).addEventListener('click', () => track.scrollBy({ left: -track.clientWidth, behavior: 'smooth' }));
     $('.slider__btn--next', slider).addEventListener('click', () => track.scrollBy({ left: track.clientWidth, behavior: 'smooth' }));
     track.addEventListener('scroll', () => updateSliderButtons(slider), { passive: true });
-    updateSliderButtons(slider);
   });
+  // Đợi trình duyệt vẽ xong khung đầu rồi mới đo (không chặn lúc dựng trang)
+  requestAnimationFrame(() => updateAllSliderButtons(sliders));
 }
 
 /* ---------- Nút thêm giỏ / mua ngay (ủy quyền sự kiện) ---------- */
@@ -968,7 +982,7 @@ function initSearch() {
     box.innerHTML = results.length
       ? results.map((p) => `
           <a class="suggest__item" href="product.html?id=${p.id}" role="option">
-            <img src="${p.img}" alt="" width="44" height="44">
+            <img src="${thumb(p.img)}" alt="" width="44" height="44">
             <span class="suggest__name">${p.name}</span>
             <b class="suggest__price">${formatPrice(p.price)}</b>
           </a>`).join('') + `<a class="suggest__all" href="category.html?q=${encodeURIComponent(q)}">Xem tất cả kết quả cho “${esc(q)}”${icon('arrow-right')}</a>`
@@ -1094,13 +1108,15 @@ function initReveal(root = document) {
     items.forEach((el) => el.classList.add('reveal--visible'));
     return;
   }
+  // Bắt đầu hiện sớm (khi còn cách mép dưới màn hình 15%) để không thấy khoảng trống lúc cuộn nhanh;
+  // khối đã cuộn qua (nằm phía trên, vd. trình duyệt khôi phục vị trí cuộn) thì hiện luôn.
   revealObserver ||= new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
+      if (!entry.isIntersecting && entry.boundingClientRect.bottom > 0) return;
       entry.target.classList.add('reveal--visible');
       revealObserver.unobserve(entry.target);
     });
-  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  }, { threshold: 0, rootMargin: '0px 0px 15% 0px' });
   items.forEach((el) => revealObserver.observe(el));
 }
 
@@ -1134,5 +1150,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollUI();
   initReveal();
 
-  window.addEventListener('resize', () => $$('[data-slider]').forEach(updateSliderButtons));
+  window.addEventListener('resize', () => updateAllSliderButtons($$('[data-slider]')));
 });
