@@ -12,6 +12,7 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  overflow-x: clip; /* chặn thanh cuộn ngang trên mobile, không làm hỏng header sticky */
 }
 
 body {

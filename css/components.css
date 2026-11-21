@@ -505,6 +505,13 @@
   transform: none;
 }
 
+/* Dưới 1025px nút "Danh mục" mở drawer → bỏ hẳn dropdown/mega để không tràn ngang */
+@media (max-width: 1024px) {
+  .subnav__cat .subnav__dropdown {
+    display: none;
+  }
+}
+
 .subnav__list {
   display: flex;
   align-items: center;
