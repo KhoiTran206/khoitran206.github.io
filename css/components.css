@@ -430,6 +430,16 @@
   object-fit: cover;
 }
 
+/* Có ảnh: nền trắng (không lộ viền đỏ của nền chữ cái ở mép ảnh) + vòng xám mảnh để ảnh nền trắng vẫn rõ khung */
+.avatar:has(img) {
+  background: var(--color-surface);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
+.avatar:has(img) img {
+  border-radius: 50%;
+}
+
 .account-dropdown__head {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
