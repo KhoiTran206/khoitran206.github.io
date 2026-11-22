@@ -6,29 +6,31 @@
 /* ---------- BẢNG GIÁ THU (chủ shop chỉnh tại đây) ----------
    Giá thu = giá cơ sở theo thông số × tình trạng × bảo hành × phụ kiện
    (+ trợ giá lên đời nếu đổi sang sản phẩm mới tại cửa hàng).
-   Mọi con số dưới đây là GIÁ MẪU — cập nhật theo giá thị trường thực tế. */
+   Mọi con số dưới đây là GIÁ MẪU, đã cập nhật theo thị trường tháng 11/2026
+   (khủng hoảng bộ nhớ: RAM ~×5, SSD ~×3, VGA ~×1,35–1,8 so với 2025; CPU, màn hình gần như đứng giá). */
 const M = 1e6;
 const CPU_MODELS = {
   Intel: {
     'Core i3-10100F': 0.6 * M, 'Core i3-12100F': 1.1 * M, 'Core i5-10400F': 0.9 * M, 'Core i5-11400F': 1.1 * M,
-    'Core i5-12400F': 1.6 * M, 'Core i5-13400F': 2.3 * M, 'Core i5-14400F': 2.6 * M, 'Core i5-14600K/KF': 4.0 * M,
+    'Core i5-12400F': 1.6 * M, 'Core i5-12600K/KF': 2.9 * M, 'Core i5-13400F': 2.3 * M, 'Core i5-14400F': 2.6 * M, 'Core i5-14600K/KF': 4.0 * M,
     'Core i7-12700K/KF': 3.6 * M, 'Core i7-13700K/KF': 5.2 * M, 'Core i7-14700K/KF': 6.0 * M, 'Core i9-13900K/KF': 7.5 * M,
-    'Core i9-14900K/KF': 9.0 * M, 'Core Ultra 5 245K': 4.2 * M, 'Core Ultra 7 265K': 6.2 * M,
+    'Core i9-14900K/KF': 9.0 * M, 'Core Ultra 5 245K': 4.2 * M, 'Core Ultra 7 265K': 6.2 * M, 'Core Ultra 9 285K': 10.5 * M,
   },
   AMD: {
-    'Ryzen 5 3600': 0.8 * M, 'Ryzen 5 5600': 1.6 * M, 'Ryzen 5 5600X': 1.8 * M, 'Ryzen 7 5700X': 2.4 * M,
+    'Ryzen 5 3600': 0.8 * M, 'Ryzen 5 5600': 1.6 * M, 'Ryzen 5 5600X': 1.8 * M, 'Ryzen 7 5700X': 2.4 * M, 'Ryzen 7 5700X3D': 3.0 * M,
     'Ryzen 7 5800X3D': 4.5 * M, 'Ryzen 5 7500F': 2.5 * M, 'Ryzen 5 7600': 3.0 * M, 'Ryzen 7 7700': 4.4 * M,
-    'Ryzen 7 7800X3D': 7.0 * M, 'Ryzen 7 9800X3D': 9.5 * M,
+    'Ryzen 7 7800X3D': 7.0 * M, 'Ryzen 5 9600X': 4.0 * M, 'Ryzen 7 9700X': 5.5 * M, 'Ryzen 7 9800X3D': 9.5 * M, 'Ryzen 9 9950X3D': 13.0 * M,
   },
 };
 const VGA_MODELS = {
   NVIDIA: {
-    'GTX 1650': 1.2 * M, 'GTX 1660 Super': 2.0 * M, 'RTX 2060': 2.4 * M, 'RTX 3050': 2.6 * M, 'RTX 3060 12GB': 3.8 * M,
-    'RTX 3060 Ti': 4.3 * M, 'RTX 3070': 5.2 * M, 'RTX 3070 Ti': 5.8 * M, 'RTX 3080': 8.0 * M, 'RTX 4060': 5.2 * M,
-    'RTX 4060 Ti': 6.5 * M, 'RTX 4070': 9.0 * M, 'RTX 4070 Super': 10.5 * M, 'RTX 4070 Ti Super': 13.0 * M,
-    'RTX 4080 Super': 17.0 * M, 'RTX 4090': 30.0 * M,
+    'GTX 1650': 1.5 * M, 'GTX 1660 Super': 2.6 * M, 'RTX 2060': 3.2 * M, 'RTX 3050': 3.5 * M, 'RTX 3060 12GB': 5.0 * M,
+    'RTX 3060 Ti': 5.8 * M, 'RTX 3070': 7.0 * M, 'RTX 3070 Ti': 7.8 * M, 'RTX 3080': 10.8 * M, 'RTX 3080 Ti': 13.0 * M, 'RTX 3090': 18.0 * M,
+    'RTX 4060': 7.0 * M, 'RTX 4060 Ti': 8.8 * M, 'RTX 4070': 12.2 * M, 'RTX 4070 Super': 14.2 * M, 'RTX 4070 Ti Super': 19.5 * M,
+    'RTX 4080 Super': 27.0 * M, 'RTX 4090': 58.0 * M, 'RTX 5060': 9.0 * M, 'RTX 5060 Ti 16GB': 13.0 * M, 'RTX 5070': 18.0 * M,
+    'RTX 5070 Ti': 26.0 * M, 'RTX 5080': 40.0 * M,
   },
-  AMD: { 'RX 6600': 2.6 * M, 'RX 6700 XT': 4.2 * M, 'RX 7600': 3.8 * M, 'RX 7800 XT': 8.0 * M },
+  AMD: { 'RX 6600': 3.4 * M, 'RX 6700 XT': 5.6 * M, 'RX 6800 XT': 8.5 * M, 'RX 7600': 5.0 * M, 'RX 7800 XT': 10.5 * M, 'RX 9060 XT 16GB': 9.5 * M, 'RX 9070 XT': 18.0 * M },
 };
 const flatModels = (groups) => Object.assign({}, ...Object.values(groups));
 
@@ -79,7 +81,7 @@ const TRADE_IN = {
     ram: {
       name: 'RAM', icon: 'memory-stick', img: 'ram-1.jpg',
       fields: [
-        { id: 'type', label: 'Chuẩn RAM', options: { DDR4: 30000, DDR5: 45000 }, perGb: true },
+        { id: 'type', label: 'Chuẩn RAM', options: { DDR4: 170000, DDR5: 240000 }, perGb: true }, // đ/GB (11/2026)
         { id: 'size', label: 'Dung lượng', options: { '8GB': 8, '16GB (1 thanh)': 16, '16GB (kit 2×8GB)': 16, '32GB': 32, '64GB': 64 }, gb: true },
         { id: 'bus', label: 'Bus', options: { 'Đến 3200MHz': 1, '3600MHz': 1.05, '4800 - 5600MHz': 1, '6000MHz trở lên': 1.1 } },
         { id: 'rgb', label: 'Đèn LED', options: { 'Không LED': 1, 'Có LED RGB': 1.1 } },
@@ -90,17 +92,34 @@ const TRADE_IN = {
       fields: [
         { id: 'cpu', label: 'CPU', groups: CPU_MODELS, sum: true },
         { id: 'vga', label: 'Card đồ họa', groups: { 'Không có': { 'Không có VGA rời (dùng iGPU)': 0 }, ...VGA_MODELS }, sum: true },
-        { id: 'ram', label: 'RAM', options: { '8GB': 0.35 * M, '16GB': 0.7 * M, '32GB': 1.4 * M, '64GB': 2.8 * M }, sum: true },
-        { id: 'ssd', label: 'Ổ cứng', options: { 'SSD 256GB': 0.2 * M, 'SSD 512GB': 0.4 * M, 'SSD 1TB': 0.7 * M, 'SSD 2TB': 1.3 * M }, sum: true },
+        { id: 'ram', label: 'RAM', options: { '8GB': 1.4 * M, '16GB': 2.8 * M, '32GB': 5.8 * M, '64GB': 11.5 * M }, sum: true },
+        { id: 'ssd', label: 'Ổ cứng', options: { 'SSD 256GB': 0.6 * M, 'SSD 512GB': 1.1 * M, 'SSD 1TB': 2.0 * M, 'SSD 2TB': 3.8 * M }, sum: true },
         { id: 'base', label: 'Mainboard + Nguồn + Case', options: { 'Phổ thông': 1.2 * M, 'Tầm trung': 2.2 * M, 'Cao cấp': 4.0 * M }, sum: true },
       ],
       bundleRate: 0.95, // bộ máy nguyên chiếc: tính 95% tổng linh kiện
+    },
+    laptop: {
+      name: 'Laptop', icon: 'laptop', img: 'laptop-office-1.jpg',
+      fields: [
+        { id: 'line', label: 'Dòng máy', options: {
+          'Văn phòng phổ thông (i3 / i5, Ryzen 3 / 5)': 4.0 * M, 'Doanh nhân (ThinkPad, Latitude, EliteBook, XPS)': 6.5 * M,
+          'Gaming tầm trung (GTX 1650 – RTX 4050)': 9.0 * M, 'Gaming cao cấp (RTX 4060 trở lên)': 16.0 * M,
+          'MacBook Air (M1 – M3)': 12.0 * M, 'MacBook Pro (M1 Pro trở lên)': 22.0 * M,
+        }, base: true },
+        { id: 'year', label: 'Năm sản xuất', options: { '2025 - 2026': 1.3, '2023 - 2024': 1, '2021 - 2022': 0.75, '2020 trở về trước': 0.5 } },
+        { id: 'ram', label: 'RAM', options: { '8GB': 0.9, '16GB': 1.1, '32GB trở lên': 1.3 } },
+        { id: 'battery', label: 'Pin', options: { 'Pin tốt (trên 80%)': 1, 'Pin chai (dưới 80%)': 0.9 } },
+      ],
     },
   },
 };
 
 /* ---------- Chính sách thu (nội dung riêng của Minh Khôi PC) ---------- */
 const TRADE_POLICY = {
+  laptop: {
+    yes: ['Laptop Windows và MacBook từ đời 2018 trở lên, còn hoạt động bình thường.', 'Màn hình, bàn phím, touchpad, loa, webcam, cổng kết nối hoạt động tốt.', 'Có sạc zin; đã đăng xuất iCloud / tài khoản Microsoft.', 'Còn hộp, hóa đơn, bảo hành hãng được cộng thêm giá.'],
+    no: ['Vỡ màn, liệt phím, cong bản lề nặng, vào nước.', 'Khóa iCloud / BIOS / MDM không gỡ được.', 'Đã thay main, thay màn không rõ nguồn gốc.'],
+  },
   lcd: {
     yes: ['Màn hình gaming 144Hz trở lên, màn hình văn phòng IPS phổ biến.', 'Lên hình đều màu, không điểm chết lớn, không hở sáng nặng.', 'Còn đủ chân đế, dây nguồn / adapter và cáp tín hiệu.', 'Còn tem, serial; có hóa đơn hoặc bảo hành là điểm cộng.'],
     no: ['Vỡ, nứt panel, sọc màn, ố vàng hoặc chảy mực.', 'Không xác định được model / serial.', 'Đã thay panel, sửa bo mạch không rõ nguồn gốc.'],
@@ -127,8 +146,8 @@ const TRADE_POLICY = {
   },
 };
 
-const ORDER = ['lcd', 'cpu', 'mainboard', 'vga', 'ram', 'pc'];
-const state = { group: 'lcd', values: {}, upgrade: true, result: null };
+const ORDER = ['laptop', 'lcd', 'cpu', 'mainboard', 'vga', 'ram', 'pc'];
+const state = { group: 'laptop', values: {}, upgrade: true, result: null };
 
 /* ---------- Tính giá ---------- */
 const fieldsOf = (g) => [...TRADE_IN.groups[g].fields, ...COMMON_FIELDS];
@@ -285,7 +304,7 @@ function policyHTML() {
 }
 
 function render() {
-  const tiles = ['lcd', 'vga', 'mainboard', 'cpu'];
+  const tiles = ['laptop', 'vga', 'lcd', 'cpu'];
   $('#trade-page').innerHTML = `
     ${renderBreadcrumb([['Thu cũ đổi mới', '#']])}
 
@@ -293,7 +312,7 @@ function render() {
       <div class="ti-hero__text">
         <p class="ti-eyebrow">${icon('recycle')}Thu cũ đổi mới · ${COMPANY.name}</p>
         <h1 class="ti-hero__title" id="ti-title">Định giá trong 1 phút. <em>Lên đời</em> <strong>trợ giá đến 2 triệu</strong></h1>
-        <p class="ti-hero__desc">Thu mua màn hình, CPU, mainboard, card đồ họa, RAM và bộ PC cũ. Nhận tiền mặt, chuyển khoản hoặc trừ thẳng vào đơn hàng mới.</p>
+        <p class="ti-hero__desc">Thu mua laptop, màn hình, CPU, mainboard, card đồ họa, RAM và bộ PC cũ. Nhận tiền mặt, chuyển khoản hoặc trừ thẳng vào đơn hàng mới.</p>
         <div class="ti-hero__actions">
           <a class="btn btn--primary btn--lg" href="#dinh-gia">${icon('calculator')}Định giá ngay</a>
           <a class="btn ti-btn-light btn--lg" href="${COMPANY.zalo}" target="_blank" rel="noopener">${icon('message-circle')}Gửi ảnh qua Zalo</a>
@@ -333,7 +352,7 @@ function render() {
     <section class="section ti-policy" id="chinh-sach" aria-labelledby="ti-policy-title">
       <p class="ti-eyebrow ti-eyebrow--red">Minh Khôi PC thu gì?</p>
       <h2 class="ti-policy__title" id="ti-policy-title">Chính sách thu cũ</h2>
-      <p class="ti-policy__desc">Điều kiện tiếp nhận cho 6 nhóm hàng. Mọi trường hợp đều được kỹ thuật kiểm tra trực tiếp trước khi chốt giá.</p>
+      <p class="ti-policy__desc">Điều kiện tiếp nhận cho ${ORDER.length} nhóm hàng. Mọi trường hợp đều được kỹ thuật kiểm tra trực tiếp trước khi chốt giá.</p>
       ${policyHTML()}
     </section>
 
