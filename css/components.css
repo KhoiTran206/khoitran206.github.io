@@ -3540,3 +3540,63 @@ body.has-compare-bar .site-footer {
   content-visibility: auto;
   contain-intrinsic-size: auto 720px;
 }
+
+/* Thanh đầu trang tạm (có sẵn trong HTML) — hiện ngay khi mở trang, JS thay bằng header thật.
+   Chiều cao khớp header thật để không giật: topbar 34 + header 112 (mobile) / 69 (≥1025px) + subnav 39 */
+.header-skel__top {
+  height: 34px;
+  background: var(--color-surface);
+}
+
+.header-skel__bar {
+  height: 112px;
+  background: var(--color-primary);
+}
+
+.header-skel__inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 66px;
+  color: var(--color-text-inverse);
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.header-skel__inner::before {
+  content: '';
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: var(--color-surface);
+}
+
+.header-skel__nav {
+  height: 39px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+@media (min-width: 1025px) {
+  .header-skel__bar {
+    height: 69px;
+  }
+
+  .header-skel__inner {
+    height: 69px;
+    font-size: 21px;
+  }
+
+  .header-skel__inner::before {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .is-app .header-skel__top,
+  .is-app .header-skel__nav {
+    display: none;
+  }
+}

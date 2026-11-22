@@ -286,6 +286,9 @@ const CATEGORIES = [
    specs: [loại, giá trị] — loại map sang icon trong components.js
    ---------------------------------------------------------- */
 let __id = 0;
+// Biểu thức nhận diện thương hiệu tạo sẵn 1 lần (trước đây tạo lại ~95 lần cho mỗi sản phẩm → chậm trên điện thoại)
+const BRAND_RE = BRANDS.map((b) => [b, new RegExp(`\\b${b}\\b`, 'i')]);
+const brandOf = (name) => BRAND_RE.find(([, re]) => re.test(name))?.[0] || 'Khác';
 function product(cat, name, img, price, oldPrice, specs, tags = [], extra = {}) {
   __id += 1;
   return {
@@ -296,7 +299,7 @@ function product(cat, name, img, price, oldPrice, specs, tags = [], extra = {}) 
     reviews: extra.reviews ?? 0,
     gift: extra.gift ?? '',
     label: extra.label ?? '',
-    brand: BRANDS.find((b) => new RegExp(`\\b${b}\\b`, 'i').test(name)) || 'Khác',
+    brand: brandOf(name),
     stock: extra.stock ?? 5 + ((__id * 13) % 20), // Tồn kho mẫu
     warranty: extra.warranty ?? SHOP.warranty[cat] ?? 12, // tháng (hàng cũ có thời hạn riêng)
   };
