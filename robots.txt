@@ -7,4 +7,4 @@ Disallow: /login.html
 Disallow: /admin.html
 Disallow: /offline.html
 
-Sitemap: https://khoitran206.github.io/sitemap.xml
+Sitemap: https://minhkhoipc.github.io/sitemap.xml

@@ -42,7 +42,7 @@ const SPEC_LABELS = {
 
 const LOGO_MARK = '<svg viewBox="0 0 64 64" aria-hidden="true"><path fill-rule="evenodd" fill="currentColor" d="M18 14h28a4 4 0 0 1 4 4v28a4 4 0 0 1-4 4H18a4 4 0 0 1-4-4V18a4 4 0 0 1 4-4z M21 42V22h5l6 8 6-8h5v20h-5V30.5l-6 7.5-6-7.5V42z M21 7h3v7h-3z M21 50h3v7h-3z M7 21h7v3H7z M50 21h7v3h-7z M30.5 7h3v7h-3z M30.5 50h3v7h-3z M7 30.5h7v3H7z M50 30.5h7v3h-7z M40 7h3v7h-3z M40 50h3v7h-3z M7 40h7v3H7z M50 40h7v3h-7z"/></svg>';
 
-/* Link trang chủ: trên web dùng "./" (địa chỉ gọn https://khoitran206.github.io/), mở file trên máy dùng index.html */
+/* Link trang chủ: trên web dùng "./" (địa chỉ gọn https://minhkhoipc.github.io/), mở file trên máy dùng index.html */
 const HOME_URL = location.protocol === 'file:' ? 'index.html' : './';
 
 function renderLogo() {

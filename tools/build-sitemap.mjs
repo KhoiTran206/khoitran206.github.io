@@ -5,7 +5,7 @@ import vm from 'node:vm';
 import path from 'node:path';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/(\w:)/, '$1')), '..');
-const BASE = 'https://khoitran206.github.io/';
+const BASE = 'https://minhkhoipc.github.io/';
 const read = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8');
 
 const ctx = { location: { protocol: 'https:' }, console };
