@@ -211,23 +211,27 @@ function renderProductCard(p, options = {}) {
   const compact = !!options.compact;
   const wished = Wishlist.has(p.id);
   const compared = Compare.has(p.id);
+  // Hàng cũ: giá gạch là giá khi còn mới → ghi "Rẻ hơn mới x%" thay cho "Giảm x%"
+  const used = p.tags.includes('used');
+  const condition = used ? p.specs.find(([t]) => t === 'condition')?.[1] : '';
 
   return `
-    <article class="product-card${compact ? ' product-card--compact' : ''} ${options.itemClass || ''}" style="--i:${options.index || 0}">
+    <article class="product-card${compact ? ' product-card--compact' : ''}${used ? ' product-card--used' : ''} ${options.itemClass || ''}" style="--i:${options.index || 0}">
       <a class="product-card__media" href="${url}" tabindex="-1" aria-hidden="true">
         <img src="${thumb(p.img)}" alt="${p.name}" loading="lazy" width="200" height="200">
-        ${discount ? `<span class="product-card__discount">Giảm ${discount}%</span>` : ''}
+        ${discount ? `<span class="product-card__discount">${used ? `Rẻ hơn mới ${discount}%` : `Giảm ${discount}%`}</span>` : ''}
+        ${used ? `<span class="product-card__cond">${icon('recycle')}Hàng cũ${condition ? ` · ${condition.split(',')[0]}` : ''}</span>` : ''}
       </a>
       <button class="product-card__cart" type="button" data-add-cart="${p.id}" aria-label="Thêm ${p.name} vào giỏ hàng">${icon('shopping-cart')}</button>
       <div class="product-card__tools">
         <button class="product-card__tool${wished ? ' is-active' : ''}" type="button" data-wish="${p.id}" aria-pressed="${wished}" aria-label="Yêu thích ${p.name}" title="Yêu thích">${icon('heart')}</button>
         <button class="product-card__tool product-card__tool--compare${compared ? ' is-active' : ''}" type="button" data-compare="${p.id}" aria-pressed="${compared}" aria-label="So sánh ${p.name}" title="So sánh">${icon('git-compare-arrows')}</button>
       </div>
-      ${p.label && !compact ? `<span class="product-card__tag">${icon('flame')}${p.label}</span>` : ''}
+      ${p.label && !compact && !used ? `<span class="product-card__tag">${icon('flame')}${p.label}</span>` : ''}
       <h3 class="product-card__name"><a href="${url}">${p.name}</a></h3>
       ${compact ? '' : `<ul class="product-card__specs" aria-label="Thông số chính">${specs}</ul>`}
       <div class="product-card__prices">
-        ${discount ? `<div class="product-card__old-row"><del class="product-card__old">${formatPrice(p.oldPrice)}</del><span class="product-card__percent">-${discount}%</span></div>` : ''}
+        ${discount ? `<div class="product-card__old-row">${used ? '<span class="product-card__new-label">Giá mới</span>' : ''}<del class="product-card__old">${formatPrice(p.oldPrice)}</del>${used ? '' : `<span class="product-card__percent">-${discount}%</span>`}</div>` : ''}
         <strong class="product-card__price">${formatPrice(p.price)}</strong>
       </div>
       ${compact ? '' : `<div class="product-card__rating">${icon('star')}<b>${p.rating.toFixed(1)}</b>(${p.reviews} đánh giá)</div>`}

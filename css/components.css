@@ -1294,6 +1294,37 @@
   font-weight: 700;
 }
 
+/* Hàng cũ: nhãn tình trạng trên ảnh, "Rẻ hơn mới x%" nền tối (không nhầm với khuyến mãi) */
+.product-card--used .product-card__discount {
+  background: var(--color-dark);
+}
+
+.product-card__cond {
+  position: absolute;
+  z-index: 1;
+  left: 6px;
+  bottom: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: calc(100% - 12px);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-success);
+  color: var(--color-text-inverse);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-card__new-label {
+  margin-right: 4px;
+  font-size: var(--fs-xs);
+  color: var(--color-text-muted);
+}
+
 .product-card__tag {
   align-self: flex-start;
   display: inline-flex;
@@ -2463,6 +2494,17 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.suggest__used {
+  margin-right: 6px;
+  padding: 1px 6px;
+  border-radius: var(--radius-badge);
+  background: var(--color-dark);
+  color: var(--color-text-inverse);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
 }
 
 .suggest__price {

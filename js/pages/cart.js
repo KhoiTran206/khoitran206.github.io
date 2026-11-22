@@ -90,7 +90,7 @@ function render() {
 
 function suggestionsHTML() {
   const inCart = Object.keys(Cart.read());
-  const list = PRODUCTS.filter((p) => !inCart.includes(p.id) && p.cat !== 'pc').sort((a, b) => b.reviews - a.reviews).slice(0, 10);
+  const list = PRODUCTS.filter((p) => !inCart.includes(p.id) && p.cat !== 'pc' && isNew(p)).sort((a, b) => b.reviews - a.reviews).slice(0, 10);
   return `
     <section class="section block reveal">
       <div class="block-head"><h2 class="block-head__title">Có thể bạn cũng thích</h2></div>

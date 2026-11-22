@@ -211,6 +211,65 @@
 }
 
 /* ---------- Bộ lọc đang áp dụng ---------- */
+/* Cột sản phẩm không bị nội dung dài (thanh chọn cuộn ngang) đẩy rộng ra */
+.catalog__main {
+  min-width: 0;
+}
+
+/* Thanh tách hàng mới / hàng cũ (và loại hàng cũ) */
+.seg {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.seg::-webkit-scrollbar {
+  display: none;
+}
+
+.seg__btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+}
+
+.seg__btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.seg__btn span {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  font-size: var(--fs-xs);
+  text-align: center;
+}
+
+.seg__btn.is-active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.seg__btn.is-active span {
+  background: rgba(255, 255, 255, 0.22);
+  color: var(--color-text-inverse);
+}
+
 .active-filters {
   display: flex;
   flex-wrap: wrap;

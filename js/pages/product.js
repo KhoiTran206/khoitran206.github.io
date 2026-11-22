@@ -98,7 +98,9 @@ function renderProduct(p) {
   const catId = p.tags.includes('used') ? 'used' : CAT_FOR_PRODUCT[p.cat]?.(p) || p.cat;
   const catName = CATEGORY_RULES[catId]?.name || 'Sản phẩm';
   const { warranty } = p;
-  const related = PRODUCTS.filter((x) => x.cat === p.cat && x.id !== p.id).slice(0, 10);
+  // Hàng mới gợi ý hàng mới, hàng cũ gợi ý hàng cũ (cùng loại; hàng cũ ít → lấy thêm hàng cũ khác loại)
+  const sameCond = (x) => isUsed(x) === isUsed(p) && x.id !== p.id;
+  const related = [...PRODUCTS.filter((x) => sameCond(x) && x.cat === p.cat), ...(isUsed(p) ? PRODUCTS.filter((x) => sameCond(x) && x.cat !== p.cat) : [])].slice(0, 10);
   const recent = Recent.list(p.id).slice(0, 10);
   const specRows = [
     ['Thương hiệu', p.brand],

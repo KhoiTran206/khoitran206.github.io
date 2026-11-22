@@ -73,32 +73,46 @@ const FIREBASE_SDK = 'https://www.gstatic.com/firebasejs/13.4.0/';
 const BRANDS = ['MKPC', 'ASUS', 'Acer', 'MSI', 'Lenovo', 'Dell', 'HP', 'Apple', 'Logitech', 'Razer', 'Corsair', 'Akko', 'AULA', 'LG', 'Samsung', 'ViewSonic', 'Kingston', 'Crucial', 'G.Skill', 'Lexar', 'WD', 'Seagate', 'Toshiba', 'Intel', 'AMD', 'GIGABYTE', 'ASRock', 'ZOTAC', 'Cooler Master', 'DeepCool', 'Thermalright', 'NZXT', 'Lian Li', 'Xigmatek', 'be quiet', 'HyperX', 'SteelSeries', 'Sony', 'E-Dra', 'Warrior', 'Microsoft', 'Kaspersky', 'Adobe', 'TP-Link', 'Mercusys', 'UGREEN', 'Tenda', 'Bitdefender', 'ESET', 'AOC', 'Philips', 'Keychron', 'Dareu', 'Leopold', 'Pulsar', 'VGN', 'Palit', 'INNO3D', 'Sapphire', 'TeamGroup', 'ADATA', 'Super Flower', 'ID-COOLING', 'ARCTIC', 'Montech', 'Jonsbo', 'Cougar', 'Microlab', 'Edifier', 'Creative', 'Rapoo', 'Fifine', 'Rode', 'Elgato', '8BitDo', 'SanDisk', 'North Bayou', 'BenQ', 'Xiaomi', 'Glorious', 'Fuhlen', 'Ajazz', 'GALAX', 'Colorful', 'PowerColor', 'Patriot', 'Thermaltake', 'Seasonic', 'Noctua', 'Fractal Design', 'Fantech', 'XFX', 'Sparkle'];
 
 /* Danh mục "ảo" trên menu → điều kiện lọc sản phẩm */
+/* Hàng cũ (tag used) chỉ nằm trong danh mục "Hàng cũ"; mọi danh mục khác chỉ có hàng mới */
+const isUsed = (p) => p.tags.includes('used');
+const isNew = (p) => !isUsed(p);
+
 const CATEGORY_RULES = {
-  laptop: { name: 'Laptop văn phòng', match: (p) => p.cat === 'laptop' },
-  'laptop-gaming': { name: 'Laptop gaming', match: (p) => p.cat === 'laptop-gaming' },
-  pc: { name: 'PC Gaming', match: (p) => p.cat === 'pc' && p.tags.includes('gaming') },
-  'pc-office': { name: 'PC Văn phòng - Đồ họa', match: (p) => p.cat === 'pc' && !p.tags.includes('gaming') },
-  components: { name: 'Linh kiện máy tính', match: (p) => p.cat === 'components' },
-  cpu: { name: 'CPU - Vi xử lý', match: (p) => p.cat === 'components' && p.tags.includes('cpu') },
-  mainboard: { name: 'Mainboard', match: (p) => p.cat === 'components' && p.tags.includes('mainboard') },
-  vga: { name: 'Card đồ họa (VGA)', match: (p) => p.cat === 'components' && p.tags.includes('vga') },
-  ram: { name: 'RAM', match: (p) => p.cat === 'components' && p.tags.includes('ram') },
-  storage: { name: 'Ổ cứng SSD - HDD', match: (p) => p.cat === 'components' && (p.tags.includes('ssd') || p.tags.includes('hdd')) },
-  psu: { name: 'Nguồn máy tính (PSU)', match: (p) => p.cat === 'components' && p.tags.includes('psu') },
-  cooler: { name: 'Tản nhiệt', match: (p) => p.cat === 'components' && p.tags.includes('cooler') },
-  case: { name: 'Vỏ case', match: (p) => p.cat === 'components' && p.tags.includes('case') },
-  monitor: { name: 'Màn hình', match: (p) => p.cat === 'monitor' },
-  keyboard: { name: 'Bàn phím', match: (p) => p.cat === 'keyboard' },
-  mouse: { name: 'Chuột - Lót chuột', match: (p) => p.cat === 'mouse' },
-  headset: { name: 'Tai nghe', match: (p) => p.cat === 'headset' },
-  furniture: { name: 'Bàn ghế gaming', match: (p) => p.cat === 'chair' || p.cat === 'desk' },
-  chair: { name: 'Ghế gaming - Công thái học', match: (p) => p.cat === 'chair' },
-  desk: { name: 'Bàn gaming', match: (p) => p.cat === 'desk' },
-  software: { name: 'Phần mềm bản quyền', match: (p) => p.cat === 'software' },
-  network: { name: 'Thiết bị mạng', match: (p) => p.cat === 'network' },
-  accessory: { name: 'Phụ kiện (loa, webcam, micro…)', match: (p) => p.cat === 'accessory' },
-  used: { name: 'Hàng cũ giá tốt', match: (p) => p.tags.includes('used') },
+  laptop: { name: 'Laptop văn phòng', match: (p) => isNew(p) && p.cat === 'laptop' },
+  'laptop-gaming': { name: 'Laptop gaming', match: (p) => isNew(p) && p.cat === 'laptop-gaming' },
+  pc: { name: 'PC Gaming', match: (p) => isNew(p) && p.cat === 'pc' && p.tags.includes('gaming') },
+  'pc-office': { name: 'PC Văn phòng - Đồ họa', match: (p) => isNew(p) && p.cat === 'pc' && !p.tags.includes('gaming') },
+  components: { name: 'Linh kiện máy tính', match: (p) => isNew(p) && p.cat === 'components' },
+  cpu: { name: 'CPU - Vi xử lý', match: (p) => isNew(p) && p.cat === 'components' && p.tags.includes('cpu') },
+  mainboard: { name: 'Mainboard', match: (p) => isNew(p) && p.cat === 'components' && p.tags.includes('mainboard') },
+  vga: { name: 'Card đồ họa (VGA)', match: (p) => isNew(p) && p.cat === 'components' && p.tags.includes('vga') },
+  ram: { name: 'RAM', match: (p) => isNew(p) && p.cat === 'components' && p.tags.includes('ram') },
+  storage: { name: 'Ổ cứng SSD - HDD', match: (p) => isNew(p) && (p.cat === 'components' && (p.tags.includes('ssd') || p.tags.includes('hdd'))) },
+  psu: { name: 'Nguồn máy tính (PSU)', match: (p) => isNew(p) && p.cat === 'components' && p.tags.includes('psu') },
+  cooler: { name: 'Tản nhiệt', match: (p) => isNew(p) && p.cat === 'components' && p.tags.includes('cooler') },
+  case: { name: 'Vỏ case', match: (p) => isNew(p) && p.cat === 'components' && p.tags.includes('case') },
+  monitor: { name: 'Màn hình', match: (p) => isNew(p) && p.cat === 'monitor' },
+  keyboard: { name: 'Bàn phím', match: (p) => isNew(p) && p.cat === 'keyboard' },
+  mouse: { name: 'Chuột - Lót chuột', match: (p) => isNew(p) && p.cat === 'mouse' },
+  headset: { name: 'Tai nghe', match: (p) => isNew(p) && p.cat === 'headset' },
+  furniture: { name: 'Bàn ghế gaming', match: (p) => isNew(p) && (p.cat === 'chair' || p.cat === 'desk') },
+  chair: { name: 'Ghế gaming - Công thái học', match: (p) => isNew(p) && p.cat === 'chair' },
+  desk: { name: 'Bàn gaming', match: (p) => isNew(p) && p.cat === 'desk' },
+  software: { name: 'Phần mềm bản quyền', match: (p) => isNew(p) && p.cat === 'software' },
+  network: { name: 'Thiết bị mạng', match: (p) => isNew(p) && p.cat === 'network' },
+  accessory: { name: 'Phụ kiện (loa, webcam, micro…)', match: (p) => isNew(p) && p.cat === 'accessory' },
+  used: { name: 'Hàng cũ giá tốt', match: isUsed },
 };
+
+/* Loại hàng cũ (bộ lọc trong danh mục Hàng cũ): category.html?cat=used&type=laptop */
+const USED_TYPES = [
+  ['laptop', 'Laptop cũ', (p) => p.cat === 'laptop' || p.cat === 'laptop-gaming'],
+  ['pc', 'PC - Máy bộ cũ', (p) => p.cat === 'pc'],
+  ['components', 'Linh kiện cũ', (p) => p.cat === 'components'],
+  ['monitor', 'Màn hình cũ', (p) => p.cat === 'monitor'],
+  ['gear', 'Phím - Chuột - Tai nghe cũ', (p) => ['keyboard', 'mouse', 'headset'].includes(p.cat)],
+  ['furniture', 'Bàn ghế cũ', (p) => p.cat === 'chair' || p.cat === 'desk'],
+];
 
 /* Danh mục: dùng cho menu hero, mega menu, drawer mobile và hàng icon */
 const CATEGORIES = [
@@ -255,10 +269,10 @@ const CATEGORIES = [
   {
     id: 'used', name: 'Hàng cũ', icon: 'recycle',
     groups: [
-      { title: 'Linh kiện cũ', links: ['Card màn hình', 'RTX 3060', 'RTX 3080', 'CPU', 'Mainboard'] },
-      { title: 'Laptop cũ', links: ['Laptop gaming', 'ThinkPad', 'Dell Latitude'] },
-      { title: 'PC - Màn hình cũ', links: ['PC văn phòng', 'Màn hình'] },
-      { title: 'Gear cũ', links: ['Chuột', 'Bàn phím', 'Ghế'] },
+      { title: 'Linh kiện cũ', links: [['Tất cả linh kiện cũ', 'category.html?cat=used&type=components'], 'Card màn hình', 'RTX 3060', 'CPU', 'Mainboard'] },
+      { title: 'Laptop cũ', links: [['Tất cả laptop cũ', 'category.html?cat=used&type=laptop'], 'Laptop gaming', 'ThinkPad', 'MacBook'] },
+      { title: 'PC - Màn hình cũ', links: [['PC - Máy bộ cũ', 'category.html?cat=used&type=pc'], ['Màn hình cũ', 'category.html?cat=used&type=monitor']] },
+      { title: 'Gear cũ', links: [['Phím - Chuột - Tai nghe', 'category.html?cat=used&type=gear'], ['Bàn ghế cũ', 'category.html?cat=used&type=furniture']] },
       { title: 'Tình trạng', links: ['Like new', 'Đẹp 95%'] },
     ],
   },

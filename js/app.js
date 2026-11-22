@@ -718,10 +718,17 @@ const Catalog = {
     return scored.filter((s) => s.hits > 0).sort((a, b) => b.hits - a.hits).map((s) => s.p);
   },
 
-  filter({ cat, q, sale, brands = [], min = 0, max = Infinity, sort = 'popular' } = {}) {
+  /* cond: 'new' | 'used' (khi tìm kiếm / xem tất cả); type: loại hàng cũ trong danh mục Hàng cũ (USED_TYPES) */
+  filter({ cat, q, sale, cond = '', type = '', brands = [], min = 0, max = Infinity, sort = 'popular' } = {}) {
     let list = PRODUCTS.slice();
     if (cat && CATEGORY_RULES[cat]) list = list.filter(CATEGORY_RULES[cat].match);
-    if (sale) list = list.filter((p) => p.oldPrice > p.price);
+    if (cat === 'used' && type) {
+      const t = USED_TYPES.find(([id]) => id === type);
+      if (t) list = list.filter(t[2]);
+    }
+    if (!cat && cond) list = list.filter(cond === 'used' ? isUsed : isNew);
+    // Khuyến mãi = hàng mới đang giảm giá (giá gạch của hàng cũ là giá khi còn mới, không phải khuyến mãi)
+    if (sale) list = list.filter((p) => p.oldPrice > p.price && (cat === 'used' || isNew(p)));
     let priceFromQuery = null;
     if (q) {
       priceFromQuery = this.parsePrice(q);
@@ -731,7 +738,10 @@ const Catalog = {
     const hi = Math.min(max, priceFromQuery?.max ?? Infinity);
     list = list.filter((p) => p.price >= lo && p.price <= hi);
     if (brands.length) list = list.filter((p) => brands.includes(p.brand));
-    return this.sort(list, sort);
+    list = this.sort(list, sort);
+    // Tìm kiếm chung, sắp xếp "Phổ biến": hàng mới xếp trước, hàng cũ xếp sau
+    if (!cat && !cond && sort === 'popular') list = [...list.filter(isNew), ...list.filter(isUsed)];
+    return list;
   },
 
   sort(list, sort) {
@@ -979,12 +989,14 @@ function initSearch() {
   const render = () => {
     const q = input.value.trim();
     if (q.length < 2) return close();
-    const results = Catalog.search(q).slice(0, 6);
+    // Hàng mới hiện trước, hàng cũ sau (có nhãn "Cũ")
+    const found = Catalog.search(q);
+    const results = [...found.filter(isNew), ...found.filter(isUsed)].slice(0, 6);
     box.innerHTML = results.length
       ? results.map((p) => `
           <a class="suggest__item" href="product.html?id=${p.id}" role="option">
             <img src="${thumb(p.img)}" alt="" width="44" height="44">
-            <span class="suggest__name">${p.name}</span>
+            <span class="suggest__name">${isUsed(p) ? '<em class="suggest__used">Cũ</em>' : ''}${p.name}</span>
             <b class="suggest__price">${formatPrice(p.price)}</b>
           </a>`).join('') + `<a class="suggest__all" href="category.html?q=${encodeURIComponent(q)}">Xem tất cả kết quả cho “${esc(q)}”${icon('arrow-right')}</a>`
       : `<p class="suggest__empty">Không tìm thấy sản phẩm phù hợp với “${esc(q)}”.</p>`;

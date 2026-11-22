@@ -121,7 +121,8 @@ function renderPickList() {
   const slot = SLOTS.find((s) => s.id === currentSlot);
   const q = $('[data-pick-search]').value;
   const sort = $('[data-pick-sort]').value;
-  const list = Catalog.sort(Catalog.search(q, PRODUCTS.filter(slot.match)), sort);
+  // Build PC chỉ dùng linh kiện mới (hàng cũ xem ở danh mục Hàng cũ)
+  const list = Catalog.sort(Catalog.search(q, PRODUCTS.filter((p) => isNew(p) && slot.match(p))), sort);
   const chosen = readBuild()[slot.id]?.id;
   $('#pick-list').innerHTML = list.length ? list.map((p) => `
     <li class="pick-item${p.id === chosen ? ' is-chosen' : ''}">

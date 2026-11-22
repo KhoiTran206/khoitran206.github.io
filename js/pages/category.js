@@ -1,6 +1,6 @@
 /* ==========================================================
    Trang danh mục / tìm kiếm / khuyến mãi
-   URL: category.html?cat=&q=&sale=1&brand=A,B&min=&max=&sort=&page=
+   URL: category.html?cat=&q=&sale=1&cond=new|used&type=&brand=A,B&min=&max=&sort=&page=
    ========================================================== */
 
 const PER_PAGE = 20;
@@ -24,6 +24,8 @@ const state = {
   cat: params.get('cat') || '',
   q: params.get('q') || '',
   sale: params.get('sale') === '1',
+  cond: ['new', 'used'].includes(params.get('cond')) ? params.get('cond') : '', // tìm kiếm: hàng mới / hàng cũ
+  type: params.get('type') || '', // loại hàng cũ (USED_TYPES)
   brands: (params.get('brand') || '').split(',').filter(Boolean),
   min: Number(params.get('min')) || 0,
   max: params.get('max') ? Number(params.get('max')) : Infinity,
@@ -36,6 +38,8 @@ function syncUrl() {
   if (state.cat) u.set('cat', state.cat);
   if (state.q) u.set('q', state.q);
   if (state.sale) u.set('sale', '1');
+  if (state.cond) u.set('cond', state.cond);
+  if (state.type) u.set('type', state.type);
   if (state.brands.length) u.set('brand', state.brands.join(','));
   if (state.min) u.set('min', state.min);
   if (state.max !== Infinity) u.set('max', state.max);
@@ -46,13 +50,34 @@ function syncUrl() {
 
 function pageTitle() {
   if (state.q && !Catalog.parsePrice(state.q)) return `Kết quả tìm kiếm cho “${esc(state.q)}”`;
+  if (usedType()) return usedType()[1];
   if (state.cat && CATEGORY_RULES[state.cat]) return CATEGORY_RULES[state.cat].name;
   if (state.sale) return 'Sản phẩm khuyến mãi';
   return 'Tất cả sản phẩm';
 }
 
 /* Danh sách gốc (chưa lọc thương hiệu/giá) để đếm số lượng trong bộ lọc */
-const baseList = () => Catalog.filter({ cat: state.cat, q: state.q, sale: state.sale });
+const baseList = () => Catalog.filter({ cat: state.cat, q: state.q, sale: state.sale, cond: state.cond, type: state.type });
+const usedType = () => (state.cat === 'used' ? USED_TYPES.find(([id]) => id === state.type) : null);
+
+/* Thanh tách hàng mới / hàng cũ:
+   - Danh mục Hàng cũ: chọn loại (laptop, PC, linh kiện...)
+   - Tìm kiếm / tất cả sản phẩm: Tất cả · Hàng mới · Hàng cũ (chỉ hiện khi có cả hai) */
+function conditionBar() {
+  const seg = (attr, value, label, count, active) =>
+    `<button type="button" class="seg__btn${active ? ' is-active' : ''}" ${attr}="${value}" aria-pressed="${active}">${label}<span>${count}</span></button>`;
+  if (state.cat === 'used') {
+    const all = Catalog.filter({ cat: 'used', q: state.q, sale: state.sale });
+    const types = USED_TYPES.map(([id, label, match]) => [id, label, all.filter(match).length]).filter(([, , n]) => n);
+    return `<div class="seg" role="group" aria-label="Loại hàng cũ">${seg('data-type', '', 'Tất cả hàng cũ', all.length, !state.type)}${types.map(([id, label, n]) => seg('data-type', id, label, n, state.type === id)).join('')}</div>`;
+  }
+  if (state.cat || state.sale) return '';
+  const all = Catalog.filter({ q: state.q });
+  const used = all.filter(isUsed).length;
+  const fresh = all.length - used;
+  if (!used || !fresh) return '';
+  return `<div class="seg" role="group" aria-label="Tình trạng sản phẩm">${seg('data-cond', '', 'Tất cả', all.length, !state.cond)}${seg('data-cond', 'new', `${icon('sparkles')}Hàng mới`, fresh, state.cond === 'new')}${seg('data-cond', 'used', `${icon('recycle')}Hàng cũ`, used, state.cond === 'used')}</div>`;
+}
 
 function renderFilters() {
   const base = baseList();
@@ -130,7 +155,8 @@ function render() {
   const pages = Math.max(1, Math.ceil(list.length / PER_PAGE));
   state.page = Math.min(state.page, pages);
   const slice = list.slice((state.page - 1) * PER_PAGE, state.page * PER_PAGE);
-  const crumbs = state.cat && CATEGORY_RULES[state.cat] ? [[CATEGORY_RULES[state.cat].name, '#']] : [[state.q ? 'Tìm kiếm' : 'Sản phẩm', '#']];
+  const crumbs = usedType() ? [[CATEGORY_RULES.used.name, 'category.html?cat=used'], [usedType()[1], '#']]
+    : state.cat && CATEGORY_RULES[state.cat] ? [[CATEGORY_RULES[state.cat].name, '#']] : [[state.q ? 'Tìm kiếm' : 'Sản phẩm', '#']];
 
   $('#category-page').innerHTML = `
     ${renderBreadcrumb(crumbs)}
@@ -150,6 +176,7 @@ function render() {
             </label>
           </div>
         </div>
+        ${conditionBar()}
         ${activeChips()}
         ${slice.length
           ? `<div class="product-grid reveal">${slice.map((p, i) => renderProductCard(p, { index: i % 8, itemClass: 'reveal-item' })).join('')}</div>${pagination(list.length)}`
@@ -189,10 +216,14 @@ function bindEvents() {
       update(same ? { min: 0, max: Infinity } : { min: Number(lo), max: hi ? Number(hi) : Infinity });
       return;
     }
+    const cond = e.target.closest('[data-cond]');
+    if (cond) { update({ cond: cond.dataset.cond }); return; }
+    const type = e.target.closest('[data-type]');
+    if (type) { update({ type: type.dataset.type }); return; }
     const remove = e.target.closest('[data-remove]');
     if (remove) {
       const key = remove.dataset.remove;
-      if (key === 'all') update({ q: '', sale: false, brands: [], min: 0, max: Infinity });
+      if (key === 'all') update({ q: '', sale: false, cond: '', type: '', brands: [], min: 0, max: Infinity });
       else if (key === 'q') update({ q: '' });
       else if (key === 'sale') update({ sale: false });
       else if (key === 'price') update({ min: 0, max: Infinity });
