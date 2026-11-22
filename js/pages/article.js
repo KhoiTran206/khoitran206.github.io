@@ -23,7 +23,7 @@ function initPage() {
         <span class="news-tile__tag article__tag">${article.tag}</span>
         <h1 class="article__title">${article.title}</h1>
         <p class="article__meta">${icon('calendar')}${article.date}<span>·</span>${icon('user-round')}${COMPANY.name}</p>
-        <img class="article__cover" src="${IMG}${article.img}" alt="${article.title}">
+        <img class="article__cover" src="${photo(article.img)}" alt="${article.title}">
         <p class="article__lead">${article.excerpt}</p>
         <div class="prose">${renderRichText(article.body)}</div>
         <div class="article__share">
@@ -38,7 +38,7 @@ function initPage() {
           <ul class="side-news">
             ${others.map((n) => `
               <li><a href="article.html?id=${n.id}">
-                <img src="${thumb(IMG + n.img)}" alt="" width="88" height="66" loading="lazy">
+                <img src="${thumb(photo(n.img))}" alt="" width="88" height="66" loading="lazy">
                 <span><b>${n.title}</b><small>${n.date}</small></span>
               </a></li>`).join('')}
           </ul>

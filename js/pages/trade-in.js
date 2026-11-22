@@ -327,7 +327,7 @@ function render() {
       <div class="ti-hero__tiles">
         ${tiles.map((id) => `
           <button class="ti-tile" type="button" data-pick="${id}">
-            <img src="${thumb(IMG + TRADE_IN.groups[id].img)}" alt="" width="200" height="200">
+            <img src="${thumb(photo(TRADE_IN.groups[id].img))}" alt="" width="200" height="200">
             <span><small>Thu cũ</small><b>${TRADE_IN.groups[id].name}</b></span>
           </button>`).join('')}
       </div>

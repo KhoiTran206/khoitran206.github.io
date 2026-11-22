@@ -15,9 +15,12 @@ const COMPANY = {
 };
 
 const IMG = 'assets/images/photos/'; // Ảnh chụp thật (Pexels, giấy phép miễn phí thương mại)
-/* Ảnh thu nhỏ 400px (photos/thumb/) cho ô sản phẩm, giỏ hàng, danh sách — nhẹ hơn ~3,5 lần.
-   Thêm ảnh mới: đặt bản gốc vào photos/ và bản rộng 400px cùng tên vào photos/thumb/. */
-const thumb = (src) => String(src || '').replace('/photos/', '/photos/thumb/');
+/* Web dùng ảnh WebP (nhẹ hơn JPG ~50%): bản lớn rộng tối đa 960px trong photos/, bản 400px trong photos/thumb/.
+   Dữ liệu vẫn ghi tên .jpg; photo()/thumb() tự đổi sang .webp. Bản .jpg giữ lại cho chia sẻ mạng xã hội (og:image).
+   Thêm ảnh mới: đặt .jpg vào photos/ + photos/thumb/ rồi chạy  node tools/build-webp.mjs */
+const webp = (src) => String(src || '').replace(/\.jpe?g$/i, '.webp');
+const photo = (name) => IMG + webp(name);
+const thumb = (src) => webp(String(src || '').replace('/photos/', '/photos/thumb/'));
 
 const PROMO_MESSAGES = [
   { icon: 'flame', text: 'BLACK FRIDAY — Giảm đến 50% toàn bộ gaming gear' },
@@ -287,7 +290,7 @@ function product(cat, name, img, price, oldPrice, specs, tags = [], extra = {}) 
   __id += 1;
   return {
     id: `mk${String(__id).padStart(3, '0')}`,
-    cat, name, img: IMG + img, price, oldPrice, specs, tags,
+    cat, name, img: photo(img), price, oldPrice, specs, tags,
     // Điểm mẫu 4.5–5.0 (thay bằng đánh giá thật khi có backend)
     rating: extra.rating ?? 4.5 + ((__id * 7) % 6) / 10,
     reviews: extra.reviews ?? 0,

@@ -99,7 +99,7 @@ function renderAuth(tab) {
     ${renderBreadcrumb([[view.title, '#']])}
     <div class="auth reveal">
       <aside class="auth__intro">
-        <img src="${IMG}setup-2.jpg" alt="Góc máy tính gaming" width="600" height="800">
+        <img src="${photo('setup-2.jpg')}" alt="Góc máy tính gaming" width="600" height="800">
         <div class="auth__intro-body">
           ${renderLogo()}
           <h2>${COMPANY.slogan}</h2>

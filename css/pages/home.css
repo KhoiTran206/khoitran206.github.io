@@ -1081,3 +1081,14 @@
     transition: none;
   }
 }
+
+/* Ô giữ chỗ cho khối sản phẩm vẽ dần (giữ chiều cao để trang không giật khi khối hiện ra) */
+.home-lazy {
+  min-height: 470px;
+}
+
+@media (max-width: 576px) {
+  .home-lazy {
+    min-height: 430px;
+  }
+}

@@ -3534,3 +3534,9 @@ body.has-compare-bar .site-footer {
     transition: none;
   }
 }
+
+/* Tăng tốc: trình duyệt bỏ qua dựng/vẽ chân trang cho tới khi khách cuộn gần tới */
+.site-footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 720px;
+}

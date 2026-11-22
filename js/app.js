@@ -1039,6 +1039,9 @@ function initDrawer() {
   let lastFocus = null;
   const open = () => {
     lastFocus = document.activeElement;
+    // Dựng danh sách danh mục lần đầu mở menu (không làm nặng lúc tải trang)
+    const body = $('[data-drawer-body]', drawer);
+    if (body && !body.childElementCount) body.innerHTML = drawerBodyHTML();
     drawer.classList.add('is-open');
     drawer.setAttribute('aria-hidden', 'false');
     document.body.classList.add('is-locked');
@@ -1063,7 +1066,15 @@ function initCategoryDropdown() {
   if (!wrap) return;
   const btn = $('[data-cat-toggle]', wrap);
   const isDesktop = () => window.matchMedia('(min-width: 1025px)').matches;
+  // Mega menu (~1.200 phần tử) chỉ dựng khi khách rê chuột / bấm / tab vào "Danh mục" lần đầu
+  const fillMenu = () => {
+    const dd = $('#cat-dropdown', wrap);
+    if (dd && !dd.childElementCount) dd.innerHTML = renderCategoryMenu();
+  };
+  wrap.addEventListener('pointerenter', fillMenu);
+  wrap.addEventListener('focusin', fillMenu);
   const setOpen = (open) => {
+    if (open) fillMenu();
     wrap.classList.toggle('is-open', open);
     btn.setAttribute('aria-expanded', open);
   };

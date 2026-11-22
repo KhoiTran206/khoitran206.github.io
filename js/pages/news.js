@@ -5,7 +5,7 @@
 function newsCard(n, i) {
   return `
     <a class="news-card reveal-item" style="--i:${i}" href="article.html?id=${n.id}">
-      <span class="news-card__img"><img src="${IMG}${n.img}" alt="" loading="lazy"><span class="news-tile__tag">${n.tag}</span></span>
+      <span class="news-card__img"><img src="${photo(n.img)}" alt="" loading="lazy"><span class="news-tile__tag">${n.tag}</span></span>
       <span class="news-card__body">
         <h2 class="news-card__title">${n.title}</h2>
         <p class="news-card__excerpt">${n.excerpt}</p>
@@ -29,7 +29,7 @@ function render(tag) {
     </div>
     ${first ? `
       <a class="news-feature reveal" href="article.html?id=${first.id}">
-        <img src="${IMG}${first.img}" alt="">
+        <img src="${photo(first.img)}" alt="">
         <div class="news-feature__body">
           <span class="news-tile__tag">${first.tag}</span>
           <h2>${first.title}</h2>

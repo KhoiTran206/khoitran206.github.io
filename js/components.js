@@ -92,7 +92,7 @@ function renderHeader() {
       <div class="container subnav__inner">
         <div class="subnav__cat" data-cat-wrap>
           <button class="subnav__cat-btn" type="button" data-cat-toggle aria-expanded="false" aria-controls="cat-dropdown">${icon('menu')}<span>Danh mục</span></button>
-          <nav class="cat-menu subnav__dropdown" id="cat-dropdown" aria-label="Danh mục sản phẩm">${renderCategoryMenu()}</nav>
+          <nav class="cat-menu subnav__dropdown" id="cat-dropdown" aria-label="Danh mục sản phẩm"></nav>
         </div>
         <ul class="subnav__list">
           ${SUB_NAV.map((l) => `<li><a class="subnav__link" href="${l.href}">${l.text}</a></li>`).join('')}
@@ -146,6 +146,18 @@ function megaFeaturedHTML(catId) {
 }
 
 /* ---------- Drawer (mobile + nút Danh mục) ---------- */
+/* Danh sách danh mục trong drawer — chỉ dựng khi khách mở menu lần đầu (trang nhẹ hơn ~450 phần tử) */
+function drawerBodyHTML() {
+  return CATEGORIES.map((c) => `
+    <details class="drawer__group">
+      <summary>${icon(c.icon)}<span>${c.name}</span>${icon('chevron-right', 'drawer__chevron')}</summary>
+      <div class="drawer__sub">
+        <a class="drawer__all" href="category.html?cat=${c.id}">Xem tất cả ${c.name}${icon('chevron-right')}</a>
+        ${c.groups.flatMap((g) => g.links).slice(0, 10).map((l) => catLink(c, l)).map(([text, href]) => `<a href="${href}">${text}</a>`).join('')}
+      </div>
+    </details>`).join('');
+}
+
 function renderDrawer() {
   return `
     <div class="drawer" id="drawer" aria-hidden="true">
@@ -155,16 +167,7 @@ function renderDrawer() {
           ${renderLogo()}
           <button class="header-icon-btn" type="button" data-drawer-close aria-label="Đóng danh mục">${icon('x')}</button>
         </div>
-        <div class="drawer__body">
-          ${CATEGORIES.map((c) => `
-            <details class="drawer__group">
-              <summary>${icon(c.icon)}<span>${c.name}</span>${icon('chevron-right', 'drawer__chevron')}</summary>
-              <div class="drawer__sub">
-                <a class="drawer__all" href="category.html?cat=${c.id}">Xem tất cả ${c.name}${icon('chevron-right')}</a>
-                ${c.groups.flatMap((g) => g.links).slice(0, 10).map((l) => catLink(c, l)).map(([text, href]) => `<a href="${href}">${text}</a>`).join('')}
-              </div>
-            </details>`).join('')}
-        </div>
+        <div class="drawer__body" data-drawer-body></div>
         <div class="drawer__foot">
           <a href="wishlist.html">${icon('heart')}<span>Sản phẩm yêu thích</span></a>
           <a href="compare.html">${icon('git-compare-arrows')}<span>So sánh sản phẩm</span></a>
@@ -250,7 +253,7 @@ function renderPromo(b, size = '') {
         ${b.desc ? `<p class="promo__desc">${b.desc}</p>` : ''}
         ${b.cta ? `<span class="btn btn--light promo__cta">${b.cta}${icon('arrow-right')}</span>` : ''}
       </div>
-      <img class="promo__img" src="${IMG}${b.img}" alt="" loading="lazy">
+      <img class="promo__img" src="${photo(b.img)}" alt="" loading="lazy">
     </a>`;
 }
 

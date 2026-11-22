@@ -9,8 +9,10 @@ function renderHero() {
     <button class="hero-slider__btn hero-slider__btn--next" type="button" aria-label="Banner tiếp theo">${icon('chevron-right')}</button>
     <div class="hero-slider__dots">${HERO_SLIDES.map((_, i) => `<button class="hero-slider__dot" type="button" aria-label="Chuyển tới banner ${i + 1}"></button>`).join('')}</div>`;
   $('#hero-side').innerHTML = HERO_SIDE.map((b) => renderPromo(b, 'sm')).join('');
-  // Banner đầu trang hiển thị ngay, không lazy
-  $$('#hero-slider img, #hero-side img').forEach((img) => img.removeAttribute('loading'));
+  // Chỉ banner đầu tiên (và 2 banner bên phải trên máy tính) tải ngay, ưu tiên cao; các banner trượt sau tải khi cần
+  const first = $('#hero-slider img');
+  if (first) { first.removeAttribute('loading'); first.fetchPriority = 'high'; }
+  if (window.matchMedia('(min-width: 1025px)').matches) $$('#hero-side img').forEach((img) => img.removeAttribute('loading'));
 }
 
 function renderCategoryIcons() {
@@ -18,7 +20,7 @@ function renderCategoryIcons() {
     <a class="cat-icon reveal-item" style="--i:${i}" href="${c.href}">
       ${c.special
         ? `<span class="cat-icon__img cat-icon__img--special">${icon('flame')}<b>BLACK<br>FRIDAY</b></span>`
-        : `<span class="cat-icon__img"><img src="${thumb(IMG + c.img)}" alt="" loading="lazy" width="64" height="64"></span>`}
+        : `<span class="cat-icon__img"><img src="${thumb(photo(c.img))}" alt="" loading="lazy" width="64" height="64"></span>`}
       <span class="cat-icon__label">${c.name}</span>
     </a>`).join('');
 }
@@ -54,8 +56,42 @@ function productsFor(section, filter) {
     .slice(0, HOME_SECTION_LIMIT);
 }
 
+/* Khối sản phẩm vẽ dần: 2 khối đầu vẽ ngay, các khối sau là ô giữ chỗ → vẽ khi khách cuộn tới gần (nhẹ trang, mở nhanh) */
+const HOME_EAGER_BLOCKS = 2;
+
 function renderHomeSections() {
-  $('#home-sections').innerHTML = HOME_SECTIONS.map((s) => {
+  let blocks = 0;
+  $('#home-sections').innerHTML = HOME_SECTIONS.map((s, i) => {
+    if (s.type !== 'banners' && ++blocks > HOME_EAGER_BLOCKS) {
+      return `<section class="container section home-lazy" id="${s.id}" data-home-sec="${i}" aria-label="${s.title}"></section>`;
+    }
+    return homeSectionHTML(s);
+  }).join('');
+  initLazySections();
+}
+
+function initLazySections() {
+  const holders = $$('[data-home-sec]');
+  const fill = (el) => {
+    const tpl = document.createElement('template');
+    tpl.innerHTML = homeSectionHTML(HOME_SECTIONS[Number(el.dataset.homeSec)]).trim();
+    const section = tpl.content.firstElementChild;
+    el.replaceWith(section);
+    refreshIcons();
+    initSliders(section);
+    initReveal($("#home-sections"));
+  };
+  if (!('IntersectionObserver' in window)) { holders.forEach(fill); return; }
+  const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+    if (!e.isIntersecting) return;
+    io.unobserve(e.target);
+    fill(e.target);
+  }), { rootMargin: '800px 0px' });
+  holders.forEach((el) => io.observe(el));
+}
+
+function homeSectionHTML(s) {
+  {
     if (s.type === 'banners') {
       const { layout, items } = MID_BANNERS[s.key];
       const inner = layout === 'feature'
@@ -79,14 +115,14 @@ function renderHomeSections() {
           ${sliderHTML(productCardsHTML(productsFor(s, 'all')))}
         </div>
       </section>`;
-  }).join('');
+  }
 }
 
 function renderNews() {
   const [featured, ...rest] = NEWS;
   const tile = (n, large = false) => `
     <a class="news-tile${large ? ' news-tile--lg' : ''}" href="article.html?id=${n.id}">
-      <img class="news-tile__img" src="${IMG}${n.img}" alt="" loading="lazy">
+      <img class="news-tile__img" src="${photo(n.img)}" alt="" loading="lazy">
       <div class="news-tile__body">
         <span class="news-tile__tag">${n.tag}</span>
         <h3 class="news-tile__title">${n.title}</h3>
@@ -127,6 +163,9 @@ function initHeroSlider() {
       slide.setAttribute('aria-hidden', n === index ? 'false' : 'true');
       slide.tabIndex = n === index ? 0 : -1;
     });
+    // Tải trước ảnh banner kế tiếp để khi trượt sang không bị trống
+    const next = track.children[(index + 1) % total]?.querySelector('img');
+    if (next) next.loading = 'eager';
   };
   const start = () => {
     if (reduceMotion) return;
@@ -227,7 +266,7 @@ function promoPopupHTML(cfg) {
       <div class="promo-pop__card">
         <button class="promo-pop__close" type="button" data-pop-close aria-label="Đóng">${icon('x')}</button>
         <div class="promo-pop__media">
-          <img src="${IMG}${cfg.img}" alt="Góc máy tính gaming tại ${COMPANY.name}" width="400" height="600">
+          <img src="${photo(cfg.img)}" alt="Góc máy tính gaming tại ${COMPANY.name}" width="400" height="600">
           ${stamp ? `<span class="promo-pop__stamp"><b>${stamp}</b><small>thêm</small></span>` : ''}
         </div>
         <div class="promo-pop__body">

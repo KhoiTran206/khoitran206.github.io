@@ -32,14 +32,16 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
+  <!-- Font tải song song, không chặn hiển thị (trang hiện ngay bằng font hệ thống rồi đổi sang Be Vietnam Pro) -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&display=swap"></noscript>
 
-  <link rel="stylesheet" href="css/variables.css?v=20261123h">
-  <link rel="stylesheet" href="css/base.css?v=20261123h">
-  <link rel="stylesheet" href="css/components.css?v=20261123h">
-  <link rel="stylesheet" href="css/app-mode.css?v=20261123h">
-  <link rel="stylesheet" href="css/pages/checkout.css?v=20261123h">
-  <link rel="stylesheet" href="css/pages/build-pc.css?v=20261123h">
+  <link rel="stylesheet" href="css/variables.css?v=20261123i">
+  <link rel="stylesheet" href="css/base.css?v=20261123i">
+  <link rel="stylesheet" href="css/components.css?v=20261123i">
+  <link rel="stylesheet" href="css/app-mode.css?v=20261123i">
+  <link rel="stylesheet" href="css/pages/checkout.css?v=20261123i">
+  <link rel="stylesheet" href="css/pages/build-pc.css?v=20261123i">
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua tới nội dung chính</a>
@@ -54,11 +56,11 @@
   <!-- Footer + drawer + nút nổi được render từ js/components.js -->
   <div id="site-footer-slot"></div>
 
-  <script src="js/icons.js?v=20261123h"></script>
-  <script src="js/data.js?v=20261123h"></script>
-  <script src="js/content.js?v=20261123h"></script>
-  <script src="js/components.js?v=20261123h"></script>
-  <script src="js/app.js?v=20261123h"></script>
-  <script src="js/pages/build-pc.js?v=20261123h"></script>
+  <script src="js/icons.js?v=20261123i"></script>
+  <script src="js/data.js?v=20261123i"></script>
+  <script src="js/content.js?v=20261123i"></script>
+  <script src="js/components.js?v=20261123i"></script>
+  <script src="js/app.js?v=20261123i"></script>
+  <script src="js/pages/build-pc.js?v=20261123i"></script>
 </body>
 </html>
