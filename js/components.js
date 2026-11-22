@@ -251,6 +251,59 @@ function renderPromo(b, size = '') {
 }
 
 /* ---------- Footer ---------- */
+/* ---------- Trợ lý nổi góc phải: robot "Khôi Bot" (vẽ từ logo con chip) + bảng liên hệ nhanh ---------- */
+const MASCOT_SVG = `
+  <svg class="mascot" viewBox="0 0 64 64" aria-hidden="true">
+    <g class="mascot__bot">
+      <path class="mascot__antenna" d="M32 15V9" />
+      <circle class="mascot__tip" cx="32" cy="7.5" r="3" />
+      <rect class="mascot__pin" x="9" y="24" width="6" height="3" rx="1.5" /><rect class="mascot__pin" x="9" y="31" width="6" height="3" rx="1.5" />
+      <rect class="mascot__pin" x="49" y="24" width="6" height="3" rx="1.5" /><rect class="mascot__pin" x="49" y="31" width="6" height="3" rx="1.5" />
+      <rect class="mascot__head" x="13" y="14" width="38" height="31" rx="11" />
+      <rect class="mascot__visor" x="18" y="20" width="28" height="18" rx="8" />
+      <g class="mascot__eyes"><rect x="23.5" y="24.5" width="5" height="7" rx="2.5" /><rect x="35.5" y="24.5" width="5" height="7" rx="2.5" /></g>
+      <path class="mascot__smile" d="M29 34.2q3 1.8 6 0" />
+      <rect class="mascot__body" x="18" y="47" width="28" height="17" rx="8" />
+      <path class="mascot__chest" d="M27 59v-8h2.4l2.6 3.4 2.6-3.4H37v8h-2.4v-4.4L32 58l-2.6-3.4V59z" />
+    </g>
+    <g class="mascot__bubble">
+      <path d="M44 1.5h15a4.5 4.5 0 0 1 4.5 4.5v6a4.5 4.5 0 0 1-4.5 4.5h-9l-4 3.5v-3.5h-2A4.5 4.5 0 0 1 39.5 12V6A4.5 4.5 0 0 1 44 1.5z" />
+      <circle cx="46" cy="9" r="1.6" /><circle cx="51.5" cy="9" r="1.6" /><circle cx="57" cy="9" r="1.6" />
+    </g>
+  </svg>`;
+
+const ASSIST_OPTIONS = [
+  ['message-circle', 'Chat Zalo', 'Tư vấn cấu hình, báo giá nhanh', COMPANY.zalo, true],
+  ['phone', 'Gọi hotline', COMPANY.phoneDisplay, `tel:${COMPANY.phone}`],
+  ['facebook', 'Nhắn Facebook', 'Fanpage Minh Khôi PC', COMPANY.socials.facebook, true],
+  ['clipboard-list', 'Tra cứu đơn hàng', 'Xem trạng thái đơn đã đặt', 'order.html'],
+  ['cpu', 'Tự build PC', 'Chọn linh kiện, xem tổng giá', 'build-pc.html'],
+];
+
+function renderAssist() {
+  return `
+    <div class="assist">
+      <div class="assist__panel" id="assist-panel" role="dialog" aria-label="Hỗ trợ khách hàng" hidden>
+        <div class="assist__head">
+          <span class="assist__avatar">${MASCOT_SVG}</span>
+          <div class="assist__who"><b>Khôi Bot</b><small><i></i>Trợ lý ${COMPANY.name}</small></div>
+          <button class="assist__close" type="button" data-assist-close aria-label="Đóng">${icon('x')}</button>
+        </div>
+        <p class="assist__hello">Xin chào! 👋 Bạn cần tư vấn cấu hình, báo giá hay kiểm tra đơn hàng? Chọn cách liên hệ bên dưới nhé.</p>
+        <div class="assist__options">
+          ${ASSIST_OPTIONS.map(([ic, title, desc, href, ext]) => `
+            <a class="assist__opt" href="${href}"${ext ? ' target="_blank" rel="noopener"' : ''}>
+              <span class="assist__opt-icon">${icon(ic)}</span>
+              <span class="assist__opt-text"><b>${title}</b><small>${desc}</small></span>
+              ${icon('chevron-right')}
+            </a>`).join('')}
+        </div>
+      </div>
+      <p class="assist__tip" data-assist-tip hidden>Cần tư vấn? Hỏi mình nhé!</p>
+      <button class="floating__btn floating__btn--assist" type="button" data-assist-toggle aria-expanded="false" aria-controls="assist-panel" aria-label="Mở trợ lý hỗ trợ khách hàng">${MASCOT_SVG}</button>
+    </div>`;
+}
+
 /* Footer: hình thức thanh toán / giao hàng (khớp trang Hướng dẫn thanh toán + Chính sách giao hàng) */
 const FOOTER_PAYMENTS = [
   ['banknote', 'Tiền mặt', 'Trả khi nhận hàng (COD)'],
@@ -328,9 +381,12 @@ function renderFooter() {
       </div></div>
     </footer>
     <div class="floating">
-      <a class="floating__btn floating__btn--call" href="tel:${COMPANY.phone}" aria-label="Gọi hotline ${COMPANY.phoneDisplay}">${icon('phone')}</a>
-      <a class="floating__btn" href="${COMPANY.zalo}" target="_blank" rel="noopener" aria-label="Chat Zalo với cửa hàng">${icon('message-circle')}</a>
-      <button class="floating__btn floating__btn--top" type="button" data-back-top aria-label="Lên đầu trang">${icon('arrow-up')}</button>
+      ${renderAssist()}
+      <a class="floating__btn floating__btn--zalo" href="${COMPANY.zalo}" target="_blank" rel="noopener" aria-label="Chat Zalo với cửa hàng"><span>Zalo</span></a>
+      <button class="floating__btn floating__btn--top" type="button" data-back-top aria-label="Lên đầu trang">
+        <svg class="floating__ring" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22"/><circle class="floating__ring-bar" cx="24" cy="24" r="22" pathLength="100"/></svg>
+        ${icon('chevron-up')}
+      </button>
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>`;
 }

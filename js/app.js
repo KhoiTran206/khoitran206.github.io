@@ -1095,10 +1095,40 @@ function initScrollUI() {
     const y = window.scrollY;
     header?.classList.toggle('is-scrolled', y > 40);
     backTop?.classList.toggle('is-visible', y > 600);
+    // Vòng tròn quanh nút lên đầu trang chạy theo phần trăm đã cuộn
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    backTop?.style.setProperty('--progress', max > 0 ? Math.min(100, (y / max) * 100).toFixed(1) : 0);
   };
   window.addEventListener('scroll', onScroll, { passive: true });
   backTop?.addEventListener('click', () => window.scrollTo({ top: 0 }));
   onScroll();
+  initAssist();
+}
+
+/* ---------- Trợ lý nổi (Khôi Bot): bấm mở bảng liên hệ nhanh; lời chào hiện 1 lần mỗi phiên ---------- */
+function initAssist() {
+  const toggle = $('[data-assist-toggle]');
+  const panel = $('#assist-panel');
+  const tip = $('[data-assist-tip]');
+  if (!toggle || !panel) return;
+  const setOpen = (open) => {
+    panel.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.classList.toggle('is-open', open);
+    if (open && tip) tip.hidden = true;
+  };
+  toggle.addEventListener('click', () => setOpen(panel.hidden));
+  $('[data-assist-close]', panel).addEventListener('click', () => { setOpen(false); toggle.focus(); });
+  document.addEventListener('click', (e) => { if (!panel.hidden && !e.target.closest('.assist')) setOpen(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) { setOpen(false); toggle.focus(); } });
+  // Lời chào nhỏ cạnh robot: hiện sau 5 giây, tự ẩn sau 6 giây, mỗi phiên 1 lần
+  let greeted = false;
+  try { greeted = sessionStorage.getItem('mkpc-assist-hi') === '1'; sessionStorage.setItem('mkpc-assist-hi', '1'); } catch { greeted = true; }
+  if (tip && !greeted) {
+    setTimeout(() => { if (panel.hidden) tip.hidden = false; }, 5000);
+    setTimeout(() => { tip.hidden = true; }, 11000);
+    tip.addEventListener('click', () => setOpen(true));
+  }
 }
 
 /* ---------- Animation khi scroll ---------- */
