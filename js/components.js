@@ -50,10 +50,7 @@ function renderLogo() {
   return `
     <a class="logo" href="${HOME_URL}" aria-label="${COMPANY.name} — Trang chủ">
       <span class="logo__mark">${LOGO_MARK}</span>
-      <span class="logo__text">
-        <span class="logo__name">MINH KHÔI</span>
-        <span class="logo__sub">PC · GAMING GEAR</span>
-      </span>
+      <span class="logo__name">MINH KHÔI PC</span>
     </a>`;
 }
 
