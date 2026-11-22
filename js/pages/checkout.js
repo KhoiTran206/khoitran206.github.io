@@ -22,7 +22,7 @@ function field(name, label, { type = 'text', required = false, placeholder = '',
 
 function summaryBox(totals, lines) {
   return `
-    <h2 class="panel__title">${icon('shopping-bag')}Đơn hàng (${lines.reduce((s, l) => s + l.qty, 0)} sản phẩm)<a class="summary__edit" href="cart.html">Sửa</a></h2>
+    <h2 class="panel__title">${icon('shopping-bag')}Đơn hàng (${lines.reduce((s, l) => s + l.qty, 0)} sản phẩm)<a class="summary__edit" href="gio-hang">Sửa</a></h2>
     <ul class="mini-list">
       ${lines.map(({ p, qty, total }) => `
         <li>
@@ -56,10 +56,10 @@ function render() {
   const profile = Profile.get() || {};
   const totals = calcTotals(lines, Store.get(CHECKOUT_COUPON_KEY, ''), 'ship');
   const loginHint = user ? '' : `
-    <p class="alert alert--info checkout__login">${icon('user-round')}<span>Đã có tài khoản? <a href="login.html?next=checkout.html">Đăng nhập</a> để điền nhanh và theo dõi đơn hàng, hoặc <a href="login.html?tab=register&amp;next=checkout.html">đăng ký</a>.</span></p>`;
+    <p class="alert alert--info checkout__login">${icon('user-round')}<span>Đã có tài khoản? <a href="dang-nhap?next=thanh-toan">Đăng nhập</a> để điền nhanh và theo dõi đơn hàng, hoặc <a href="dang-nhap?tab=register&amp;next=thanh-toan">đăng ký</a>.</span></p>`;
 
   root.innerHTML = `
-    ${renderBreadcrumb([['Giỏ hàng', 'cart.html'], ['Thanh toán', '#']])}
+    ${renderBreadcrumb([['Giỏ hàng', 'gio-hang'], ['Thanh toán', '#']])}
     <ol class="steps" aria-label="Các bước đặt hàng">
       <li class="is-done">${icon('shopping-cart')}Giỏ hàng</li>
       <li class="is-active">${icon('clipboard-pen')}Thông tin đặt hàng</li>
@@ -113,7 +113,7 @@ function render() {
         <div class="panel summary" id="checkout-summary">${summaryBox(totals, lines)}</div>
         <div class="panel">
           <button class="btn btn--primary btn--lg btn--block" type="submit" id="place-order">${icon('lock')}ĐẶT HÀNG</button>
-          <p class="summary__terms">Bằng việc đặt hàng, bạn đồng ý với <a href="policy.html?type=doi-tra">chính sách đổi trả</a> và <a href="policy.html?type=bao-mat">bảo mật thông tin</a> của ${COMPANY.name}.</p>
+          <p class="summary__terms">Bằng việc đặt hàng, bạn đồng ý với <a href="chinh-sach?type=doi-tra">chính sách đổi trả</a> và <a href="chinh-sach?type=bao-mat">bảo mật thông tin</a> của ${COMPANY.name}.</p>
           <div class="summary__trust">
             <span>${icon('shield-check')}Bảo mật thông tin</span>
             <span>${icon('phone-call')}Gọi xác nhận đơn</span>
@@ -194,7 +194,7 @@ async function placeOrder(form) {
 
   Cart.clear();
   Store.remove(CHECKOUT_COUPON_KEY);
-  location.href = `order.html?code=${order.code}&new=1`;
+  location.href = `tra-cuu-don-hang?code=${order.code}&new=1`;
 }
 
 function initPage() {

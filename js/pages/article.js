@@ -1,12 +1,12 @@
 /* ==========================================================
-   Trang bài viết — article.html?id=
+   Trang bài viết — bai-viet?id=
    ========================================================== */
 
 function initPage() {
   const root = $('#article-page');
   const article = NEWS.find((n) => n.id === params.get('id'));
   if (!article) {
-    root.innerHTML = `${renderBreadcrumb([['Tin tức', 'news.html'], ['Không tìm thấy', '#']])}<div class="panel">${renderEmpty('file-x', 'Không tìm thấy bài viết', 'Bài viết có thể đã bị gỡ hoặc đường dẫn không đúng.', '<a class="btn btn--primary" href="news.html">Xem tin tức khác</a>')}</div>`;
+    root.innerHTML = `${renderBreadcrumb([['Tin tức', 'tin-tuc'], ['Không tìm thấy', '#']])}<div class="panel">${renderEmpty('file-x', 'Không tìm thấy bài viết', 'Bài viết có thể đã bị gỡ hoặc đường dẫn không đúng.', '<a class="btn btn--primary" href="tin-tuc">Xem tin tức khác</a>')}</div>`;
     return;
   }
   document.title = `${article.title} | ${COMPANY.name}`;
@@ -17,7 +17,7 @@ function initPage() {
   const url = encodeURIComponent(location.href);
 
   root.innerHTML = `
-    ${renderBreadcrumb([['Tin tức', 'news.html'], [article.tag, `news.html?tag=${encodeURIComponent(article.tag)}`], [article.title, '#']])}
+    ${renderBreadcrumb([['Tin tức', 'tin-tuc'], [article.tag, `tin-tuc?tag=${encodeURIComponent(article.tag)}`], [article.title, '#']])}
     <div class="article-layout">
       <article class="panel article">
         <span class="news-tile__tag article__tag">${article.tag}</span>
@@ -37,7 +37,7 @@ function initPage() {
           <h2 class="panel__title">${icon('newspaper')}Bài viết khác</h2>
           <ul class="side-news">
             ${others.map((n) => `
-              <li><a href="article.html?id=${n.id}">
+              <li><a href="bai-viet?id=${n.id}">
                 <img src="${thumb(photo(n.img))}" alt="" width="88" height="66" loading="lazy">
                 <span><b>${n.title}</b><small>${n.date}</small></span>
               </a></li>`).join('')}
@@ -47,12 +47,12 @@ function initPage() {
           <h2>Cần tư vấn cấu hình?</h2>
           <p>Gọi ngay để được kỹ thuật viên hỗ trợ miễn phí.</p>
           <a class="btn btn--primary btn--block" href="tel:${COMPANY.phone}">${icon('phone')}${COMPANY.phoneDisplay}</a>
-          <a class="btn btn--outline btn--block" href="build-pc.html">${icon('wrench')}Tự build PC</a>
+          <a class="btn btn--outline btn--block" href="xay-dung-cau-hinh">${icon('wrench')}Tự build PC</a>
         </section>
       </aside>
     </div>
     <section class="section block reveal">
-      <div class="block-head"><h2 class="block-head__title">Sản phẩm bán chạy</h2><a class="block-head__more" href="category.html?sale=1">Xem tất cả${icon('chevron-right')}</a></div>
+      <div class="block-head"><h2 class="block-head__title">Sản phẩm bán chạy</h2><a class="block-head__more" href="danh-muc?sale=1">Xem tất cả${icon('chevron-right')}</a></div>
       ${sliderHTML(productCardsHTML(featured, { compact: true }))}
     </section>`;
 

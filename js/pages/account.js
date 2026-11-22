@@ -71,7 +71,7 @@ function ordersSection(orders) {
   return `
     <ul class="order-list">
       ${orders.map((o) => `
-        <li><a href="order.html?code=${esc(o.code)}">
+        <li><a href="tra-cuu-don-hang?code=${esc(o.code)}">
           <span><b>${esc(o.code)}</b><small>${new Date(o.createdAt).toLocaleString('vi-VN')} · ${esc(o.items.map((i) => i.name).join(', ').slice(0, 80))}…</small></span>
           <span class="order-list__right"><b>${formatPrice(o.totals.total)}</b><small class="status-tag" data-status="${esc(o.status)}">${esc(o.status)}</small></span>
         </a></li>`).join('')}
@@ -104,11 +104,11 @@ function render(editing = state.editing) {
         <nav class="account__nav" aria-label="Tài khoản">
           <a href="#thong-tin">${icon('id-card')}Thông tin cá nhân</a>
           <a href="#don-hang">${icon('shopping-bag')}Đơn hàng của tôi</a>
-          <a href="wishlist.html">${icon('heart')}Sản phẩm yêu thích (${Wishlist.ids().length})</a>
+          <a href="yeu-thich">${icon('heart')}Sản phẩm yêu thích (${Wishlist.ids().length})</a>
           <a href="#mat-khau">${icon('key-round')}Mật khẩu</a>
-          <a href="order.html">${icon('search')}Tra cứu đơn hàng</a>
-          <a href="cart.html">${icon('shopping-cart')}Giỏ hàng (${Cart.count()})</a>
-          ${Auth.isAdmin(user) ? `<a href="admin.html">${icon('layout-dashboard')}Quản trị cửa hàng</a>` : ''}
+          <a href="tra-cuu-don-hang">${icon('search')}Tra cứu đơn hàng</a>
+          <a href="gio-hang">${icon('shopping-cart')}Giỏ hàng (${Cart.count()})</a>
+          ${Auth.isAdmin(user) ? `<a href="quan-tri">${icon('layout-dashboard')}Quản trị cửa hàng</a>` : ''}
           <button type="button" data-logout>${icon('log-out')}Đăng xuất</button>
         </nav>
       </aside>
@@ -184,7 +184,7 @@ async function initPage() {
 
   const user = await Auth.ready();
   if (!user) {
-    location.replace(`login.html?next=${encodeURIComponent('account.html' + location.hash)}`);
+    location.replace(`dang-nhap?next=${encodeURIComponent('tai-khoan' + location.hash)}`);
     return;
   }
   render(false);
@@ -197,7 +197,7 @@ async function initPage() {
 
   // Đăng xuất ở tab khác → về trang đăng nhập
   document.addEventListener('auth:change', () => {
-    if (!Auth.current()) location.replace('login.html');
+    if (!Auth.current()) location.replace('dang-nhap');
   });
 
   root.addEventListener('submit', (e) => {

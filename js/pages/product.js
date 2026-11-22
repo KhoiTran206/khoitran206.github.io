@@ -1,5 +1,5 @@
 /* ==========================================================
-   Trang chi tiết sản phẩm — product.html?id=mk001
+   Trang chi tiết sản phẩm — san-pham?id=mk001
    ========================================================== */
 
 const CAT_FOR_PRODUCT = {
@@ -110,7 +110,7 @@ function renderProduct(p) {
   ];
 
   return `
-    ${renderBreadcrumb([[catName, `category.html?cat=${catId}`], [p.name, '#']])}
+    ${renderBreadcrumb([[catName, `danh-muc?cat=${catId}`], [p.name, '#']])}
     <section class="pd panel">
       <div class="pd__gallery">
         <div class="pd__image" data-zoom>
@@ -121,7 +121,7 @@ function renderProduct(p) {
       </div>
 
       <div class="pd__info">
-        <p class="pd__brand">Thương hiệu: <a href="category.html?cat=${catId}&brand=${encodeURIComponent(p.brand)}">${p.brand}</a> · Mã SP: ${p.id.toUpperCase()}</p>
+        <p class="pd__brand">Thương hiệu: <a href="danh-muc?cat=${catId}&brand=${encodeURIComponent(p.brand)}">${p.brand}</a> · Mã SP: ${p.id.toUpperCase()}</p>
         <h1 class="pd__name">${p.name}</h1>
         <div class="pd__meta">
           <span class="stars">${starIcons(p.rating)}</span>
@@ -160,7 +160,7 @@ function renderProduct(p) {
         <div class="pd__actions">
           <button class="btn btn--primary btn--lg btn--stack pd__buy" type="button" data-pd-buy>MUA NGAY<span class="btn__sub">Giao tận nơi hoặc nhận tại cửa hàng</span></button>
           <button class="btn btn--outline btn--lg" type="button" data-pd-add>${icon('shopping-cart')}Thêm vào giỏ</button>
-          <a class="btn btn--dark btn--lg btn--stack" href="policy.html?type=tra-gop">TRẢ GÓP 0%<span class="btn__sub">Duyệt nhanh qua điện thoại</span></a>
+          <a class="btn btn--dark btn--lg btn--stack" href="chinh-sach?type=tra-gop">TRẢ GÓP 0%<span class="btn__sub">Duyệt nhanh qua điện thoại</span></a>
         </div>
 
         <div class="pd__extra">
@@ -198,7 +198,7 @@ function renderProduct(p) {
 
     ${related.length ? `
     <section class="section block reveal">
-      <div class="block-head"><h2 class="block-head__title">Sản phẩm tương tự</h2><a class="block-head__more" href="category.html?cat=${catId}">Xem tất cả${icon('chevron-right')}</a></div>
+      <div class="block-head"><h2 class="block-head__title">Sản phẩm tương tự</h2><a class="block-head__more" href="danh-muc?cat=${catId}">Xem tất cả${icon('chevron-right')}</a></div>
       ${sliderHTML(productCardsHTML(related))}
     </section>` : ''}
 
@@ -235,7 +235,7 @@ function bindProduct(p) {
     if (e.target.closest('[data-pd-add]')) addToCartWithFeedback(p.id, qty());
     if (e.target.closest('[data-pd-buy]')) {
       Cart.add(p.id, qty());
-      location.href = 'checkout.html';
+      location.href = 'thanh-toan';
     }
   });
   input.addEventListener('change', syncQty);
@@ -274,7 +274,7 @@ function initPage() {
   const p = productById(params.get('id'));
   const root = $('#product-page');
   if (!p) {
-    root.innerHTML = `${renderBreadcrumb([['Không tìm thấy', '#']])}<div class="panel">${renderEmpty('package-x', 'Không tìm thấy sản phẩm', 'Sản phẩm có thể đã ngừng kinh doanh hoặc đường dẫn không đúng.', '<a class="btn btn--primary" href="category.html">Xem sản phẩm khác</a>')}</div>`;
+    root.innerHTML = `${renderBreadcrumb([['Không tìm thấy', '#']])}<div class="panel">${renderEmpty('package-x', 'Không tìm thấy sản phẩm', 'Sản phẩm có thể đã ngừng kinh doanh hoặc đường dẫn không đúng.', '<a class="btn btn--primary" href="danh-muc">Xem sản phẩm khác</a>')}</div>`;
     return;
   }
   document.title = `${p.name} | ${COMPANY.name}`;

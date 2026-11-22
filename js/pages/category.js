@@ -1,6 +1,6 @@
 /* ==========================================================
    Trang danh mục / tìm kiếm / khuyến mãi
-   URL: category.html?cat=&q=&sale=1&cond=new|used&type=&brand=A,B&min=&max=&sort=&page=
+   URL: danh-muc?cat=&q=&sale=1&cond=new|used&type=&brand=A,B&min=&max=&sort=&page=
    ========================================================== */
 
 const PER_PAGE = 20;
@@ -85,7 +85,7 @@ function renderFilters() {
   const brands = Object.keys(brandCounts).sort((a, b) => brandCounts[b] - brandCounts[a]);
   const catLinks = Object.entries(CATEGORY_RULES).map(([id, rule]) => {
     const count = PRODUCTS.filter(rule.match).length;
-    return `<li><a class="filter-cat${state.cat === id ? ' is-active' : ''}" href="category.html?cat=${id}">${rule.name}<span>${count}</span></a></li>`;
+    return `<li><a class="filter-cat${state.cat === id ? ' is-active' : ''}" href="danh-muc?cat=${id}">${rule.name}<span>${count}</span></a></li>`;
   }).join('');
   const presetActive = (lo, hi) => state.min === lo && state.max === hi;
 
@@ -155,7 +155,7 @@ function render() {
   const pages = Math.max(1, Math.ceil(list.length / PER_PAGE));
   state.page = Math.min(state.page, pages);
   const slice = list.slice((state.page - 1) * PER_PAGE, state.page * PER_PAGE);
-  const crumbs = usedType() ? [[CATEGORY_RULES.used.name, 'category.html?cat=used'], [usedType()[1], '#']]
+  const crumbs = usedType() ? [[CATEGORY_RULES.used.name, 'danh-muc?cat=used'], [usedType()[1], '#']]
     : state.cat && CATEGORY_RULES[state.cat] ? [[CATEGORY_RULES[state.cat].name, '#']] : [[state.q ? 'Tìm kiếm' : 'Sản phẩm', '#']];
 
   $('#category-page').innerHTML = `

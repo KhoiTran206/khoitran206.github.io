@@ -158,7 +158,7 @@ const Cloud = {
 
 /* ---------- Đơn hàng ----------
    Lưu 1 bản trên thiết bị (để khách vãng lai tra cứu) + 1 bản trên Firestore (khách đăng nhập
-   xem trên mọi máy, chủ shop xem ở admin.html). */
+   xem trên mọi máy, chủ shop xem ở quan-tri). */
 const ORDER_STATUSES = ['Chờ xác nhận', 'Đã xác nhận', 'Đang giao', 'Hoàn thành', 'Đã hủy'];
 
 const Orders = {
@@ -624,7 +624,7 @@ function renderCompareBar() {
           </li>` : `<li class="compare-bar__item compare-bar__item--empty">${icon('plus')}<span>Thêm sản phẩm</span></li>`)).join('')}
       </ul>
       <div class="compare-bar__actions">
-        <a class="btn btn--primary" href="compare.html">${icon('git-compare-arrows')}So sánh (${items.length})</a>
+        <a class="btn btn--primary" href="so-sanh">${icon('git-compare-arrows')}So sánh (${items.length})</a>
         <button class="btn btn--ghost" type="button" data-compare-clear>Xóa tất cả</button>
       </div>
     </div>`;
@@ -868,7 +868,7 @@ function initAccountMenu() {
       closeAccountMenu();
       Auth.logout().then(() => {
         showToast('Bạn đã đăng xuất');
-        if ($('#account-page, #admin-page')) setTimeout(() => (location.href = 'login.html'), 600);
+        if ($('#account-page, #admin-page')) setTimeout(() => (location.href = 'dang-nhap'), 600);
       });
       return;
     }
@@ -968,7 +968,7 @@ function initCartButtons() {
     const buyBtn = e.target.closest('[data-buy-now]');
     if (buyBtn) {
       Cart.add(buyBtn.dataset.buyNow, Number(buyBtn.dataset.qty || 1));
-      location.href = 'checkout.html';
+      location.href = 'thanh-toan';
     }
   });
 }
@@ -979,7 +979,7 @@ function initSearch() {
   const input = $('#search-input');
   const box = $('#search-suggest');
   if (!form || !input || !box) return;
-  if (params.get('q') && location.pathname.endsWith('category.html')) input.value = params.get('q');
+  if (params.get('q') && /\/danh-muc(\.html)?$/.test(location.pathname)) input.value = params.get('q');
   let active = -1;
 
   const close = () => {
@@ -994,11 +994,11 @@ function initSearch() {
     const results = [...found.filter(isNew), ...found.filter(isUsed)].slice(0, 6);
     box.innerHTML = results.length
       ? results.map((p) => `
-          <a class="suggest__item" href="product.html?id=${p.id}" role="option">
+          <a class="suggest__item" href="san-pham?id=${p.id}" role="option">
             <img src="${thumb(p.img)}" alt="" width="44" height="44">
             <span class="suggest__name">${isUsed(p) ? '<em class="suggest__used">Cũ</em>' : ''}${p.name}</span>
             <b class="suggest__price">${formatPrice(p.price)}</b>
-          </a>`).join('') + `<a class="suggest__all" href="category.html?q=${encodeURIComponent(q)}">Xem tất cả kết quả cho “${esc(q)}”${icon('arrow-right')}</a>`
+          </a>`).join('') + `<a class="suggest__all" href="danh-muc?q=${encodeURIComponent(q)}">Xem tất cả kết quả cho “${esc(q)}”${icon('arrow-right')}</a>`
       : `<p class="suggest__empty">Không tìm thấy sản phẩm phù hợp với “${esc(q)}”.</p>`;
     refreshIcons();
     box.classList.add('is-open');
@@ -1342,10 +1342,10 @@ function initAppShell() {
   const isHome = page === 'index';
   const params = new URLSearchParams(location.search);
   const tab = isHome ? 'home'
-    : page === 'category' && params.get('sale') ? 'sale'
-    : page === 'cart' ? 'cart'
-    : ['account', 'login', 'admin'].includes(page) ? 'account' : '';
-  const hideTabs = ['product', 'checkout'].includes(page);
+    : page === 'danh-muc' && params.get('sale') ? 'sale'
+    : page === 'gio-hang' ? 'cart'
+    : ['tai-khoan', 'dang-nhap', 'quan-tri'].includes(page) ? 'account' : '';
+  const hideTabs = ['san-pham', 'thanh-toan'].includes(page);
 
   document.body.classList.add('app-shell', hideTabs ? 'app-shell--notab' : 'app-shell--tab');
   document.body.insertAdjacentHTML('beforeend', (hideTabs ? '' : renderTabBar(tab)) + renderAppCats());
@@ -1354,7 +1354,7 @@ function initAppShell() {
   if (header && isHome) {
     $('#flash')?.insertAdjacentHTML('beforebegin', renderAppShortcuts());
   } else if (header) {
-    const title = page === 'product' ? 'Chi tiết sản phẩm' : document.title.split('|')[0].trim();
+    const title = page === 'san-pham' ? 'Chi tiết sản phẩm' : document.title.split('|')[0].trim();
     header.classList.add('appbar');
     $('.site-header__inner', header).insertAdjacentHTML('afterbegin', renderAppBarControls(title));
     $('[data-app-back]', header).addEventListener('click', () => {
@@ -1416,6 +1416,16 @@ function initAppCats(activeTab) {
 }
 
 /* ---------- Khởi động ---------- */
+/* Đường dẫn đẹp không đuôi .html (vd: tin-tuc, san-pham?id=) — GitHub Pages tự hiểu.
+   Khi mở file trực tiếp trên máy (file://) thì gắn lại .html lúc bấm link để vẫn chạy được. */
+if (location.protocol === 'file:') {
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest?.('a[href]');
+    const href = a?.getAttribute('href') || '';
+    if (/^[a-z0-9-]+([?#]|$)/i.test(href)) a.setAttribute('href', href.replace(/^([a-z0-9-]+)/i, '$1.html'));
+  }, true);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const headerSlot = $('#site-header-slot');
   const footerSlot = $('#site-footer-slot');

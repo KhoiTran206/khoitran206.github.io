@@ -25,8 +25,8 @@ function summaryHTML(totals) {
       <div><dt>Phí giao hàng</dt><dd>${totals.shipping ? formatPrice(totals.shipping) : 'Miễn phí'}</dd></div>
       <div class="totals__grand"><dt>Tổng cộng</dt><dd>${formatPrice(totals.total)}<small>(Đã bao gồm VAT nếu có)</small></dd></div>
     </dl>
-    <a class="btn btn--primary btn--lg btn--block" href="checkout.html">TIẾN HÀNH ĐẶT HÀNG${icon('arrow-right')}</a>
-    <a class="btn btn--ghost btn--block" href="category.html">${icon('arrow-left')}Tiếp tục mua sắm</a>`;
+    <a class="btn btn--primary btn--lg btn--block" href="thanh-toan">TIẾN HÀNH ĐẶT HÀNG${icon('arrow-right')}</a>
+    <a class="btn btn--ghost btn--block" href="danh-muc">${icon('arrow-left')}Tiếp tục mua sắm</a>`;
 }
 
 function render() {
@@ -57,9 +57,9 @@ function render() {
         <ul class="cart-list">
           ${lines.map(({ p, qty, total }) => `
             <li class="cart-item" data-id="${p.id}">
-              <a class="cart-item__img" href="product.html?id=${p.id}"><img src="${thumb(p.img)}" alt="${p.name}" width="88" height="88" loading="lazy"></a>
+              <a class="cart-item__img" href="san-pham?id=${p.id}"><img src="${thumb(p.img)}" alt="${p.name}" width="88" height="88" loading="lazy"></a>
               <div class="cart-item__info">
-                <a class="cart-item__name" href="product.html?id=${p.id}">${p.name}</a>
+                <a class="cart-item__name" href="san-pham?id=${p.id}">${p.name}</a>
                 <p class="cart-item__price">${formatPrice(p.price)} ${p.oldPrice > p.price ? `<del>${formatPrice(p.oldPrice)}</del>` : ''}</p>
                 ${p.gift ? `<p class="cart-item__gift">${icon('gift')}${p.gift}</p>` : ''}
                 <button type="button" class="cart-item__remove" data-remove>${icon('trash-2')}Xóa</button>

@@ -1,10 +1,10 @@
 /* ==========================================================
-   Trang danh sách tin tức — news.html?tag=
+   Trang danh sách tin tức — tin-tuc?tag=
    ========================================================== */
 
 function newsCard(n, i) {
   return `
-    <a class="news-card reveal-item" style="--i:${i}" href="article.html?id=${n.id}">
+    <a class="news-card reveal-item" style="--i:${i}" href="bai-viet?id=${n.id}">
       <span class="news-card__img"><img src="${photo(n.img)}" alt="" loading="lazy"><span class="news-tile__tag">${n.tag}</span></span>
       <span class="news-card__body">
         <h2 class="news-card__title">${n.title}</h2>
@@ -28,7 +28,7 @@ function render(tag) {
       </div>
     </div>
     ${first ? `
-      <a class="news-feature reveal" href="article.html?id=${first.id}">
+      <a class="news-feature reveal" href="bai-viet?id=${first.id}">
         <img src="${photo(first.img)}" alt="">
         <div class="news-feature__body">
           <span class="news-tile__tag">${first.tag}</span>
@@ -48,7 +48,7 @@ function initPage() {
     const btn = e.target.closest('[data-tag]');
     if (!btn) return;
     const tag = btn.dataset.tag;
-    history.replaceState(null, '', tag ? `news.html?tag=${encodeURIComponent(tag)}` : 'news.html');
+    history.replaceState(null, '', tag ? `tin-tuc?tag=${encodeURIComponent(tag)}` : 'tin-tuc');
     render(tag);
   });
 }

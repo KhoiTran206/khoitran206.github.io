@@ -16,11 +16,11 @@ const { PRODUCTS, NEWS, POLICIES, CATEGORY_RULES } = ctx.__d;
 const today = new Date().toISOString().slice(0, 10);
 const urls = [
   [BASE, '1.0', 'daily'],
-  ...['category.html', 'build-pc.html', 'thu-cu-doi-moi.html', 'news.html', 'contact.html'].map((f) => [BASE + f, '0.8', 'weekly']),
-  ...Object.keys(CATEGORY_RULES).map((k) => [`${BASE}category.html?cat=${k}`, '0.8', 'daily']),
-  ...PRODUCTS.map((p) => [`${BASE}product.html?id=${p.id}`, '0.7', 'weekly']),
-  ...NEWS.map((n) => [`${BASE}article.html?id=${n.id}`, '0.5', 'monthly']),
-  ...Object.keys(POLICIES).map((k) => [`${BASE}policy.html?type=${k}`, '0.3', 'yearly']),
+  ...['danh-muc', 'xay-dung-cau-hinh', 'thu-cu-doi-moi', 'tin-tuc', 'lien-he'].map((f) => [BASE + f, '0.8', 'weekly']),
+  ...Object.keys(CATEGORY_RULES).map((k) => [`${BASE}danh-muc?cat=${k}`, '0.8', 'daily']),
+  ...PRODUCTS.map((p) => [`${BASE}san-pham?id=${p.id}`, '0.7', 'weekly']),
+  ...NEWS.map((n) => [`${BASE}bai-viet?id=${n.id}`, '0.5', 'monthly']),
+  ...Object.keys(POLICIES).map((k) => [`${BASE}chinh-sach?type=${k}`, '0.3', 'yearly']),
 ];
 
 fs.writeFileSync(path.join(ROOT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>

@@ -1,5 +1,5 @@
 /* ==========================================================
-   Trang Thu cũ đổi mới — thu-cu-doi-moi.html
+   Trang Thu cũ đổi mới — thu-cu-doi-moi
    Định giá online (tham khảo) · quy trình · chính sách thu · gửi yêu cầu
    ========================================================== */
 
@@ -229,7 +229,7 @@ function calculatorHTML() {
       <input type="checkbox" data-upgrade ${state.upgrade ? 'checked' : ''}>
       <span><b>Đổi lên đời tại ${COMPANY.name}</b><small>Trợ giá thêm ${TRADE_IN.upgradeBonus.rate * 100}% (tối đa ${formatPrice(TRADE_IN.upgradeBonus.max)}) khi mua sản phẩm mới cùng lúc</small></span>
     </label>
-    <a class="ti-calc__more" href="category.html?cat=${state.group === 'lcd' ? 'monitor' : state.group === 'pc' ? 'pc' : state.group}">${icon('sparkles')}Xem sản phẩm ${group.name.toLowerCase()} mới để lên đời${icon('arrow-right')}</a>`;
+    <a class="ti-calc__more" href="danh-muc?cat=${state.group === 'lcd' ? 'monitor' : state.group === 'pc' ? 'pc' : state.group}">${icon('sparkles')}Xem sản phẩm ${group.name.toLowerCase()} mới để lên đời${icon('arrow-right')}</a>`;
 }
 
 function summaryHTML() {

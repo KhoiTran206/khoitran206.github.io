@@ -5,7 +5,7 @@
    - Không đụng tới Firebase, FormSubmit, Google Fonts (tên miền khác)
    Đổi VERSION khi muốn xóa sạch bộ nhớ đệm cũ của mọi khách.
    ========================================================== */
-const VERSION = 'mkpc-v6';
+const VERSION = 'mkpc-v7';
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGE_CACHE = `${VERSION}-pages`;
 const OFFLINE_URL = 'offline.html';

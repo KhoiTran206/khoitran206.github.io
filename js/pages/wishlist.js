@@ -1,5 +1,5 @@
 /* ==========================================================
-   Trang sản phẩm yêu thích — wishlist.html
+   Trang sản phẩm yêu thích — yeu-thich
    ========================================================== */
 
 function renderWishlist() {

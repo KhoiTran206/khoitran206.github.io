@@ -68,7 +68,7 @@ function renderHeader() {
       <div class="container site-header__inner">
         <button class="header-icon-btn header-icon-btn--menu" type="button" data-drawer-open aria-label="Mở danh mục sản phẩm">${icon('menu')}</button>
         ${renderLogo()}
-        <form class="search" role="search" action="category.html">
+        <form class="search" role="search" action="danh-muc">
           <label class="sr-only" for="search-input">Tìm kiếm sản phẩm</label>
           <input class="search__input" id="search-input" name="q" type="search" placeholder="Bạn cần tìm gì?" autocomplete="off" aria-controls="search-suggest">
           <button class="search__btn" type="submit" aria-label="Tìm kiếm">${icon('search')}</button>
@@ -76,12 +76,12 @@ function renderHeader() {
         </form>
         <nav class="header-actions" aria-label="Tiện ích">
           <a class="header-action" href="tel:${COMPANY.phone}">${icon('headphones')}<span>Hotline<br><b>${COMPANY.phoneDisplay}</b></span></a>
-          <a class="header-action" href="contact.html">${icon('map-pin')}<span>Hệ thống<br>cửa hàng</span></a>
-          <a class="header-action" href="order.html">${icon('clipboard-list')}<span>Tra cứu<br>đơn hàng</span></a>
-          <a class="header-cart header-wish" href="wishlist.html" aria-label="Sản phẩm yêu thích" title="Sản phẩm yêu thích">
+          <a class="header-action" href="lien-he">${icon('map-pin')}<span>Hệ thống<br>cửa hàng</span></a>
+          <a class="header-action" href="tra-cuu-don-hang">${icon('clipboard-list')}<span>Tra cứu<br>đơn hàng</span></a>
+          <a class="header-cart header-wish" href="yeu-thich" aria-label="Sản phẩm yêu thích" title="Sản phẩm yêu thích">
             ${icon('heart')}<span class="cart-count" data-wish-count hidden>0</span>
           </a>
-          <a class="header-cart" href="cart.html" aria-label="Giỏ hàng">
+          <a class="header-cart" href="gio-hang" aria-label="Giỏ hàng">
             ${icon('shopping-cart')}<span class="cart-count" data-cart-count>0</span>
           </a>
           <div class="account-menu" data-account-slot>${renderAccountMenu(Auth.current())}</div>
@@ -103,12 +103,12 @@ function renderHeader() {
 
 /* ---------- Menu danh mục (desktop: mega menu) ----------
    Liên kết: 'chữ' → tìm trong danh mục đó, hoặc ['chữ', 'địa chỉ riêng'] */
-const catLink = (c, l) => (Array.isArray(l) ? l : [l, `category.html?cat=${c.id}&q=${encodeURIComponent(l)}`]);
+const catLink = (c, l) => (Array.isArray(l) ? l : [l, `danh-muc?cat=${c.id}&q=${encodeURIComponent(l)}`]);
 
 function renderCategoryMenu() {
   return `<ul>${CATEGORIES.map((c) => `
     <li class="cat-menu__item" data-mega-cat="${c.id}">
-      <a class="cat-menu__link" href="category.html?cat=${c.id}">${icon(c.icon)}<span>${c.name}</span>${icon('chevron-right', 'cat-menu__chevron')}</a>
+      <a class="cat-menu__link" href="danh-muc?cat=${c.id}">${icon(c.icon)}<span>${c.name}</span>${icon('chevron-right', 'cat-menu__chevron')}</a>
       <div class="mega">
         <div class="mega__groups">
           ${c.groups.map((g) => `
@@ -132,11 +132,11 @@ function megaFeaturedHTML(catId) {
   return `
     <div class="mega__featured-head">
       <p class="mega__title">${icon('flame')}Bán chạy nhất</p>
-      <a class="mega__all" href="category.html?cat=${catId}">Xem tất cả ${all.length} sản phẩm${icon('chevron-right')}</a>
+      <a class="mega__all" href="danh-muc?cat=${catId}">Xem tất cả ${all.length} sản phẩm${icon('chevron-right')}</a>
     </div>
     <div class="mega__products">
       ${top.map((p) => `
-        <a class="mega-card" href="product.html?id=${p.id}">
+        <a class="mega-card" href="san-pham?id=${p.id}">
           <span class="mega-card__img"><img src="${thumb(p.img)}" alt="${p.name}" width="120" height="120" loading="lazy"></span>
           <span class="mega-card__name">${p.name}</span>
           <b class="mega-card__price">${formatPrice(p.price)}</b>
@@ -152,7 +152,7 @@ function drawerBodyHTML() {
     <details class="drawer__group">
       <summary>${icon(c.icon)}<span>${c.name}</span>${icon('chevron-right', 'drawer__chevron')}</summary>
       <div class="drawer__sub">
-        <a class="drawer__all" href="category.html?cat=${c.id}">Xem tất cả ${c.name}${icon('chevron-right')}</a>
+        <a class="drawer__all" href="danh-muc?cat=${c.id}">Xem tất cả ${c.name}${icon('chevron-right')}</a>
         ${c.groups.flatMap((g) => g.links).slice(0, 10).map((l) => catLink(c, l)).map(([text, href]) => `<a href="${href}">${text}</a>`).join('')}
       </div>
     </details>`).join('');
@@ -169,9 +169,9 @@ function renderDrawer() {
         </div>
         <div class="drawer__body" data-drawer-body></div>
         <div class="drawer__foot">
-          <a href="wishlist.html">${icon('heart')}<span>Sản phẩm yêu thích</span></a>
-          <a href="compare.html">${icon('git-compare-arrows')}<span>So sánh sản phẩm</span></a>
-          <a href="order.html">${icon('clipboard-list')}<span>Tra cứu đơn hàng</span></a>
+          <a href="yeu-thich">${icon('heart')}<span>Sản phẩm yêu thích</span></a>
+          <a href="so-sanh">${icon('git-compare-arrows')}<span>So sánh sản phẩm</span></a>
+          <a href="tra-cuu-don-hang">${icon('clipboard-list')}<span>Tra cứu đơn hàng</span></a>
           <button class="drawer__install" type="button" data-install>${icon('smartphone')}<span>Tải app ${COMPANY.name}</span></button>
           <a href="tel:${COMPANY.phone}">${icon('phone')}<span>Hotline: <b>${COMPANY.phoneDisplay}</b></span></a>
           <a href="mailto:${COMPANY.email}">${icon('mail')}<span>${COMPANY.email}</span></a>
@@ -184,7 +184,7 @@ function renderDrawer() {
 /* ---------- Nút tài khoản trên header ---------- */
 function renderAccountMenu(user) {
   if (!user) {
-    return `<a class="header-login" href="login.html" aria-label="Đăng nhập">${icon('user-round')}<span>Đăng nhập</span></a>`;
+    return `<a class="header-login" href="dang-nhap" aria-label="Đăng nhập">${icon('user-round')}<span>Đăng nhập</span></a>`;
   }
   const words = user.name.trim().split(/\s+/);
   const given = words[words.length - 1];
@@ -197,10 +197,10 @@ function renderAccountMenu(user) {
     </button>
     <div class="account-dropdown" role="menu">
       <div class="account-dropdown__head"><b>${esc(user.name)}</b><small>${esc(user.email)}</small>${isAdmin ? `<em class="account-dropdown__role">${icon('shield-check')}Quản trị viên</em>` : ''}</div>
-      <a href="account.html" role="menuitem">${icon('user-round')}Tài khoản của tôi</a>
-      <a href="account.html#don-hang" role="menuitem">${icon('shopping-bag')}Đơn hàng của tôi</a>
-      <a href="wishlist.html" role="menuitem">${icon('heart')}Sản phẩm yêu thích</a>
-      ${Auth.isAdmin(user) ? `<a href="admin.html" role="menuitem">${icon('layout-dashboard')}Quản trị cửa hàng</a>` : ''}
+      <a href="tai-khoan" role="menuitem">${icon('user-round')}Tài khoản của tôi</a>
+      <a href="tai-khoan#don-hang" role="menuitem">${icon('shopping-bag')}Đơn hàng của tôi</a>
+      <a href="yeu-thich" role="menuitem">${icon('heart')}Sản phẩm yêu thích</a>
+      ${Auth.isAdmin(user) ? `<a href="quan-tri" role="menuitem">${icon('layout-dashboard')}Quản trị cửa hàng</a>` : ''}
       <button type="button" role="menuitem" data-logout>${icon('log-out')}Đăng xuất</button>
     </div>`;
 }
@@ -208,7 +208,7 @@ function renderAccountMenu(user) {
 /* ---------- Product card (dùng chung toàn site) ---------- */
 function renderProductCard(p, options = {}) {
   const discount = discountPercent(p.price, p.oldPrice);
-  const url = `product.html?id=${p.id}`;
+  const url = `san-pham?id=${p.id}`;
   const specs = p.specs.slice(0, 4).map(([type, value]) => `<li>${icon(SPEC_ICONS[type] || 'dot')}<span>${value}</span></li>`).join('');
 
   const compact = !!options.compact;
@@ -246,7 +246,7 @@ function renderProductCard(p, options = {}) {
 function renderPromo(b, size = '') {
   const plainTitle = b.title.replace(/<[^>]+>/g, '');
   return `
-    <a class="promo promo--${b.theme}${size ? ` promo--${size}` : ''}" href="${b.href || 'category.html?sale=1'}" aria-label="${plainTitle}">
+    <a class="promo promo--${b.theme}${size ? ` promo--${size}` : ''}" href="${b.href || 'danh-muc?sale=1'}" aria-label="${plainTitle}">
       <div class="promo__content">
         ${b.tag ? `<span class="promo__tag">${b.tag}</span>` : ''}
         <h3 class="promo__title">${b.title}</h3>
@@ -283,8 +283,8 @@ const ASSIST_OPTIONS = [
   ['zalo', 'Chat Zalo', 'Tư vấn cấu hình, báo giá nhanh', COMPANY.zalo, true],
   ['phone', 'Gọi hotline', COMPANY.phoneDisplay, `tel:${COMPANY.phone}`],
   ['facebook', 'Nhắn Facebook', 'Fanpage Minh Khôi PC', COMPANY.socials.facebook, true],
-  ['clipboard-list', 'Tra cứu đơn hàng', 'Xem trạng thái đơn đã đặt', 'order.html'],
-  ['cpu', 'Tự build PC', 'Chọn linh kiện, xem tổng giá', 'build-pc.html'],
+  ['clipboard-list', 'Tra cứu đơn hàng', 'Xem trạng thái đơn đã đặt', 'tra-cuu-don-hang'],
+  ['cpu', 'Tự build PC', 'Chọn linh kiện, xem tổng giá', 'xay-dung-cau-hinh'],
 ];
 
 function renderAssist() {
@@ -361,12 +361,12 @@ function renderFooter() {
           </ul>
         </div>
         <div>
-          ${list('Về Minh Khôi PC', [['Giới thiệu', 'policy.html?type=gioi-thieu'], ['Tin tức - Review', 'news.html'], ['Liên hệ', 'contact.html']])}
+          ${list('Về Minh Khôi PC', [['Giới thiệu', 'chinh-sach?type=gioi-thieu'], ['Tin tức - Review', 'tin-tuc'], ['Liên hệ', 'lien-he']])}
           <div class="footer-col__gap"></div>
-          ${list('Chính sách', [['Chính sách bảo hành', 'policy.html?type=bao-hanh'], ['Chính sách đổi trả', 'policy.html?type=doi-tra'], ['Chính sách giao hàng', 'policy.html?type=giao-hang'], ['Bảo mật thông tin', 'policy.html?type=bao-mat']])}
+          ${list('Chính sách', [['Chính sách bảo hành', 'chinh-sach?type=bao-hanh'], ['Chính sách đổi trả', 'chinh-sach?type=doi-tra'], ['Chính sách giao hàng', 'chinh-sach?type=giao-hang'], ['Bảo mật thông tin', 'chinh-sach?type=bao-mat']])}
         </div>
         <div>
-          ${list('Thông tin', [['Hệ thống cửa hàng', 'contact.html'], ['Hướng dẫn mua hàng', 'policy.html?type=huong-dan-mua-hang'], ['Hướng dẫn thanh toán', 'policy.html?type=thanh-toan'], ['Hướng dẫn trả góp', 'policy.html?type=tra-gop'], ['Tra cứu đơn hàng', 'order.html'], ['Build PC', 'build-pc.html']])}
+          ${list('Thông tin', [['Hệ thống cửa hàng', 'lien-he'], ['Hướng dẫn mua hàng', 'chinh-sach?type=huong-dan-mua-hang'], ['Hướng dẫn thanh toán', 'chinh-sach?type=thanh-toan'], ['Hướng dẫn trả góp', 'chinh-sach?type=tra-gop'], ['Tra cứu đơn hàng', 'tra-cuu-don-hang'], ['Build PC', 'xay-dung-cau-hinh']])}
         </div>
         <div class="footer-pay">
           <h3 class="footer-col__title">Hỗ trợ thanh toán</h3>
@@ -378,7 +378,7 @@ function renderFooter() {
             <ul class="ship-list">
               ${FOOTER_SHIPPING.map(([ic, title, desc]) => `<li class="ship-item"><span class="ship-item__icon">${icon(ic)}</span><span><b>${title}</b><small>${desc}</small></span></li>`).join('')}
             </ul>
-            <a class="freeship" href="policy.html?type=giao-hang">${icon('gift')}<span>Miễn phí giao hàng đơn từ <b>${formatPrice(SHOP.freeShipFrom)}</b></span>${icon('chevron-right')}</a>
+            <a class="freeship" href="chinh-sach?type=giao-hang">${icon('gift')}<span>Miễn phí giao hàng đơn từ <b>${formatPrice(SHOP.freeShipFrom)}</b></span>${icon('chevron-right')}</a>
           </div>
         </div>
       </div>
@@ -438,15 +438,15 @@ function renderEmpty(iconName, title, desc, actionHTML = '') {
 const APP_TABS = [
   { id: 'home', icon: 'house', label: 'Trang chủ', href: HOME_URL },
   { id: 'cats', icon: 'layout-grid', label: 'Danh mục' },
-  { id: 'sale', icon: 'badge-percent', label: 'Khuyến mãi', href: 'category.html?sale=1' },
-  { id: 'cart', icon: 'shopping-cart', label: 'Giỏ hàng', href: 'cart.html', badge: true },
-  { id: 'account', icon: 'circle-user-round', label: 'Tài khoản', href: 'account.html' },
+  { id: 'sale', icon: 'badge-percent', label: 'Khuyến mãi', href: 'danh-muc?sale=1' },
+  { id: 'cart', icon: 'shopping-cart', label: 'Giỏ hàng', href: 'gio-hang', badge: true },
+  { id: 'account', icon: 'circle-user-round', label: 'Tài khoản', href: 'tai-khoan' },
 ];
 
 const APP_SHORTCUTS = [
-  { icon: 'cpu', label: 'Build PC', href: 'build-pc.html' },
-  { icon: 'refresh-cw', label: 'Thu cũ đổi mới', href: 'thu-cu-doi-moi.html' },
-  { icon: 'clipboard-list', label: 'Tra cứu đơn', href: 'order.html' },
+  { icon: 'cpu', label: 'Build PC', href: 'xay-dung-cau-hinh' },
+  { icon: 'refresh-cw', label: 'Thu cũ đổi mới', href: 'thu-cu-doi-moi' },
+  { icon: 'clipboard-list', label: 'Tra cứu đơn', href: 'tra-cuu-don-hang' },
   { icon: 'message-circle', label: 'Chat Zalo', href: COMPANY.zalo, external: true },
 ];
 
@@ -512,14 +512,14 @@ function appCatsPaneHTML(catId) {
       ${link('phone', `Hotline <b>${COMPANY.phoneDisplay}</b>`, `tel:${COMPANY.phone}`)}
       ${link('message-circle', 'Chat Zalo', COMPANY.zalo, true)}
       ${link('mail', COMPANY.email, `mailto:${COMPANY.email}`)}
-      ${link('map-pin', 'Địa chỉ cửa hàng', 'contact.html')}
+      ${link('map-pin', 'Địa chỉ cửa hàng', 'lien-he')}
       <p class="app-cats__group">Tiện ích</p>
-      ${link('clipboard-list', 'Tra cứu đơn hàng', 'order.html')}
-      ${link('heart', 'Sản phẩm yêu thích', 'wishlist.html')}
-      ${link('git-compare-arrows', 'So sánh sản phẩm', 'compare.html')}
-      ${link('newspaper', 'Tin tức công nghệ', 'news.html')}
+      ${link('clipboard-list', 'Tra cứu đơn hàng', 'tra-cuu-don-hang')}
+      ${link('heart', 'Sản phẩm yêu thích', 'yeu-thich')}
+      ${link('git-compare-arrows', 'So sánh sản phẩm', 'so-sanh')}
+      ${link('newspaper', 'Tin tức công nghệ', 'tin-tuc')}
       <p class="app-cats__group">Chính sách</p>
-      ${Object.entries(POLICIES).map(([k, v]) => link('file-text', v.title, `policy.html?type=${k}`)).join('')}
+      ${Object.entries(POLICIES).map(([k, v]) => link('file-text', v.title, `chinh-sach?type=${k}`)).join('')}
       <p class="app-cats__foot">${COMPANY.name} · ${COMPANY.address}</p>`;
   }
   const c = CATEGORIES.find((x) => x.id === catId);
@@ -527,14 +527,14 @@ function appCatsPaneHTML(catId) {
   const rule = CATEGORY_RULES[c.id];
   const top = rule ? PRODUCTS.filter((p) => rule.match(p) && (c.id === 'used' || !p.tags.includes('used'))).sort((a, b) => b.reviews - a.reviews).slice(0, 6) : [];
   return `
-    <a class="app-cats__all" href="category.html?cat=${c.id}">
+    <a class="app-cats__all" href="danh-muc?cat=${c.id}">
       <span>Xem tất cả<b>${c.name}</b></span>${icon('chevron-right')}
     </a>
     ${top.length ? `
       <p class="app-cats__group">${icon('flame')}Bán chạy</p>
       <div class="app-cats__products">
         ${top.map((p) => `
-          <a class="app-cats__product" href="product.html?id=${p.id}">
+          <a class="app-cats__product" href="san-pham?id=${p.id}">
             <img src="${thumb(p.img)}" alt="${p.name}" width="96" height="96" loading="lazy">
             <span>${p.name}</span>
             <b>${formatPrice(p.price)}</b>

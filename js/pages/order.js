@@ -1,6 +1,6 @@
 /* ==========================================================
    Trang đơn hàng: đặt hàng thành công + tra cứu đơn
-   order.html?code=MK...&new=1
+   tra-cuu-don-hang?code=MK...&new=1
    ========================================================== */
 
 /* 4 bước trên thanh trạng thái — dùng đúng tên trạng thái của ORDER_STATUSES (app.js),
@@ -48,7 +48,7 @@ function orderDetailHTML(order, isNew) {
             ${order.items.map((i) => `
               <li>
                 <span class="mini-list__img"><img src="${thumb(i.img)}" alt="" width="64" height="64"><b>${i.qty}</b></span>
-                <a class="mini-list__name" href="product.html?id=${i.id}">${esc(i.name)}<small>${formatPrice(i.price)} × ${i.qty}</small></a>
+                <a class="mini-list__name" href="san-pham?id=${i.id}">${esc(i.name)}<small>${formatPrice(i.price)} × ${i.qty}</small></a>
                 <span class="mini-list__price">${formatPrice(i.price * i.qty)}</span>
               </li>`).join('')}
           </ul>
@@ -112,7 +112,7 @@ function lookupHTML(message = '') {
         <h2 class="panel__title">${icon('history')}Đơn hàng gần đây trên thiết bị này</h2>
         <ul class="order-list">
           ${recent.slice(0, 8).map((o) => `
-            <li><a href="order.html?code=${o.code}">
+            <li><a href="tra-cuu-don-hang?code=${o.code}">
               <span><b>${o.code}</b><small>${new Date(o.createdAt).toLocaleDateString('vi-VN')} · ${o.items.length} sản phẩm</small></span>
               <span class="order-list__right"><b>${formatPrice(o.totals.total)}</b><small class="status-tag">${o.status}</small></span>
             </a></li>`).join('')}
@@ -126,7 +126,7 @@ let shownOrder = null;
 function showOrder(order, isNew) {
   shownOrder = order;
   const root = $('#order-page');
-  root.innerHTML = `${renderBreadcrumb([['Đơn hàng', 'order.html'], [order.code, '#']])}${orderDetailHTML(order, isNew)}`;
+  root.innerHTML = `${renderBreadcrumb([['Đơn hàng', 'tra-cuu-don-hang'], [order.code, '#']])}${orderDetailHTML(order, isNew)}`;
   document.title = `Đơn hàng ${order.code} | ${COMPANY.name}`;
   refreshIcons();
 }
@@ -181,11 +181,11 @@ async function initPage() {
     if (!c || !isValidPhone(phone)) return;
     const found = await findOrder(c);
     if (found && found.customer.phone.replace(/\D/g, '') === phone) {
-      history.replaceState(null, '', `order.html?code=${found.code}`);
+      history.replaceState(null, '', `tra-cuu-don-hang?code=${found.code}`);
       showOrder(found, false);
       if (Auth.current()) watchOrder(found.code, false);
     } else {
-      showLookup(`Không tìm thấy đơn hàng <b>${esc(c)}</b> với số điện thoại này.${Auth.current() ? '' : ' Nếu đặt hàng trên thiết bị khác, hãy <a href="login.html?next=order.html">đăng nhập</a> tài khoản đã dùng khi đặt, hoặc gọi hotline để được hỗ trợ.'}`);
+      showLookup(`Không tìm thấy đơn hàng <b>${esc(c)}</b> với số điện thoại này.${Auth.current() ? '' : ' Nếu đặt hàng trên thiết bị khác, hãy <a href="dang-nhap?next=tra-cuu-don-hang">đăng nhập</a> tài khoản đã dùng khi đặt, hoặc gọi hotline để được hỗ trợ.'}`);
     }
   });
 
@@ -202,7 +202,7 @@ async function initPage() {
     const current = shownOrder;
     if (e.target.closest('[data-reorder]') && current) {
       current.items.forEach((i) => { if (productById(i.id)) Cart.add(i.id, i.qty); });
-      location.href = 'cart.html';
+      location.href = 'gio-hang';
     }
     const resend = e.target.closest('[data-resend]');
     if (resend && current) {

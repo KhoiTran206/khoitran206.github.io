@@ -1,6 +1,6 @@
 /* ==========================================================
    Trang đăng nhập / đăng ký / quên mật khẩu
-   login.html?tab=register | forgot  ·  &next=checkout.html
+   dang-nhap?tab=register | forgot  ·  &next=thanh-toan
    ========================================================== */
 
 const AUTH_TABS = ['login', 'register', 'forgot'];
@@ -8,7 +8,8 @@ const AUTH_TABS = ['login', 'register', 'forgot'];
 /* Chỉ cho phép quay lại trang nội bộ (chống chuyển hướng ra site lạ) */
 function nextUrl() {
   const next = params.get('next') || '';
-  return /^[a-z0-9-]+\.html([?#][^\s]*)?$/i.test(next) && !next.startsWith('login.html') ? next : 'account.html';
+  // Chỉ cho chuyển tới trang nội bộ (vd: tai-khoan, quan-tri, thanh-toan?x=1) — chặn link ngoài
+  return /^[a-z0-9-]+(\.html)?([?#][^\s]*)?$/i.test(next) && !next.startsWith('dang-nhap') ? next : 'tai-khoan';
 }
 
 function authField(name, label, { type = 'text', placeholder = '', autocomplete = '', hint = '' } = {}) {
@@ -43,11 +44,11 @@ function loginForm() {
       ${authField('password', 'Mật khẩu', { type: 'password', placeholder: 'Nhập mật khẩu', autocomplete: 'current-password' })}
       <div class="auth__row">
         <label class="check"><input type="checkbox" name="remember" checked>Ghi nhớ đăng nhập</label>
-        <a class="auth__link" href="login.html?tab=forgot" data-tab="forgot">Quên mật khẩu?</a>
+        <a class="auth__link" href="dang-nhap?tab=forgot" data-tab="forgot">Quên mật khẩu?</a>
       </div>
       <p class="auth__error" role="alert" hidden></p>
       <button class="btn btn--primary btn--lg btn--block" type="submit">Đăng nhập</button>
-      <p class="auth__switch">Bạn chưa có tài khoản? <a href="login.html?tab=register" data-tab="register">Đăng ký ngay</a></p>
+      <p class="auth__switch">Bạn chưa có tài khoản? <a href="dang-nhap?tab=register" data-tab="register">Đăng ký ngay</a></p>
     </form>`;
 }
 
@@ -64,12 +65,12 @@ function registerForm() {
       <div class="password-meter" aria-hidden="true"><span></span></div>
       ${authField('confirm', 'Nhập lại mật khẩu', { type: 'password', placeholder: 'Nhập lại mật khẩu', autocomplete: 'new-password' })}
       <div class="field">
-        <label class="check"><input type="checkbox" name="agree"><span>Tôi đồng ý với <a href="policy.html?type=bao-mat" target="_blank" rel="noopener">chính sách bảo mật</a> của ${COMPANY.name}</span></label>
+        <label class="check"><input type="checkbox" name="agree"><span>Tôi đồng ý với <a href="chinh-sach?type=bao-mat" target="_blank" rel="noopener">chính sách bảo mật</a> của ${COMPANY.name}</span></label>
         <span class="field__error"></span>
       </div>
       <p class="auth__error" role="alert" hidden></p>
       <button class="btn btn--primary btn--lg btn--block" type="submit">Tạo tài khoản</button>
-      <p class="auth__switch">Bạn đã có tài khoản? <a href="login.html" data-tab="login">Đăng nhập</a></p>
+      <p class="auth__switch">Bạn đã có tài khoản? <a href="dang-nhap" data-tab="login">Đăng nhập</a></p>
     </form>`;
 }
 
@@ -81,7 +82,7 @@ function forgotForm() {
       <p class="auth__error" role="alert" hidden></p>
       <p class="alert alert--success auth__sent" role="status" hidden></p>
       <button class="btn btn--primary btn--lg btn--block" type="submit">Gửi link đặt lại mật khẩu</button>
-      <p class="auth__switch">Không nhớ thông tin? Gọi <a href="tel:${COMPANY.phone}">${COMPANY.phoneDisplay}</a> để được hỗ trợ · <a href="login.html" data-tab="login">Quay lại đăng nhập</a></p>
+      <p class="auth__switch">Không nhớ thông tin? Gọi <a href="tel:${COMPANY.phone}">${COMPANY.phoneDisplay}</a> để được hỗ trợ · <a href="dang-nhap" data-tab="login">Quay lại đăng nhập</a></p>
     </form>`;
 }
 
@@ -114,8 +115,8 @@ function renderAuth(tab) {
       <section class="auth__card panel">
         ${tab === 'forgot' ? `<h1 class="auth__title">Quên mật khẩu</h1>` : `
         <div class="auth__tabs" role="tablist">
-          <a class="auth__tab${tab === 'login' ? ' is-active' : ''}" href="login.html" data-tab="login" role="tab" aria-selected="${tab === 'login'}">Đăng nhập</a>
-          <a class="auth__tab${tab === 'register' ? ' is-active' : ''}" href="login.html?tab=register" data-tab="register" role="tab" aria-selected="${tab === 'register'}">Đăng ký</a>
+          <a class="auth__tab${tab === 'login' ? ' is-active' : ''}" href="dang-nhap" data-tab="login" role="tab" aria-selected="${tab === 'login'}">Đăng nhập</a>
+          <a class="auth__tab${tab === 'register' ? ' is-active' : ''}" href="dang-nhap?tab=register" data-tab="register" role="tab" aria-selected="${tab === 'register'}">Đăng ký</a>
         </div>`}
         ${view.form()}
         <p class="auth__note">${icon('info')}<span>Tài khoản được bảo mật bởi Google Firebase — đăng nhập được trên mọi thiết bị.</span></p>

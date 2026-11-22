@@ -1,5 +1,5 @@
 /* ==========================================================
-   Trang so sánh sản phẩm — compare.html (tối đa 3, cùng loại)
+   Trang so sánh sản phẩm — so-sanh (tối đa 3, cùng loại)
    ========================================================== */
 
 function renderCompare() {
@@ -40,14 +40,14 @@ function renderCompare() {
                 <th scope="col">
                   <div class="compare__product">
                     <button class="compare__remove" type="button" data-compare-remove="${p.id}" aria-label="Bỏ ${p.name}">${icon('x')}</button>
-                    <a href="product.html?id=${p.id}"><img src="${thumb(p.img)}" alt="${p.name}" width="160" height="160"></a>
-                    <a class="compare__name" href="product.html?id=${p.id}">${p.name}</a>
+                    <a href="san-pham?id=${p.id}"><img src="${thumb(p.img)}" alt="${p.name}" width="160" height="160"></a>
+                    <a class="compare__name" href="san-pham?id=${p.id}">${p.name}</a>
                     <strong class="compare__price">${formatPrice(p.price)}</strong>
                     ${p.oldPrice > p.price ? `<del>${formatPrice(p.oldPrice)}</del>` : ''}
                     <button class="btn btn--primary btn--block" type="button" data-add-cart="${p.id}">${icon('shopping-cart')}Thêm vào giỏ</button>
                   </div>
                 </th>`).join('')}
-              ${canAdd ? `<th scope="col"><a class="compare__add" href="category.html?cat=${catId}">${icon('plus')}<span>Thêm sản phẩm<br><small>cùng loại để so sánh</small></span></a></th>` : ''}
+              ${canAdd ? `<th scope="col"><a class="compare__add" href="danh-muc?cat=${catId}">${icon('plus')}<span>Thêm sản phẩm<br><small>cùng loại để so sánh</small></span></a></th>` : ''}
             </tr>
           </thead>
           <tbody>

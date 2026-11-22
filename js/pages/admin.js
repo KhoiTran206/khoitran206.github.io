@@ -1,5 +1,5 @@
 /* ==========================================================
-   Trang quản trị — admin.html (chỉ email trong SHOP.adminEmails)
+   Trang quản trị — quan-tri (chỉ email trong SHOP.adminEmails)
    Thống kê · đơn hàng (lọc, tìm, đổi trạng thái) · khách hàng
    Quyền thật sự được kiểm tra ở firestore.rules, không chỉ ở giao diện.
    ========================================================== */
@@ -176,7 +176,7 @@ async function initPage() {
 
   const user = await Auth.ready();
   if (!user) {
-    location.replace('login.html?next=admin.html');
+    location.replace('dang-nhap?next=quan-tri');
     return;
   }
   if (!Auth.isAdmin(user)) {

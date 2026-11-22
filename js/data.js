@@ -31,13 +31,13 @@ const PROMO_MESSAGES = [
 ];
 
 const SUB_NAV = [
-  { text: 'Tất cả khuyến mãi', href: 'category.html?sale=1' },
-  { text: 'Tin tức - Review', href: 'news.html' },
-  { text: 'Tra cứu đơn hàng', href: 'order.html' },
-  { text: 'Chính sách bảo hành', href: 'policy.html?type=bao-hanh' },
-  { text: 'Thu cũ đổi mới', href: 'thu-cu-doi-moi.html' },
-  { text: 'Build PC', href: 'build-pc.html' },
-  { text: 'Trả góp 0%', href: 'policy.html?type=tra-gop' },
+  { text: 'Tất cả khuyến mãi', href: 'danh-muc?sale=1' },
+  { text: 'Tin tức - Review', href: 'tin-tuc' },
+  { text: 'Tra cứu đơn hàng', href: 'tra-cuu-don-hang' },
+  { text: 'Chính sách bảo hành', href: 'chinh-sach?type=bao-hanh' },
+  { text: 'Thu cũ đổi mới', href: 'thu-cu-doi-moi' },
+  { text: 'Build PC', href: 'xay-dung-cau-hinh' },
+  { text: 'Trả góp 0%', href: 'chinh-sach?type=tra-gop' },
 ];
 
 /* ----------------------------------------------------------
@@ -56,7 +56,7 @@ const SHOP = {
   },
   // Bảo hành mẫu theo nhóm hàng (tháng)
   warranty: { pc: 36, 'laptop-gaming': 24, laptop: 24, components: 36, mouse: 24, keyboard: 24, monitor: 36, headset: 12, chair: 12, desk: 12, software: 12, network: 24, accessory: 12 },
-  // Email quản trị viên: xem toàn bộ đơn hàng + khách hàng ở admin.html.
+  // Email quản trị viên: xem toàn bộ đơn hàng + khách hàng ở quan-tri.
   // Thêm/bớt email ở đây VÀ trong firestore.rules (hàm isAdmin) rồi dán lại Rules trên Firebase.
   adminEmails: ['tranngminhkhoi062@gmail.com'],
 };
@@ -107,7 +107,7 @@ const CATEGORY_RULES = {
   used: { name: 'Hàng cũ giá tốt', match: isUsed },
 };
 
-/* Loại hàng cũ (bộ lọc trong danh mục Hàng cũ): category.html?cat=used&type=laptop */
+/* Loại hàng cũ (bộ lọc trong danh mục Hàng cũ): danh-muc?cat=used&type=laptop */
 const USED_TYPES = [
   ['laptop', 'Laptop cũ', (p) => p.cat === 'laptop' || p.cat === 'laptop-gaming'],
   ['pc', 'PC - Máy bộ cũ', (p) => p.cat === 'pc'],
@@ -146,7 +146,7 @@ const CATEGORIES = [
       { title: 'Theo CPU', links: ['Intel Core i3', 'Intel Core i5', 'Intel Core i7', 'Intel Core Ultra', 'AMD Ryzen 5', 'AMD Ryzen 7'] },
       { title: 'Theo VGA', links: ['GTX 1650', 'RTX 3050', 'RTX 4060', 'RTX 5060', 'RTX 5070', 'RTX 5080', 'RX 7600'] },
       { title: 'Theo nhu cầu', links: ['Esport', 'Streaming', 'AAA 2K', 'Đồ họa - Render'] },
-      { title: 'Dịch vụ', links: [['Build PC theo yêu cầu', 'build-pc.html'], ['Bảo hành tận nơi', 'policy.html?type=bao-hanh'], ['Thu cũ đổi mới', 'thu-cu-doi-moi.html'], ['Trả góp 0%', 'policy.html?type=tra-gop']] },
+      { title: 'Dịch vụ', links: [['Build PC theo yêu cầu', 'xay-dung-cau-hinh'], ['Bảo hành tận nơi', 'chinh-sach?type=bao-hanh'], ['Thu cũ đổi mới', 'thu-cu-doi-moi'], ['Trả góp 0%', 'chinh-sach?type=tra-gop']] },
     ],
   },
   {
@@ -156,7 +156,7 @@ const CATEGORIES = [
       { title: 'PC Đồ họa', links: ['Thiết kế 2D', 'Dựng phim - 3D', 'Workstation', 'RTX 4070', 'RTX 4080'] },
       { title: 'Theo giá', links: ['Dưới 8 triệu', '8 - 12 triệu', '12 - 20 triệu', 'Trên 20 triệu'] },
       { title: 'RAM - SSD', links: ['8GB', '16GB', '32GB', '64GB', 'SSD 512GB'] },
-      { title: 'Máy đồng bộ cũ', links: [['Dell OptiPlex', 'category.html?cat=used&q=OptiPlex'], ['PC cũ giá rẻ', 'category.html?cat=used&q=PC']] },
+      { title: 'Máy đồng bộ cũ', links: [['Dell OptiPlex', 'danh-muc?cat=used&q=OptiPlex'], ['PC cũ giá rẻ', 'danh-muc?cat=used&q=PC']] },
     ],
   },
   {
@@ -216,7 +216,7 @@ const CATEGORIES = [
       { title: 'Kết nối', links: ['Có dây', 'Không dây', 'Bluetooth'] },
       { title: 'Driver', links: ['40mm', '50mm', 'Chống ồn ANC'] },
       { title: 'Giá bán', links: ['Dưới 1 triệu', '1 - 3 triệu', 'Trên 3 triệu'] },
-      { title: 'Âm thanh khác', links: [['Loa vi tính', 'category.html?cat=accessory&q=Loa'], ['Micro thu âm', 'category.html?cat=accessory&q=Micro'], ['Soundbar', 'category.html?cat=accessory&q=Loa thanh']] },
+      { title: 'Âm thanh khác', links: [['Loa vi tính', 'danh-muc?cat=accessory&q=Loa'], ['Micro thu âm', 'danh-muc?cat=accessory&q=Micro'], ['Soundbar', 'danh-muc?cat=accessory&q=Loa thanh']] },
     ],
   },
   {
@@ -226,7 +226,7 @@ const CATEGORIES = [
       { title: 'Ghế công thái học', links: ['Lưng lưới', 'Có tựa đầu', 'Warrior'] },
       { title: 'Bàn gaming', links: ['Bàn chữ K', 'Bàn chữ Z', 'Bàn chữ L', 'Có LED', 'Bàn nâng hạ'] },
       { title: 'Kích thước bàn', links: ['1m2', '1m4', '1m6'] },
-      { title: 'Phụ kiện', links: [['Giá treo màn hình', 'category.html?cat=accessory&q=Giá treo'], ['Lót chuột', 'category.html?cat=mouse&q=Lót chuột']] },
+      { title: 'Phụ kiện', links: [['Giá treo màn hình', 'danh-muc?cat=accessory&q=Giá treo'], ['Lót chuột', 'danh-muc?cat=mouse&q=Lót chuột']] },
     ],
   },
   {
@@ -236,7 +236,7 @@ const CATEGORIES = [
       { title: 'SSD SATA', links: ['240GB', '500GB'] },
       { title: 'Ổ cứng HDD', links: ['1TB', '2TB', '4TB', '8TB', 'NAS', 'Camera'] },
       { title: 'Thương hiệu', links: ['Samsung', 'Kingston', 'WD', 'Crucial', 'Lexar', 'Seagate', 'Toshiba'] },
-      { title: 'Lưu trữ di động', links: [['Ổ cứng di động', 'category.html?cat=accessory&q=di động'], ['USB', 'category.html?cat=accessory&q=USB Kingston'], ['Thẻ nhớ', 'category.html?cat=accessory&q=Thẻ nhớ']] },
+      { title: 'Lưu trữ di động', links: [['Ổ cứng di động', 'danh-muc?cat=accessory&q=di động'], ['USB', 'danh-muc?cat=accessory&q=USB Kingston'], ['Thẻ nhớ', 'danh-muc?cat=accessory&q=Thẻ nhớ']] },
     ],
   },
   {
@@ -272,10 +272,10 @@ const CATEGORIES = [
   {
     id: 'used', name: 'Hàng cũ', icon: 'recycle',
     groups: [
-      { title: 'Linh kiện cũ', links: [['Tất cả linh kiện cũ', 'category.html?cat=used&type=components'], 'Card màn hình', 'RTX 3060', 'CPU', 'Mainboard'] },
-      { title: 'Laptop cũ', links: [['Tất cả laptop cũ', 'category.html?cat=used&type=laptop'], 'Laptop gaming', 'ThinkPad', 'MacBook'] },
-      { title: 'PC - Màn hình cũ', links: [['PC - Máy bộ cũ', 'category.html?cat=used&type=pc'], ['Màn hình cũ', 'category.html?cat=used&type=monitor']] },
-      { title: 'Gear cũ', links: [['Phím - Chuột - Tai nghe', 'category.html?cat=used&type=gear'], ['Bàn ghế cũ', 'category.html?cat=used&type=furniture']] },
+      { title: 'Linh kiện cũ', links: [['Tất cả linh kiện cũ', 'danh-muc?cat=used&type=components'], 'Card màn hình', 'RTX 3060', 'CPU', 'Mainboard'] },
+      { title: 'Laptop cũ', links: [['Tất cả laptop cũ', 'danh-muc?cat=used&type=laptop'], 'Laptop gaming', 'ThinkPad', 'MacBook'] },
+      { title: 'PC - Màn hình cũ', links: [['PC - Máy bộ cũ', 'danh-muc?cat=used&type=pc'], ['Màn hình cũ', 'danh-muc?cat=used&type=monitor']] },
+      { title: 'Gear cũ', links: [['Phím - Chuột - Tai nghe', 'danh-muc?cat=used&type=gear'], ['Bàn ghế cũ', 'danh-muc?cat=used&type=furniture']] },
       { title: 'Tình trạng', links: ['Like new', 'Đẹp 95%'] },
     ],
   },
@@ -3011,46 +3011,46 @@ const PROMO_POPUP = {
   coupon: 'BLACKFRIDAY',
   img: 'setup-1.jpg',
   perks: ['Trả góp 0% qua thẻ tín dụng', 'Giao nhanh 2h nội thành TP.HCM', 'Bảo hành tận nơi'],
-  cta: { text: 'Săn deal ngay', href: 'category.html?sale=1' },
+  cta: { text: 'Săn deal ngay', href: 'danh-muc?sale=1' },
 };
 
 /* Banner */
 const HERO_SLIDES = [
-  { theme: 'red', tag: 'Black Friday', title: 'PC Gaming <em>giảm đến 5 triệu</em>', desc: 'Tặng kèm bàn phím + chuột gaming cho mọi cấu hình từ 15 triệu', cta: 'Mua ngay', img: 'pc-4.jpg', href: 'category.html?cat=pc' },
-  { theme: 'dark', tag: 'Hàng mới về', title: 'Laptop Gaming <em>RTX 50 Series</em>', desc: 'Trả góp 0% — Giao nhanh 2h nội thành TP.HCM', cta: 'Khám phá', img: 'laptop-gaming-3.jpg', href: 'category.html?cat=laptop-gaming' },
-  { theme: 'dark', tag: 'Deal hot', title: 'Màn hình 2K 180Hz <em>chỉ từ 4.59 triệu</em>', desc: 'ASUS, LG, Samsung, MSI chính hãng — bảo hành 36 tháng', cta: 'Xem ngay', img: 'monitor-4.jpg', href: 'category.html?cat=monitor' },
-  { theme: 'red', tag: 'Gaming gear', title: 'Gear chính hãng <em>giảm đến 50%</em>', desc: 'Chuột, bàn phím, tai nghe từ Logitech, Razer, Akko, Corsair', cta: 'Săn deal', img: 'keyboard-2.jpg', href: 'category.html?cat=keyboard' },
+  { theme: 'red', tag: 'Black Friday', title: 'PC Gaming <em>giảm đến 5 triệu</em>', desc: 'Tặng kèm bàn phím + chuột gaming cho mọi cấu hình từ 15 triệu', cta: 'Mua ngay', img: 'pc-4.jpg', href: 'danh-muc?cat=pc' },
+  { theme: 'dark', tag: 'Hàng mới về', title: 'Laptop Gaming <em>RTX 50 Series</em>', desc: 'Trả góp 0% — Giao nhanh 2h nội thành TP.HCM', cta: 'Khám phá', img: 'laptop-gaming-3.jpg', href: 'danh-muc?cat=laptop-gaming' },
+  { theme: 'dark', tag: 'Deal hot', title: 'Màn hình 2K 180Hz <em>chỉ từ 4.59 triệu</em>', desc: 'ASUS, LG, Samsung, MSI chính hãng — bảo hành 36 tháng', cta: 'Xem ngay', img: 'monitor-4.jpg', href: 'danh-muc?cat=monitor' },
+  { theme: 'red', tag: 'Gaming gear', title: 'Gear chính hãng <em>giảm đến 50%</em>', desc: 'Chuột, bàn phím, tai nghe từ Logitech, Razer, Akko, Corsair', cta: 'Săn deal', img: 'keyboard-2.jpg', href: 'danh-muc?cat=keyboard' },
 ];
 
 const HERO_SIDE = [
-  { theme: 'dark', tag: 'Miễn phí', title: 'Build PC <em>theo yêu cầu</em>', img: 'setup-3.jpg', href: 'build-pc.html' },
-  { theme: 'light', tag: 'Trợ giá', title: 'Thu cũ đổi mới <em>đến 2 triệu</em>', img: 'laptop-office-3.jpg', href: 'thu-cu-doi-moi.html' },
+  { theme: 'dark', tag: 'Miễn phí', title: 'Build PC <em>theo yêu cầu</em>', img: 'setup-3.jpg', href: 'xay-dung-cau-hinh' },
+  { theme: 'light', tag: 'Trợ giá', title: 'Thu cũ đổi mới <em>đến 2 triệu</em>', img: 'laptop-office-3.jpg', href: 'thu-cu-doi-moi' },
 ];
 
 /* Hàng icon danh mục nhanh dưới hero */
 const QUICK_CATS = [
-  { name: 'Black Friday', href: 'category.html?sale=1', special: true },
-  { name: 'Laptop', img: 'laptop-office-2.jpg', href: 'category.html?cat=laptop' },
-  { name: 'Laptop gaming', img: 'laptop-gaming-3.jpg', href: 'category.html?cat=laptop-gaming' },
-  { name: 'PC Gaming', img: 'pc-1.jpg', href: 'category.html?cat=pc' },
-  { name: 'Màn hình', img: 'monitor-2.jpg', href: 'category.html?cat=monitor' },
-  { name: 'CPU', img: 'cpu-1.jpg', href: 'category.html?cat=cpu' },
-  { name: 'Mainboard', img: 'mainboard-1.jpg', href: 'category.html?cat=mainboard' },
-  { name: 'VGA', img: 'vga-1.jpg', href: 'category.html?cat=vga' },
-  { name: 'RAM', img: 'ram-2.jpg', href: 'category.html?cat=ram' },
-  { name: 'Ổ cứng', img: 'ssd-1.jpg', href: 'category.html?cat=storage' },
-  { name: 'Nguồn', img: 'psu-1.jpg', href: 'category.html?cat=psu' },
-  { name: 'Tản nhiệt', img: 'cooler-2.jpg', href: 'category.html?cat=cooler' },
-  { name: 'Case', img: 'case-1.jpg', href: 'category.html?cat=case' },
-  { name: 'Bàn phím', img: 'keyboard-3.jpg', href: 'category.html?cat=keyboard' },
-  { name: 'Chuột', img: 'mouse-4.jpg', href: 'category.html?cat=mouse' },
-  { name: 'Tai nghe', img: 'headset-1.jpg', href: 'category.html?cat=headset' },
-  { name: 'Bàn ghế', img: 'chair-3.jpg', href: 'category.html?cat=furniture' },
-  { name: 'Phụ kiện', img: 'gamepad-1.jpg', href: 'category.html?cat=accessory' },
-  { name: 'Thiết bị mạng', img: 'router-1.jpg', href: 'category.html?cat=network' },
-  { name: 'Phần mềm', img: 'software-1.jpg', href: 'category.html?cat=software' },
-  { name: 'PC văn phòng', img: 'pc-office.jpg', href: 'category.html?cat=pc-office' },
-  { name: 'Hàng cũ', img: 'laptop-gaming-4.jpg', href: 'category.html?cat=used' },
+  { name: 'Black Friday', href: 'danh-muc?sale=1', special: true },
+  { name: 'Laptop', img: 'laptop-office-2.jpg', href: 'danh-muc?cat=laptop' },
+  { name: 'Laptop gaming', img: 'laptop-gaming-3.jpg', href: 'danh-muc?cat=laptop-gaming' },
+  { name: 'PC Gaming', img: 'pc-1.jpg', href: 'danh-muc?cat=pc' },
+  { name: 'Màn hình', img: 'monitor-2.jpg', href: 'danh-muc?cat=monitor' },
+  { name: 'CPU', img: 'cpu-1.jpg', href: 'danh-muc?cat=cpu' },
+  { name: 'Mainboard', img: 'mainboard-1.jpg', href: 'danh-muc?cat=mainboard' },
+  { name: 'VGA', img: 'vga-1.jpg', href: 'danh-muc?cat=vga' },
+  { name: 'RAM', img: 'ram-2.jpg', href: 'danh-muc?cat=ram' },
+  { name: 'Ổ cứng', img: 'ssd-1.jpg', href: 'danh-muc?cat=storage' },
+  { name: 'Nguồn', img: 'psu-1.jpg', href: 'danh-muc?cat=psu' },
+  { name: 'Tản nhiệt', img: 'cooler-2.jpg', href: 'danh-muc?cat=cooler' },
+  { name: 'Case', img: 'case-1.jpg', href: 'danh-muc?cat=case' },
+  { name: 'Bàn phím', img: 'keyboard-3.jpg', href: 'danh-muc?cat=keyboard' },
+  { name: 'Chuột', img: 'mouse-4.jpg', href: 'danh-muc?cat=mouse' },
+  { name: 'Tai nghe', img: 'headset-1.jpg', href: 'danh-muc?cat=headset' },
+  { name: 'Bàn ghế', img: 'chair-3.jpg', href: 'danh-muc?cat=furniture' },
+  { name: 'Phụ kiện', img: 'gamepad-1.jpg', href: 'danh-muc?cat=accessory' },
+  { name: 'Thiết bị mạng', img: 'router-1.jpg', href: 'danh-muc?cat=network' },
+  { name: 'Phần mềm', img: 'software-1.jpg', href: 'danh-muc?cat=software' },
+  { name: 'PC văn phòng', img: 'pc-office.jpg', href: 'danh-muc?cat=pc-office' },
+  { name: 'Hàng cũ', img: 'laptop-gaming-4.jpg', href: 'danh-muc?cat=used' },
 ];
 
 /* Banner xen kẽ: 'pair' = 2 banner đều nhau, 'feature' = 1 lớn + 2 nhỏ xếp dọc */
@@ -3058,16 +3058,16 @@ const MID_BANNERS = {
   a: {
     layout: 'pair',
     items: [
-      { theme: 'red', tag: 'Build PC', title: 'Build PC từ 12 triệu <em>tặng màn hình</em>', desc: 'Áp dụng cho cấu hình RTX 4060 trở lên', cta: 'Xem cấu hình', img: 'pc-2.jpg', href: 'build-pc.html' },
-      { theme: 'dark', tag: 'Gaming gear', title: 'Gear đa dạng <em>giảm đến 50%</em>', desc: 'Chuột, bàn phím, tai nghe chính hãng', cta: 'Săn deal', img: 'headset-2.jpg', href: 'category.html?cat=mouse' },
+      { theme: 'red', tag: 'Build PC', title: 'Build PC từ 12 triệu <em>tặng màn hình</em>', desc: 'Áp dụng cho cấu hình RTX 4060 trở lên', cta: 'Xem cấu hình', img: 'pc-2.jpg', href: 'xay-dung-cau-hinh' },
+      { theme: 'dark', tag: 'Gaming gear', title: 'Gear đa dạng <em>giảm đến 50%</em>', desc: 'Chuột, bàn phím, tai nghe chính hãng', cta: 'Săn deal', img: 'headset-2.jpg', href: 'danh-muc?cat=mouse' },
     ],
   },
   b: {
     layout: 'feature',
     items: [
-      { theme: 'dark', tag: 'Màn hình chính hãng', title: 'Giảm sốc <em>đến 35%</em>', desc: 'Màn hình 2K 180Hz chỉ từ 4.590.000đ — ASUS, LG, Samsung, MSI', cta: 'Mua ngay', img: 'monitor-5.jpg', href: 'category.html?cat=monitor' },
-      { theme: 'light', tag: 'Combo', title: 'Combo gear <em>đẹp cả đôi</em>', img: 'keyboard-4.jpg', href: 'category.html?cat=keyboard' },
-      { theme: 'red', tag: 'Góc gaming', title: 'Deal bàn ghế <em>thả ga lựa chọn</em>', img: 'chair-2.jpg', href: 'category.html?cat=furniture' },
+      { theme: 'dark', tag: 'Màn hình chính hãng', title: 'Giảm sốc <em>đến 35%</em>', desc: 'Màn hình 2K 180Hz chỉ từ 4.590.000đ — ASUS, LG, Samsung, MSI', cta: 'Mua ngay', img: 'monitor-5.jpg', href: 'danh-muc?cat=monitor' },
+      { theme: 'light', tag: 'Combo', title: 'Combo gear <em>đẹp cả đôi</em>', img: 'keyboard-4.jpg', href: 'danh-muc?cat=keyboard' },
+      { theme: 'red', tag: 'Góc gaming', title: 'Deal bàn ghế <em>thả ga lựa chọn</em>', img: 'chair-2.jpg', href: 'danh-muc?cat=furniture' },
     ],
   },
 };

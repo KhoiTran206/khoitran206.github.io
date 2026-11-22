@@ -1,5 +1,5 @@
 /* ==========================================================
-   Trang chính sách / thông tin — policy.html?type=
+   Trang chính sách / thông tin — chinh-sach?type=
    ========================================================== */
 
 function initPage() {
@@ -8,12 +8,12 @@ function initPage() {
   document.title = `${policy.title} | ${COMPANY.name}`;
 
   $('#policy-page').innerHTML = `
-    ${renderBreadcrumb([['Chính sách', 'policy.html'], [policy.title, '#']])}
+    ${renderBreadcrumb([['Chính sách', 'chinh-sach'], [policy.title, '#']])}
     <div class="policy-layout">
       <aside class="panel policy-nav">
         <h2 class="panel__title">${icon('book-open')}Thông tin & chính sách</h2>
         <ul>
-          ${POLICY_NAV.map((key) => `<li><a href="policy.html?type=${key}" class="${key === type ? 'is-active' : ''}">${POLICIES[key].title}${icon('chevron-right')}</a></li>`).join('')}
+          ${POLICY_NAV.map((key) => `<li><a href="chinh-sach?type=${key}" class="${key === type ? 'is-active' : ''}">${POLICIES[key].title}${icon('chevron-right')}</a></li>`).join('')}
         </ul>
       </aside>
       <article class="panel">

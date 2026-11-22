@@ -38,23 +38,23 @@
 ```
 /
 ├── index.html            # Trang chủ
-├── category.html         # Danh mục / tìm kiếm / khuyến mãi (lọc, sắp xếp, phân trang)
-├── product.html          # Chi tiết sản phẩm (?id=mk001)
-├── cart.html             # Giỏ hàng (mã giảm giá, phí ship)
-├── checkout.html         # Thanh toán → gửi đơn về email qua FormSubmit
-├── order.html            # Đặt hàng thành công + tra cứu đơn (?code=)
-├── login.html            # Đăng nhập / đăng ký / quên mật khẩu (?tab=register|forgot&next=)
-├── account.html          # Tài khoản (cần đăng nhập): thông tin, đơn hàng, đổi mật khẩu
-├── admin.html            # Quản trị (chỉ email quản trị): đơn hàng, trạng thái, khách hàng
+├── danh-muc.html         # Danh mục / tìm kiếm / khuyến mãi (lọc, sắp xếp, phân trang)
+├── san-pham.html          # Chi tiết sản phẩm (?id=mk001)
+├── gio-hang.html             # Giỏ hàng (mã giảm giá, phí ship)
+├── thanh-toan.html         # Thanh toán → gửi đơn về email qua FormSubmit
+├── tra-cuu-don-hang.html            # Đặt hàng thành công + tra cứu đơn (?code=)
+├── dang-nhap.html            # Đăng nhập / đăng ký / quên mật khẩu (?tab=register|forgot&next=)
+├── tai-khoan.html          # Tài khoản (cần đăng nhập): thông tin, đơn hàng, đổi mật khẩu
+├── quan-tri.html            # Quản trị (chỉ email quản trị): đơn hàng, trạng thái, khách hàng
 ├── firestore.rules       # Quy tắc bảo mật Firestore (dán vào Firebase Console)
-├── wishlist.html         # Sản phẩm yêu thích (Wishlist)
-├── compare.html          # So sánh tối đa 3 sản phẩm cùng loại (Compare)
+├── yeu-thich.html         # Sản phẩm yêu thích (Wishlist)
+├── so-sanh.html          # So sánh tối đa 3 sản phẩm cùng loại (Compare)
 ├── manifest.webmanifest, sitemap.xml, robots.txt, favicon.ico  # SEO + cài như app (tạo lại bằng script khi thêm trang)
-├── build-pc.html         # Tự chọn cấu hình PC
+├── xay-dung-cau-hinh.html         # Tự chọn cấu hình PC
 ├── thu-cu-doi-moi.html   # Thu cũ đổi mới: định giá online (bảng giá TRADE_IN đầu file js/pages/trade-in.js), chính sách thu, gửi yêu cầu qua email
-├── news.html, article.html  # Tin tức + bài viết (?id=)
-├── contact.html          # Liên hệ, bản đồ, form gửi email
-├── policy.html           # Chính sách (?type=bao-hanh...)
+├── tin-tuc.html, bai-viet.html  # Tin tức + bài viết (?id=)
+├── lien-he.html          # Liên hệ, bản đồ, form gửi email
+├── chinh-sach.html           # Chính sách (?type=bao-hanh...)
 ├── 404.html              # Trang lỗi (tự chứa CSS, cho GitHub Pages)
 ├── offline.html          # Trang "Không có kết nối" (sw.js trả về khi mất mạng, tự chứa CSS)
 ├── sw.js                 # Service worker: HTML lấy mạng trước, CSS/JS/ảnh lưu đệm. Đổi VERSION để xóa đệm cũ
@@ -74,13 +74,14 @@
     └── logo/             # Logo Minh Khoi PC
 ```
 
+- **Đường dẫn tiếng Việt, không đuôi .html**: file trang tên tiếng Việt (`tin-tuc.html`, `san-pham.html`...), link trong code viết **không đuôi** (`tin-tuc`, `san-pham?id=mk001`, `danh-muc?cat=laptop`) — GitHub Pages tự trỏ `/tin-tuc` → `tin-tuc.html`. Tên cũ (news.html, product.html...) là trang chuyển hướng giữ tham số, không xóa. Mở file trực tiếp (file://) thì `app.js` tự gắn lại `.html` khi bấm link. Thêm trang mới: đặt tên tiếng Việt không dấu, nối bằng gạch ngang.
 - Thứ tự nạp script mọi trang: `icons.js` → `data.js` → `content.js` → `components.js` → `app.js` → `pages/<trang>.js`.
 - Mọi link CSS/JS nội bộ có hậu tố `?v=<phiên bản>` để trình duyệt (nhất là Safari iPhone) lấy bản mới ngay. **Mỗi lần sửa CSS/JS rồi đẩy lên, đổi số phiên bản ở tất cả trang** (thay hàng loạt bằng sed).
 - Không có backend: giỏ hàng, hồ sơ, đơn hàng lưu `localStorage` (luôn qua `Store` có try/catch); đơn hàng + form liên hệ gửi email qua FormSubmit (`SHOP.orderEndpoint`).
 - Link trang chủ luôn dùng `HOME_URL` (web: `./` → https://khoitran206.github.io/, file trên máy: `index.html`), không viết cứng `index.html`.
 - Thêm trang mới: chép một trang có sẵn, đổi `<title>`/description/id/script, cập nhật khối `<!-- SEO -->` và `sitemap.xml`.
 - Tài khoản khách: **Firebase Authentication** (email/mật khẩu + Google), cấu hình `FIREBASE_CONFIG` trong `data.js`. `Auth` trong `app.js`: `Auth.current()` đọc tức thì bản sao `mkpc-user` (localStorage), `Auth.ready()` chờ Firebase xác nhận phiên (tải SDK khi cần), sự kiện `auth:change` khi đăng nhập/xuất. SDK chỉ tải khi đã đăng nhập hoặc ở trang cần (khách vãng lai không tải). Nút tài khoản trên header do `renderAccountMenu()` vẽ, gọi `updateAccountLabel()`.
-- Dữ liệu trên mạng: **Firestore** (`Cloud.db()` tải lười) — `users/{uid}` (hồ sơ) và `orders/{code}` (đơn, có `uid` nếu đã đăng nhập). Quyền đọc/ghi do `firestore.rules` quyết định: sửa xong phải dán lại vào Firebase Console → Firestore → Rules → Publish. Quản trị viên = `SHOP.adminEmails` **và** danh sách trong `isAdmin()` của rules (email phải đã xác minh — nên đăng nhập bằng Google). Trang `admin.html`: thống kê, đổi trạng thái đơn, danh sách khách.
+- Dữ liệu trên mạng: **Firestore** (`Cloud.db()` tải lười) — `users/{uid}` (hồ sơ) và `orders/{code}` (đơn, có `uid` nếu đã đăng nhập). Quyền đọc/ghi do `firestore.rules` quyết định: sửa xong phải dán lại vào Firebase Console → Firestore → Rules → Publish. Quản trị viên = `SHOP.adminEmails` **và** danh sách trong `isAdmin()` của rules (email phải đã xác minh — nên đăng nhập bằng Google). Trang `quan-tri`: thống kê, đổi trạng thái đơn, danh sách khách.
 - App cài từ website (PWA, miễn phí): `manifest.webmanifest` + `sw.js` + thẻ `apple-mobile-web-app-*` ở mọi trang. Mọi nút có `[data-install]` mở luồng cài (`initInstallApp()` trong `app.js`): Android/Chrome hiện hộp cài, iPhone hiện hướng dẫn. Đã cài → `html.is-app`, ẩn nút cài. Không lên CH Play/App Store (cần tài khoản trả phí). **Giao diện app riêng**: đoạn script nhỏ trong `<head>` mọi trang gắn `html.is-app` khi mở bằng app (hoặc xem thử bằng `?app=1`, tắt `?app=0`); `css/app-mode.css` (chỉ áp dụng ≤768px) ẩn topbar/subnav/footer/breadcrumb, header trang con thành thanh tiêu đề (quay lại · tên trang · tìm kiếm), thêm thanh tab dưới đáy (`APP_TABS`), phím tắt trang chủ (`APP_SHORTCUTS`) và màn hình Danh mục (`renderAppCats`) — tất cả trong `components.js` + `initAppShell()` ở `app.js`. Trang mới nhớ thêm link `app-mode.css` và đoạn script `<head>`.
 - Pop-up khuyến mãi trang chủ: cấu hình `PROMO_POPUP` trong `data.js` (bật/tắt, mã giảm giá, ảnh, nội dung); mỗi khách thấy tối đa 1 lần/ngày (`mkpc-popup-seen`). Thiết kế riêng (thẻ chia đôi + mã dạng vé), không chép pop-up của trang khác.
 - Mọi dữ liệu người dùng nhập khi hiển thị lại phải qua `esc()`.

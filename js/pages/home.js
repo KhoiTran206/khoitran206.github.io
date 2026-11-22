@@ -40,7 +40,7 @@ function renderFlashSale() {
         <b class="countdown__unit" data-cd="m">00</b>
         <b class="countdown__unit" data-cd="s">00</b>
       </div>
-      <a class="flash__more" href="category.html?sale=1">Xem tất cả${icon('chevron-right')}</a>
+      <a class="flash__more" href="danh-muc?sale=1">Xem tất cả${icon('chevron-right')}</a>
     </div>
     ${sliderHTML(cards)}`;
 }
@@ -103,13 +103,13 @@ function homeSectionHTML(s) {
       <section class="container section reveal" id="${s.id}" aria-labelledby="title-${s.id}">
         <div class="block">
           <div class="block-head">
-            <h2 class="block-head__title" id="title-${s.id}"><a href="category.html?cat=${s.id}">${s.title}</a></h2>
+            <h2 class="block-head__title" id="title-${s.id}"><a href="danh-muc?cat=${s.id}">${s.title}</a></h2>
             <span class="block-head__tag">${icon(s.tag.icon)}${s.tag.text}</span>
             <div class="block-head__right">
               <div class="tabs" role="tablist" aria-label="Lọc ${s.title}">
                 ${s.tabs.map(([key, label], i) => `<button class="tabs__btn${i === 0 ? ' is-active' : ''}" type="button" role="tab" aria-selected="${i === 0}" data-tab="${key}" data-section="${s.id}">${label}</button>`).join('')}
               </div>
-              <a class="block-head__more" href="category.html?cat=${s.id}">Xem tất cả${icon('chevron-right')}</a>
+              <a class="block-head__more" href="danh-muc?cat=${s.id}">Xem tất cả${icon('chevron-right')}</a>
             </div>
           </div>
           ${sliderHTML(productCardsHTML(productsFor(s, 'all')))}
@@ -121,7 +121,7 @@ function homeSectionHTML(s) {
 function renderNews() {
   const [featured, ...rest] = NEWS;
   const tile = (n, large = false) => `
-    <a class="news-tile${large ? ' news-tile--lg' : ''}" href="article.html?id=${n.id}">
+    <a class="news-tile${large ? ' news-tile--lg' : ''}" href="bai-viet?id=${n.id}">
       <img class="news-tile__img" src="${photo(n.img)}" alt="" loading="lazy">
       <div class="news-tile__body">
         <span class="news-tile__tag">${n.tag}</span>

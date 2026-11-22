@@ -80,7 +80,7 @@ const NEWS = [
   },
 ];
 
-/* Trang chính sách / thông tin — policy.html?type=<key> */
+/* Trang chính sách / thông tin — chinh-sach?type=<key> */
 const POLICIES = {
   'gioi-thieu': {
     title: 'Giới thiệu Minh Khôi PC',
@@ -142,7 +142,7 @@ const POLICIES = {
     body: [
       ['p', 'Mang thiết bị cũ (laptop, PC, linh kiện, màn hình) đến cửa hàng để được định giá và trợ giá khi lên đời sản phẩm mới.'],
       ['ul', ['Định giá miễn phí, nhanh chóng.', 'Trợ giá thêm khi đổi sang sản phẩm mới tại cửa hàng.', 'Giá thu phụ thuộc tình trạng thực tế của thiết bị.']],
-      ['p', `Định giá online ngay tại trang <a href="thu-cu-doi-moi.html">Thu cũ đổi mới</a> hoặc liên hệ ${COMPANY.phoneDisplay} để được báo giá sơ bộ.`],
+      ['p', `Định giá online ngay tại trang <a href="thu-cu-doi-moi">Thu cũ đổi mới</a> hoặc liên hệ ${COMPANY.phoneDisplay} để được báo giá sơ bộ.`],
     ],
   },
   'bao-mat': {
