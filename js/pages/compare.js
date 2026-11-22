@@ -40,8 +40,8 @@ function renderCompare() {
                 <th scope="col">
                   <div class="compare__product">
                     <button class="compare__remove" type="button" data-compare-remove="${p.id}" aria-label="Bỏ ${p.name}">${icon('x')}</button>
-                    <a href="san-pham?id=${p.id}"><img src="${thumb(p.img)}" alt="${p.name}" width="160" height="160"></a>
-                    <a class="compare__name" href="san-pham?id=${p.id}">${p.name}</a>
+                    <a href="${productUrl(p)}"><img src="${thumb(p.img)}" alt="${p.name}" width="160" height="160"></a>
+                    <a class="compare__name" href="${productUrl(p)}">${p.name}</a>
                     <strong class="compare__price">${formatPrice(p.price)}</strong>
                     ${p.oldPrice > p.price ? `<del>${formatPrice(p.oldPrice)}</del>` : ''}
                     <button class="btn btn--primary btn--block" type="button" data-add-cart="${p.id}">${icon('shopping-cart')}Thêm vào giỏ</button>

@@ -271,8 +271,13 @@ function bindProduct(p) {
 }
 
 function initPage() {
-  const p = productById(params.get('id'));
+  // Trang tĩnh san-pham/<slug> khai báo sẵn window.PRODUCT_ID; link cũ san-pham?id=mk010 → chuyển sang đường dẫn đẹp
+  const p = productById(window.PRODUCT_ID || params.get('id'));
   const root = $('#product-page');
+  if (p && !window.PRODUCT_ID) {
+    location.replace(productUrl(p) + (location.protocol === 'file:' ? '.html' : '') + location.hash);
+    return;
+  }
   if (!p) {
     root.innerHTML = `${renderBreadcrumb([['Không tìm thấy', '#']])}<div class="panel">${renderEmpty('package-x', 'Không tìm thấy sản phẩm', 'Sản phẩm có thể đã ngừng kinh doanh hoặc đường dẫn không đúng.', '<a class="btn btn--primary" href="danh-muc">Xem sản phẩm khác</a>')}</div>`;
     return;
@@ -291,7 +296,7 @@ function addProductSchema(p) {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: p.name,
-    image: new URL(p.img, location.href).href,
+    image: new URL(p.img, document.baseURI).href,
     sku: p.id,
     brand: { '@type': 'Brand', name: p.brand },
     offers: {

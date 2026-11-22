@@ -57,9 +57,9 @@ function render() {
         <ul class="cart-list">
           ${lines.map(({ p, qty, total }) => `
             <li class="cart-item" data-id="${p.id}">
-              <a class="cart-item__img" href="san-pham?id=${p.id}"><img src="${thumb(p.img)}" alt="${p.name}" width="88" height="88" loading="lazy"></a>
+              <a class="cart-item__img" href="${productUrl(p)}"><img src="${thumb(p.img)}" alt="${p.name}" width="88" height="88" loading="lazy"></a>
               <div class="cart-item__info">
-                <a class="cart-item__name" href="san-pham?id=${p.id}">${p.name}</a>
+                <a class="cart-item__name" href="${productUrl(p)}">${p.name}</a>
                 <p class="cart-item__price">${formatPrice(p.price)} ${p.oldPrice > p.price ? `<del>${formatPrice(p.oldPrice)}</del>` : ''}</p>
                 ${p.gift ? `<p class="cart-item__gift">${icon('gift')}${p.gift}</p>` : ''}
                 <button type="button" class="cart-item__remove" data-remove>${icon('trash-2')}Xóa</button>

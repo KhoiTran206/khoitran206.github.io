@@ -62,7 +62,7 @@ function render() {
                 <div class="build-row__item">
                   <img src="${thumb(sel.img)}" alt="" width="56" height="56">
                   <div>
-                    <a href="san-pham?id=${sel.id}" class="build-row__name">${sel.name}</a>
+                    <a href="${productUrl(sel)}" class="build-row__name">${sel.name}</a>
                     <b>${formatPrice(sel.price)}</b>
                   </div>
                 </div>
@@ -128,7 +128,7 @@ function renderPickList() {
     <li class="pick-item${p.id === chosen ? ' is-chosen' : ''}">
       <img src="${thumb(p.img)}" alt="" width="72" height="72">
       <div class="pick-item__info">
-        <a href="san-pham?id=${p.id}" target="_blank" rel="noopener">${p.name}</a>
+        <a href="${productUrl(p)}" target="_blank" rel="noopener">${p.name}</a>
         <p>${p.specs.map((s) => s[1]).join(' · ')}</p>
         <b>${formatPrice(p.price)}</b>${p.oldPrice > p.price ? `<del>${formatPrice(p.oldPrice)}</del>` : ''}
       </div>

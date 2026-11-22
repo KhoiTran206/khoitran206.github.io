@@ -994,7 +994,7 @@ function initSearch() {
     const results = [...found.filter(isNew), ...found.filter(isUsed)].slice(0, 6);
     box.innerHTML = results.length
       ? results.map((p) => `
-          <a class="suggest__item" href="san-pham?id=${p.id}" role="option">
+          <a class="suggest__item" href="${productUrl(p)}" role="option">
             <img src="${thumb(p.img)}" alt="" width="44" height="44">
             <span class="suggest__name">${isUsed(p) ? '<em class="suggest__used">Cũ</em>' : ''}${p.name}</span>
             <b class="suggest__price">${formatPrice(p.price)}</b>
@@ -1338,7 +1338,7 @@ const isAppMode = () => document.documentElement.classList.contains('is-app');
 
 function initAppShell() {
   if (!isAppMode()) return;
-  const page = (location.pathname.split('/').pop() || 'index.html').replace(/\.html$/, '') || 'index';
+  const page = window.PRODUCT_ID ? 'san-pham' : (location.pathname.split('/').pop() || 'index.html').replace(/\.html$/, '') || 'index';
   const isHome = page === 'index';
   const params = new URLSearchParams(location.search);
   const tab = isHome ? 'home'
@@ -1422,7 +1422,14 @@ if (location.protocol === 'file:') {
   document.addEventListener('click', (e) => {
     const a = e.target.closest?.('a[href]');
     const href = a?.getAttribute('href') || '';
-    if (/^[a-z0-9-]+([?#]|$)/i.test(href)) a.setAttribute('href', href.replace(/^([a-z0-9-]+)/i, '$1.html'));
+    if (/^[a-z0-9-]+(\/[a-z0-9-]+)?([?#]|$)/i.test(href)) a.setAttribute('href', href.replace(/^([a-z0-9-]+(\/[a-z0-9-]+)?)/i, '$1.html'));
+  }, true);
+}
+/* Trang sản phẩm san-pham/<slug> dùng <base href="/"> → link "#muc" phải giữ nguyên trang hiện tại */
+if (document.querySelector('base')) {
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest?.('a[href^="#"]');
+    if (a && a.getAttribute('href').length > 1) a.setAttribute('href', location.pathname + location.search + a.getAttribute('href'));
   }, true);
 }
 

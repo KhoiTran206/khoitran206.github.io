@@ -16,7 +16,6 @@ const icon = (name, extraClass = '') => {
   }
   return `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-${name}${extraClass ? ` ${extraClass}` : ''}" aria-hidden="true">${inner}</svg>`;
 };
-const slugify = (text) => text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
 const SPEC_ICONS = {
   cpu: 'cpu', gpu: 'circuit-board', ram: 'memory-stick', ssd: 'hard-drive', screen: 'monitor',
@@ -136,7 +135,7 @@ function megaFeaturedHTML(catId) {
     </div>
     <div class="mega__products">
       ${top.map((p) => `
-        <a class="mega-card" href="san-pham?id=${p.id}">
+        <a class="mega-card" href="${productUrl(p)}">
           <span class="mega-card__img"><img src="${thumb(p.img)}" alt="${p.name}" width="120" height="120" loading="lazy"></span>
           <span class="mega-card__name">${p.name}</span>
           <b class="mega-card__price">${formatPrice(p.price)}</b>
@@ -208,7 +207,7 @@ function renderAccountMenu(user) {
 /* ---------- Product card (dùng chung toàn site) ---------- */
 function renderProductCard(p, options = {}) {
   const discount = discountPercent(p.price, p.oldPrice);
-  const url = `san-pham?id=${p.id}`;
+  const url = productUrl(p);
   const specs = p.specs.slice(0, 4).map(([type, value]) => `<li>${icon(SPEC_ICONS[type] || 'dot')}<span>${value}</span></li>`).join('');
 
   const compact = !!options.compact;
@@ -534,7 +533,7 @@ function appCatsPaneHTML(catId) {
       <p class="app-cats__group">${icon('flame')}Bán chạy</p>
       <div class="app-cats__products">
         ${top.map((p) => `
-          <a class="app-cats__product" href="san-pham?id=${p.id}">
+          <a class="app-cats__product" href="${productUrl(p)}">
             <img src="${thumb(p.img)}" alt="${p.name}" width="96" height="96" loading="lazy">
             <span>${p.name}</span>
             <b>${formatPrice(p.price)}</b>

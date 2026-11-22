@@ -2994,6 +2994,25 @@ const PRODUCTS = [
   );
 }
 
+/* Đường dẫn đẹp cho từng sản phẩm: san-pham/<tên không dấu>. Trùng tên → thêm -2, -3 (theo thứ tự mã).
+   Trang tĩnh trong thư mục san-pham/ tạo bằng: node tools/build-product-pages.mjs */
+const slugify = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd')
+  .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+{
+  const seen = new Map();
+  PRODUCTS.forEach((p) => {
+    const base = slugify(p.name) || p.id;
+    const n = (seen.get(base) || 0) + 1;
+    seen.set(base, n);
+    p.slug = n > 1 ? `${base}-${n}` : base;
+  });
+}
+// Nhận sản phẩm hoặc mã (vd 'mk010'); mã không còn tồn tại → trang cũ ?id= (báo không tìm thấy)
+function productUrl(p) {
+  const x = typeof p === 'string' ? PRODUCTS.find((q) => q.id === p) : p;
+  return x ? `san-pham/${x.slug}` : `san-pham?id=${p}`;
+}
+
 /* Flash sale: danh sách id sản phẩm */
 const FLASH_SALE = ['mk010', 'mk017', 'mk001', 'mk034', 'mk039', 'mk046', 'mk053', 'mk024', 'mk055', 'mk029', 'mk012', 'mk021'];
 
