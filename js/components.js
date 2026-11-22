@@ -251,12 +251,24 @@ function renderPromo(b, size = '') {
 }
 
 /* ---------- Footer ---------- */
+/* Footer: hình thức thanh toán / giao hàng (khớp trang Hướng dẫn thanh toán + Chính sách giao hàng) */
+const FOOTER_PAYMENTS = [
+  ['banknote', 'Tiền mặt', 'Trả khi nhận hàng (COD)'],
+  ['landmark', 'Chuyển khoản', 'Qua ngân hàng'],
+  ['credit-card', 'Quẹt thẻ', 'ATM, Visa, MasterCard'],
+  ['percent', 'Trả góp 0%', 'Qua thẻ tín dụng'],
+];
+const FOOTER_SHIPPING = [
+  ['zap', 'Giao nhanh nội thành', 'TP.HCM: trong ngày hoặc hôm sau'],
+  ['truck', 'Giao toàn quốc', '2–5 ngày làm việc'],
+  ['store', 'Nhận tại cửa hàng', 'Đặt online, ghé shop lấy hàng'],
+];
+
 function renderFooter() {
   const year = new Date().getFullYear();
   const list = (title, links) => `
     <h3 class="footer-col__title">${title}</h3>
     <ul class="footer-col__list">${links.map(([text, href]) => `<li><a href="${href}">${text}</a></li>`).join('')}</ul>`;
-  const chips = (items) => `<div class="chips">${items.map((c) => `<span class="chip">${c}</span>`).join('')}</div>`;
 
   return `
     <footer class="site-footer" id="footer-contact">
@@ -295,11 +307,16 @@ function renderFooter() {
         <div>
           ${list('Thông tin', [['Hệ thống cửa hàng', 'contact.html'], ['Hướng dẫn mua hàng', 'policy.html?type=huong-dan-mua-hang'], ['Hướng dẫn thanh toán', 'policy.html?type=thanh-toan'], ['Hướng dẫn trả góp', 'policy.html?type=tra-gop'], ['Tra cứu đơn hàng', 'order.html'], ['Build PC', 'build-pc.html']])}
         </div>
-        <div>
+        <div class="footer-pay">
           <h3 class="footer-col__title">Hỗ trợ thanh toán</h3>
-          ${chips(['VISA', 'MasterCard', 'JCB', 'VNPAY', 'MoMo', 'ZaloPay', 'Tiền mặt', 'Trả góp'])}
+          <ul class="pay-grid">
+            ${FOOTER_PAYMENTS.map(([ic, title, desc]) => `<li class="pay-tile">${icon(ic)}<b>${title}</b><small>${desc}</small></li>`).join('')}
+          </ul>
           <h3 class="footer-col__title footer-col__title--spaced">Hình thức vận chuyển</h3>
-          <div class="chips chips--auto">${['Giao nội thành', 'Giao toàn quốc', 'Nhận tại cửa hàng'].map((c) => `<span class="chip">${c}</span>`).join('')}</div>
+          <ul class="ship-list">
+            ${FOOTER_SHIPPING.map(([ic, title, desc]) => `<li class="ship-item"><span class="ship-item__icon">${icon(ic)}</span><span><b>${title}</b><small>${desc}</small></span></li>`).join('')}
+          </ul>
+          <a class="freeship" href="policy.html?type=giao-hang">${icon('gift')}<span>Miễn phí giao hàng đơn từ <b>${formatPrice(SHOP.freeShipFrom)}</b></span>${icon('chevron-right')}</a>
         </div>
       </div>
       <div class="container"><div class="site-footer__bottom">
