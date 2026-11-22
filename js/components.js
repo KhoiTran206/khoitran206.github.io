@@ -314,10 +314,12 @@ function renderFooter() {
             ${FOOTER_PAYMENTS.map(([ic, title, desc]) => `<li class="pay-tile">${icon(ic)}<b>${title}</b><small>${desc}</small></li>`).join('')}
           </ul>
           <h3 class="footer-col__title footer-col__title--spaced">Hình thức vận chuyển</h3>
-          <ul class="ship-list">
-            ${FOOTER_SHIPPING.map(([ic, title, desc]) => `<li class="ship-item"><span class="ship-item__icon">${icon(ic)}</span><span><b>${title}</b><small>${desc}</small></span></li>`).join('')}
-          </ul>
-          <a class="freeship" href="policy.html?type=giao-hang">${icon('gift')}<span>Miễn phí giao hàng đơn từ <b>${formatPrice(SHOP.freeShipFrom)}</b></span>${icon('chevron-right')}</a>
+          <div class="footer-ship">
+            <ul class="ship-list">
+              ${FOOTER_SHIPPING.map(([ic, title, desc]) => `<li class="ship-item"><span class="ship-item__icon">${icon(ic)}</span><span><b>${title}</b><small>${desc}</small></span></li>`).join('')}
+            </ul>
+            <a class="freeship" href="policy.html?type=giao-hang">${icon('gift')}<span>Miễn phí giao hàng đơn từ <b>${formatPrice(SHOP.freeShipFrom)}</b></span>${icon('chevron-right')}</a>
+          </div>
         </div>
       </div>
       <div class="container"><div class="site-footer__bottom">
