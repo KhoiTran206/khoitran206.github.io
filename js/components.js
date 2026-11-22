@@ -41,7 +41,7 @@ const SPEC_LABELS = {
   condition: 'Tình trạng',
 };
 
-const LOGO_MARK = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 46V18h6l12 15 12-15h6v28h-7V30L32 43 21 30v16z" fill="currentColor"/></svg>';
+const LOGO_MARK = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 50 17 14h10l5 14 12-14h10l-9 36h-9l5-20-11 13h-5l-4-13-5 20z" fill="currentColor"/></svg>';
 
 /* Link trang chủ: trên web dùng "./" (địa chỉ gọn https://khoitran206.github.io/), mở file trên máy dùng index.html */
 const HOME_URL = location.protocol === 'file:' ? 'index.html' : './';
