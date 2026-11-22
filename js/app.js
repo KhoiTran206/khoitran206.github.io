@@ -819,6 +819,7 @@ function setFieldError(input, message) {
 function updateCartCount(bump = false) {
   $$('[data-cart-count]').forEach((el) => {
     el.textContent = Cart.count();
+    if (el.classList.contains('tabbar__badge')) el.hidden = !Cart.count();
     if (bump) {
       el.classList.remove('is-bump');
       void el.offsetWidth; // chạy lại animation
@@ -1277,6 +1278,90 @@ function initMegaFeatured() {
   document.addEventListener('focusin', fill);
 }
 
+/* ---------- Giao diện app (html.is-app — gắn sẵn bởi đoạn script trong <head>) ----------
+   Trang chủ: header gọn + phím tắt; trang con: thanh tiêu đề (quay lại · tên trang · tìm kiếm).
+   Thanh tab dưới đáy (ẩn ở trang chi tiết SP và thanh toán để nhường chỗ nút mua). */
+const isAppMode = () => document.documentElement.classList.contains('is-app');
+
+function initAppShell() {
+  if (!isAppMode()) return;
+  const page = (location.pathname.split('/').pop() || 'index.html').replace(/\.html$/, '') || 'index';
+  const isHome = page === 'index';
+  const params = new URLSearchParams(location.search);
+  const tab = isHome ? 'home'
+    : page === 'category' && params.get('sale') ? 'sale'
+    : page === 'cart' ? 'cart'
+    : ['account', 'login', 'admin'].includes(page) ? 'account' : '';
+  const hideTabs = ['product', 'checkout'].includes(page);
+
+  document.body.classList.add('app-shell', hideTabs ? 'app-shell--notab' : 'app-shell--tab');
+  document.body.insertAdjacentHTML('beforeend', (hideTabs ? '' : renderTabBar(tab)) + renderAppCats());
+
+  const header = $('#site-header');
+  if (header && isHome) {
+    $('#flash')?.insertAdjacentHTML('beforebegin', renderAppShortcuts());
+  } else if (header) {
+    const title = page === 'product' ? 'Chi tiết sản phẩm' : document.title.split('|')[0].trim();
+    header.classList.add('appbar');
+    $('.site-header__inner', header).insertAdjacentHTML('afterbegin', renderAppBarControls(title));
+    $('[data-app-back]', header).addEventListener('click', () => {
+      if (document.referrer.startsWith(location.origin) && history.length > 1) history.back();
+      else location.href = HOME_URL;
+    });
+    $('[data-app-search]', header).addEventListener('click', (e) => {
+      const open = header.classList.toggle('is-search-open');
+      e.currentTarget.setAttribute('aria-expanded', String(open));
+      if (open) $('#search-input')?.focus();
+    });
+  }
+  initAppCats(tab);
+  refreshIcons();
+  updateCartCount();
+}
+
+function initAppCats(activeTab) {
+  const screen = $('#app-cats');
+  if (!screen) return;
+  const pane = $('[data-cats-pane]', screen);
+  const show = (id) => {
+    $$('[data-cats-tab]', screen).forEach((b) => {
+      const on = b.dataset.catsTab === id;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-selected', String(on));
+    });
+    pane.innerHTML = appCatsPaneHTML(id);
+    pane.scrollTop = 0;
+    refreshIcons();
+  };
+  const setTab = (id) => $$('.tabbar__item').forEach((t) => t.classList.toggle('is-active', t.dataset.appTab === id));
+  const open = (push = true) => {
+    if (!screen.hidden) return;
+    if (!pane.innerHTML) show(CATEGORIES[0].id);
+    screen.hidden = false;
+    document.body.classList.add('is-locked');
+    setTab('cats');
+    if (push) history.pushState({ appCats: true }, '');
+  };
+  const close = (fromHistory) => {
+    if (screen.hidden) return;
+    screen.hidden = true;
+    document.body.classList.remove('is-locked');
+    setTab(activeTab);
+    if (!fromHistory && history.state?.appCats) history.back();
+  };
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-cats-open]')) { e.preventDefault(); screen.hidden ? open() : close(); }
+    else if (e.target.closest('[data-cats-close]')) close();
+    const t = e.target.closest('[data-cats-tab]');
+    if (t) show(t.dataset.catsTab);
+  });
+  // Nút quay lại của điện thoại đóng màn hình Danh mục thay vì rời trang
+  window.addEventListener('popstate', () => close(true));
+  // Quay lại từ trang khác khi Danh mục đang mở → mở lại đúng như lúc rời
+  if (history.state?.appCats) open(false);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+}
+
 /* ---------- Khởi động ---------- */
 document.addEventListener('DOMContentLoaded', () => {
   const headerSlot = $('#site-header-slot');
@@ -1293,6 +1378,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTopbar();
   initAccountMenu();
   initInstallApp();
+  initAppShell();
   // Đã đăng nhập → kết nối Firebase ở nền để kiểm tra phiên còn hiệu lực
   if (Auth.current()) Auth.ready();
   // Dọn dữ liệu tài khoản kiểu cũ (lưu trên trình duyệt) — nay dùng Firebase

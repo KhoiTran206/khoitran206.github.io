@@ -345,3 +345,121 @@ function renderEmpty(iconName, title, desc, actionHTML = '') {
       ${actionHTML}
     </div>`;
 }
+
+
+/* =====================================================================
+   GIAO DIỆN APP (chỉ khi mở bằng app đã cài trên điện thoại: html.is-app)
+   Thanh tab dưới đáy, thanh tiêu đề có nút quay lại, màn hình Danh mục.
+   Xem thử trên trình duyệt: thêm ?app=1 vào địa chỉ (tắt: ?app=0).
+   ===================================================================== */
+const APP_TABS = [
+  { id: 'home', icon: 'house', label: 'Trang chủ', href: HOME_URL },
+  { id: 'cats', icon: 'layout-grid', label: 'Danh mục' },
+  { id: 'sale', icon: 'badge-percent', label: 'Khuyến mãi', href: 'category.html?sale=1' },
+  { id: 'cart', icon: 'shopping-cart', label: 'Giỏ hàng', href: 'cart.html', badge: true },
+  { id: 'account', icon: 'circle-user-round', label: 'Tài khoản', href: 'account.html' },
+];
+
+const APP_SHORTCUTS = [
+  { icon: 'cpu', label: 'Build PC', href: 'build-pc.html' },
+  { icon: 'refresh-cw', label: 'Thu cũ đổi mới', href: 'thu-cu-doi-moi.html' },
+  { icon: 'clipboard-list', label: 'Tra cứu đơn', href: 'order.html' },
+  { icon: 'message-circle', label: 'Chat Zalo', href: COMPANY.zalo, external: true },
+];
+
+function renderTabBar(active) {
+  return `
+    <nav class="tabbar" aria-label="Điều hướng app">
+      ${APP_TABS.map((t) => {
+        const inner = `${icon(t.icon)}<span>${t.label}</span>${t.badge ? '<b class="tabbar__badge" data-cart-count>0</b>' : ''}`;
+        const cls = `tabbar__item${t.id === active ? ' is-active' : ''}`;
+        return t.href
+          ? `<a class="${cls}" href="${t.href}" data-app-tab="${t.id}"${t.id === active ? ' aria-current="page"' : ''}>${inner}</a>`
+          : `<button class="${cls}" type="button" data-app-tab="${t.id}" data-cats-open aria-controls="app-cats">${inner}</button>`;
+      }).join('')}
+    </nav>`;
+}
+
+function renderAppShortcuts() {
+  return `
+    <section class="container app-shortcuts" aria-label="Tiện ích">
+      ${APP_SHORTCUTS.map((s) => `
+        <a class="app-shortcut" href="${s.href}"${s.external ? ' target="_blank" rel="noopener"' : ''}>
+          <span class="app-shortcut__icon">${icon(s.icon)}</span><span>${s.label}</span>
+        </a>`).join('')}
+    </section>`;
+}
+
+/* Thanh tiêu đề trang con: quay lại · tên trang · tìm kiếm */
+function renderAppBarControls(title) {
+  return `
+    <button class="appbar__btn" type="button" data-app-back aria-label="Quay lại">${icon('chevron-left')}</button>
+    <p class="appbar__title">${esc(title)}</p>
+    <button class="appbar__btn" type="button" data-app-search aria-label="Tìm kiếm" aria-expanded="false">${icon('search')}</button>`;
+}
+
+/* Màn hình Danh mục: cột trái chọn nhóm, bên phải nhóm con + bán chạy */
+const APP_SUPPORT = { id: 'ho-tro', icon: 'headset', name: 'Hỗ trợ' };
+
+function renderAppCats() {
+  const rail = [...CATEGORIES, APP_SUPPORT];
+  return `
+    <div class="app-cats" id="app-cats" role="dialog" aria-modal="true" aria-label="Danh mục sản phẩm" hidden>
+      <div class="app-cats__head">
+        <p class="app-cats__title">Danh mục</p>
+        <button class="appbar__btn" type="button" data-cats-close aria-label="Đóng danh mục">${icon('x')}</button>
+      </div>
+      <div class="app-cats__body">
+        <div class="app-cats__rail" role="tablist" aria-orientation="vertical">
+          ${rail.map((c, i) => `
+            <button class="app-cats__tab${i === 0 ? ' is-active' : ''}" type="button" role="tab" aria-selected="${i === 0}" data-cats-tab="${c.id}">
+              ${icon(c.icon)}<span>${c.name}</span>
+            </button>`).join('')}
+        </div>
+        <div class="app-cats__pane" role="tabpanel" data-cats-pane></div>
+      </div>
+    </div>`;
+}
+
+function appCatsPaneHTML(catId) {
+  if (catId === APP_SUPPORT.id) {
+    const link = (ic, text, href, ext) => `<a class="app-cats__row" href="${href}"${ext ? ' target="_blank" rel="noopener"' : ''}>${icon(ic)}<span>${text}</span>${icon('chevron-right')}</a>`;
+    return `
+      <p class="app-cats__group">Liên hệ cửa hàng</p>
+      ${link('phone', `Hotline <b>${COMPANY.phoneDisplay}</b>`, `tel:${COMPANY.phone}`)}
+      ${link('message-circle', 'Chat Zalo', COMPANY.zalo, true)}
+      ${link('mail', COMPANY.email, `mailto:${COMPANY.email}`)}
+      ${link('map-pin', 'Địa chỉ cửa hàng', 'contact.html')}
+      <p class="app-cats__group">Tiện ích</p>
+      ${link('clipboard-list', 'Tra cứu đơn hàng', 'order.html')}
+      ${link('heart', 'Sản phẩm yêu thích', 'wishlist.html')}
+      ${link('git-compare-arrows', 'So sánh sản phẩm', 'compare.html')}
+      ${link('newspaper', 'Tin tức công nghệ', 'news.html')}
+      <p class="app-cats__group">Chính sách</p>
+      ${Object.entries(POLICIES).map(([k, v]) => link('file-text', v.title, `policy.html?type=${k}`)).join('')}
+      <p class="app-cats__foot">${COMPANY.name} · ${COMPANY.address}</p>`;
+  }
+  const c = CATEGORIES.find((x) => x.id === catId);
+  if (!c) return '';
+  const rule = CATEGORY_RULES[c.id];
+  const top = rule ? PRODUCTS.filter((p) => rule.match(p) && (c.id === 'used' || !p.tags.includes('used'))).sort((a, b) => b.reviews - a.reviews).slice(0, 6) : [];
+  return `
+    <a class="app-cats__all" href="category.html?cat=${c.id}">
+      <span>Xem tất cả<b>${c.name}</b></span>${icon('chevron-right')}
+    </a>
+    ${top.length ? `
+      <p class="app-cats__group">${icon('flame')}Bán chạy</p>
+      <div class="app-cats__products">
+        ${top.map((p) => `
+          <a class="app-cats__product" href="product.html?id=${p.id}">
+            <img src="${thumb(p.img)}" alt="${p.name}" width="96" height="96" loading="lazy">
+            <span>${p.name}</span>
+            <b>${formatPrice(p.price)}</b>
+          </a>`).join('')}
+      </div>` : ''}
+    ${c.groups.map((g) => `
+      <p class="app-cats__group">${g.title}</p>
+      <div class="app-cats__chips">
+        ${g.links.map((l) => catLink(c, l)).map(([text, href]) => `<a href="${href}">${text}</a>`).join('')}
+      </div>`).join('')}`;
+}
