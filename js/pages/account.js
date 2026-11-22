@@ -88,13 +88,12 @@ function render(editing = state.editing) {
   const { orders } = state;
   const recent = Recent.list().slice(0, 10);
   const totalSpent = (orders || []).filter((o) => o.status !== 'Đã hủy').reduce((s, o) => s + o.totals.total, 0);
-  const given = user.name.trim().split(/\s+/).pop();
 
   root.innerHTML = `
     ${renderBreadcrumb([['Tài khoản của tôi', '#']])}
     <div class="account">
       <aside class="panel account__card">
-        <span class="account__avatar">${esc(given.charAt(0).toUpperCase())}</span>
+        ${avatarHTML(user, 'account__avatar')}
         <h1 class="account__name">Xin chào, ${esc(user.name)}</h1>
         <p class="account__sub">${esc(user.email)}</p>
         <dl class="account__stats">

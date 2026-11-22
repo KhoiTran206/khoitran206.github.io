@@ -27,11 +27,12 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if (signedIn() && request.auth.uid == uid) || isAdmin();
       allow create, update: if signedIn() && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['name', 'email', 'phone', 'address', 'provider', 'createdAt', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['name', 'email', 'phone', 'address', 'provider', 'photo', 'createdAt', 'updatedAt'])
         && isStr(request.resource.data.name, 100)
         && request.resource.data.email == request.auth.token.email
         && isStr(request.resource.data.phone, 20)
-        && isStr(request.resource.data.address, 300);
+        && isStr(request.resource.data.address, 300)
+        && (!('photo' in request.resource.data) || isStr(request.resource.data.photo, 1000));
       allow delete: if isAdmin();
     }
 

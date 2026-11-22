@@ -180,6 +180,14 @@ function renderDrawer() {
     </div>`;
 }
 
+/* ---------- Avatar khách: ảnh Google / Gravatar, chưa có ảnh → chữ cái đầu của tên ---------- */
+function avatarHTML(user, cls = '') {
+  const name = String(user?.name || user?.email || '?').trim();
+  const initial = (name.split(/\s+/).pop() || '?').charAt(0).toUpperCase();
+  const src = user?.photo || (user?.gravatar ? `https://www.gravatar.com/avatar/${user.gravatar}?s=160&d=404` : '');
+  return `<span class="avatar ${cls}" aria-hidden="true">${esc(initial)}${src ? `<img src="${esc(src)}" alt="" referrerpolicy="no-referrer" data-avatar-img>` : ''}</span>`;
+}
+
 /* ---------- Nút tài khoản trên header ---------- */
 function renderAccountMenu(user) {
   if (!user) {
@@ -190,12 +198,12 @@ function renderAccountMenu(user) {
   const isAdmin = Auth.isAdmin(user);
   return `
     <button class="header-login header-login--user" type="button" data-account-toggle aria-expanded="false" aria-haspopup="true" aria-label="Tài khoản của ${esc(user.name)}${isAdmin ? ' (quản trị viên)' : ''}">
-      <b class="header-login__avatar">${esc(given.charAt(0).toUpperCase())}</b><span>${esc(given)}</span>
+      ${avatarHTML(user, 'header-login__avatar')}<span>${esc(given)}</span>
       ${isAdmin ? `<small class="header-login__badge" aria-hidden="true">${icon('shield-check')}<i>Quản trị</i></small>` : ''}
       ${icon('chevron-down', 'header-login__chevron')}
     </button>
     <div class="account-dropdown" role="menu">
-      <div class="account-dropdown__head"><b>${esc(user.name)}</b><small>${esc(user.email)}</small>${isAdmin ? `<em class="account-dropdown__role">${icon('shield-check')}Quản trị viên</em>` : ''}</div>
+      <div class="account-dropdown__head">${avatarHTML(user, 'account-dropdown__avatar')}<b>${esc(user.name)}</b><small>${esc(user.email)}</small>${isAdmin ? `<em class="account-dropdown__role">${icon('shield-check')}Quản trị viên</em>` : ''}</div>
       <a href="tai-khoan" role="menuitem">${icon('user-round')}Tài khoản của tôi</a>
       <a href="tai-khoan#don-hang" role="menuitem">${icon('shopping-bag')}Đơn hàng của tôi</a>
       <a href="yeu-thich" role="menuitem">${icon('heart')}Sản phẩm yêu thích</a>
@@ -453,7 +461,7 @@ function renderTabBar(active) {
   return `
     <nav class="tabbar" aria-label="Điều hướng app">
       ${APP_TABS.map((t) => {
-        const inner = `${icon(t.icon)}<span>${t.label}</span>${t.badge ? '<b class="tabbar__badge" data-cart-count>0</b>' : ''}`;
+        const inner = `${t.id === 'account' && typeof Auth !== 'undefined' && Auth.current() ? avatarHTML(Auth.current(), 'avatar--tab') : icon(t.icon)}<span>${t.label}</span>${t.badge ? '<b class="tabbar__badge" data-cart-count>0</b>' : ''}`;
         const cls = `tabbar__item${t.id === active ? ' is-active' : ''}`;
         return t.href
           ? `<a class="${cls}" href="${t.href}" data-app-tab="${t.id}"${t.id === active ? ' aria-current="page"' : ''}>${inner}</a>`

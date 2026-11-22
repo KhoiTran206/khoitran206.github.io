@@ -1364,3 +1364,18 @@
 .admin__stats > .panel + .panel {
   margin-top: 0;
 }
+
+/* Quản trị: avatar cạnh tên khách */
+.admin-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-user__avatar {
+  width: 36px;
+  height: 36px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 700;
+}

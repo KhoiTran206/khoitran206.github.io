@@ -182,6 +182,20 @@
     transition: transform var(--transition);
   }
 
+  /* Mục Tài khoản: avatar khách khi đã đăng nhập */
+  .avatar--tab {
+    width: 24px;
+    height: 24px;
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .tabbar__item.is-active .avatar--tab {
+    box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 3.5px var(--color-primary);
+  }
+
   .tabbar__item span {
     max-width: 100%;
     white-space: nowrap;

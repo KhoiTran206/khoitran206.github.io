@@ -91,7 +91,7 @@ function usersTabHTML() {
         <tbody>
           ${admin.users.map((u) => `
             <tr>
-              <td><b>${esc(u.name)}</b><small>${esc(u.email)}</small></td>
+              <td><span class="admin-user">${avatarHTML(u, 'admin-user__avatar')}<span><b>${esc(u.name)}</b><small>${esc(u.email)}</small></span></span></td>
               <td>${u.phone ? `<a href="tel:${esc(u.phone)}">${esc(u.phone)}</a>` : '—'}</td>
               <td>${esc(u.address || '—')}</td>
               <td>${u.provider === 'google.com' ? 'Google' : 'Email'}</td>
@@ -135,6 +135,8 @@ async function loadAdminData() {
   admin.orders = orders.docs.map((d) => d.data());
   // Tài khoản quản trị không tính là khách hàng
   admin.users = users.docs.map((d) => d.data()).filter((u) => !SHOP.adminEmails.includes(u.email)).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  // Khách đăng ký bằng email: lấy ảnh Gravatar (nếu có)
+  await Promise.all(admin.users.map(async (u) => { if (!u.photo && u.email) u.gravatar = await gravatarHash(u.email); }));
 }
 
 async function refreshAdmin() {

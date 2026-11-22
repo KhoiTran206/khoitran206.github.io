@@ -260,6 +260,20 @@ const AUTH_ERRORS = {
 };
 const authError = (e) => AUTH_ERRORS[e?.code] || (e?.message === 'timeout' || /Không tải được/.test(e?.message || '') ? AUTH_ERRORS['auth/network-request-failed'] : 'Có lỗi xảy ra, vui lòng thử lại.');
 
+/* Mã SHA-256 của email để lấy ảnh Gravatar (chỉ gửi mã băm, không gửi email). Cần https/localhost. */
+async function gravatarHash(email) {
+  try {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(email).trim().toLowerCase()));
+    return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  } catch {
+    return '';
+  }
+}
+/* Ảnh avatar không tải được (khách chưa có Gravatar, mất mạng) → bỏ ảnh, hiện chữ cái đầu bên dưới */
+document.addEventListener('error', (e) => {
+  if (e.target.matches?.('[data-avatar-img]')) e.target.remove();
+}, true);
+
 const Auth = {
   cacheKey: 'mkpc-user',
   _ready: null,
@@ -285,17 +299,26 @@ const Auth = {
     }
     const prev = this.current();
     const p = prev?.uid === u.uid ? prev : {};
+    const email = u.email || '';
     this.setCache({
       uid: u.uid,
-      email: u.email || '',
+      email,
       emailVerified: !!u.emailVerified,
       provider: u.providerData?.[0]?.providerId || 'password',
+      // Ảnh đại diện: ảnh tài khoản Google; đăng ký bằng email → ảnh Gravatar (nếu khách có), không có thì chữ cái đầu
+      photo: u.photoURL || u.providerData?.find((d) => d.photoURL)?.photoURL || '',
+      gravatar: p.email === email ? p.gravatar || '' : '',
       name: p.nameSet ? p.name : u.displayName || p.name || (u.email || 'Khách').split('@')[0],
       nameSet: !!p.nameSet,
       phone: p.phone || '',
       address: p.address || '',
       createdAt: p.createdAt || new Date(u.metadata?.creationTime || Date.now()).toISOString(),
     });
+    if (email && !this.current().gravatar) {
+      gravatarHash(email).then((hash) => {
+        if (hash && this.current()?.email === email) this.setCache({ ...this.current(), gravatar: hash });
+      });
+    }
     return this.current();
   },
 
@@ -345,7 +368,7 @@ const Auth = {
     const u = this.current();
     if (!u) return;
     const db = await Cloud.db();
-    await db.collection('users').doc(u.uid).set({
+    const data = {
       name: u.name,
       email: u.email,
       phone: u.phone || '',
@@ -353,7 +376,15 @@ const Auth = {
       provider: u.provider,
       createdAt: u.createdAt,
       updatedAt: new Date().toISOString(),
-    });
+    };
+    try {
+      // Lưu kèm ảnh Google để trang quản trị hiện avatar khách
+      await db.collection('users').doc(u.uid).set(u.photo ? { ...data, photo: u.photo } : data);
+    } catch (e) {
+      // firestore.rules bản cũ chưa cho trường photo → lưu không kèm ảnh
+      if (e.code !== 'permission-denied' || !u.photo) throw e;
+      await db.collection('users').doc(u.uid).set(data);
+    }
   },
 
   async register({ name, email, phone, password }) {
@@ -840,8 +871,14 @@ function updateCartCount(bump = false) {
 
 /* Vẽ lại nút tài khoản trên header (Đăng nhập ↔ avatar + tên + menu) */
 function updateAccountLabel() {
+  const user = Auth.current();
   $$('[data-account-slot]').forEach((el) => {
-    el.innerHTML = renderAccountMenu(Auth.current());
+    el.innerHTML = renderAccountMenu(user);
+  });
+  // Thanh tab của app: mục Tài khoản hiện avatar khi đã đăng nhập
+  $$('[data-app-tab="account"]').forEach((el) => {
+    const old = el.querySelector('svg, .avatar');
+    if (old) old.outerHTML = user ? avatarHTML(user, 'avatar--tab') : icon('circle-user-round');
   });
   refreshIcons();
 }
