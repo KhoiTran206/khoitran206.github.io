@@ -273,7 +273,7 @@ const MASCOT_SVG = `
   </svg>`;
 
 const ASSIST_OPTIONS = [
-  ['message-circle', 'Chat Zalo', 'Tư vấn cấu hình, báo giá nhanh', COMPANY.zalo, true],
+  ['zalo', 'Chat Zalo', 'Tư vấn cấu hình, báo giá nhanh', COMPANY.zalo, true],
   ['phone', 'Gọi hotline', COMPANY.phoneDisplay, `tel:${COMPANY.phone}`],
   ['facebook', 'Nhắn Facebook', 'Fanpage Minh Khôi PC', COMPANY.socials.facebook, true],
   ['clipboard-list', 'Tra cứu đơn hàng', 'Xem trạng thái đơn đã đặt', 'order.html'],
@@ -293,7 +293,7 @@ function renderAssist() {
         <div class="assist__options">
           ${ASSIST_OPTIONS.map(([ic, title, desc, href, ext]) => `
             <a class="assist__opt" href="${href}"${ext ? ' target="_blank" rel="noopener"' : ''}>
-              <span class="assist__opt-icon">${icon(ic)}</span>
+              <span class="assist__opt-icon">${ic === 'zalo' ? '<img src="assets/icons/zalo.png" alt="" width="34" height="34" loading="lazy">' : icon(ic)}</span>
               <span class="assist__opt-text"><b>${title}</b><small>${desc}</small></span>
               ${icon('chevron-right')}
             </a>`).join('')}
@@ -382,7 +382,7 @@ function renderFooter() {
     </footer>
     <div class="floating">
       ${renderAssist()}
-      <a class="floating__btn floating__btn--zalo" href="${COMPANY.zalo}" target="_blank" rel="noopener" aria-label="Chat Zalo với cửa hàng"><span>Zalo</span></a>
+      <a class="floating__btn floating__btn--zalo" href="${COMPANY.zalo}" target="_blank" rel="noopener" aria-label="Chat Zalo với cửa hàng"><img src="assets/icons/zalo.png" alt="" width="56" height="56" loading="lazy"></a>
       <button class="floating__btn floating__btn--top" type="button" data-back-top aria-label="Lên đầu trang">
         <svg class="floating__ring" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22"/><circle class="floating__ring-bar" cx="24" cy="24" r="22" pathLength="100"/></svg>
         ${icon('chevron-up')}
