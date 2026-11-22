@@ -5,11 +5,11 @@
    - Không đụng tới Firebase, FormSubmit, Google Fonts (tên miền khác)
    Đổi VERSION khi muốn xóa sạch bộ nhớ đệm cũ của mọi khách.
    ========================================================== */
-const VERSION = 'mkpc-v3';
+const VERSION = 'mkpc-v4';
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGE_CACHE = `${VERSION}-pages`;
 const OFFLINE_URL = 'offline.html';
-const PRECACHE = [OFFLINE_URL, 'assets/icons/icon-192.png', 'assets/logo/logo-mark.svg?v=2'];
+const PRECACHE = [OFFLINE_URL, 'assets/icons/icon-192.png', 'assets/logo/logo-mark.svg?v=3'];
 const STATIC_EXT = /\.(css|js|png|jpe?g|webp|svg|ico|webmanifest)$/i;
 
 self.addEventListener('install', (event) => {
