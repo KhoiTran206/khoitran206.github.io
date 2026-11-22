@@ -770,7 +770,7 @@ async function sendToShop(fields) {
 }
 
 const DELIVERY_LABELS = { ship: 'Giao hàng tận nơi', pickup: 'Nhận tại cửa hàng' };
-const PAYMENT_LABELS = { cod: 'Thanh toán khi nhận hàng (COD)', bank: 'Chuyển khoản ngân hàng', installment: 'Trả góp', store: 'Thanh toán tại cửa hàng' };
+const PAYMENT_LABELS = { cod: 'Thanh toán khi nhận hàng (COD)', bank: 'Chuyển khoản ngân hàng', ewallet: 'Ví điện tử (MoMo, ZaloPay, VNPAY)', installment: 'Trả góp', store: 'Thanh toán tại cửa hàng' };
 
 /* Gửi 1 đơn hàng về email, cập nhật trạng thái emailSent */
 async function sendOrderEmail(order) {

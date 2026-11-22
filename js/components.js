@@ -255,6 +255,7 @@ function renderPromo(b, size = '') {
 const FOOTER_PAYMENTS = [
   ['banknote', 'Tiền mặt', 'Trả khi nhận hàng (COD)'],
   ['landmark', 'Chuyển khoản', 'Qua ngân hàng'],
+  ['wallet', 'Ví điện tử', 'MoMo, ZaloPay, VNPAY'],
   ['credit-card', 'Quẹt thẻ', 'ATM, Visa, MasterCard'],
   ['percent', 'Trả góp 0%', 'Qua thẻ tín dụng'],
 ];

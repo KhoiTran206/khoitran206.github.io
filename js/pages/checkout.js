@@ -93,6 +93,7 @@ function render() {
           <div class="choice-list">
             <label class="choice"><input type="radio" name="payment" value="cod" checked><span>${icon('banknote', 'choice__icon')}</span><span><span class="choice__title">Thanh toán khi nhận hàng (COD)</span><span class="choice__desc">Kiểm tra hàng rồi mới thanh toán</span></span></label>
             <label class="choice"><input type="radio" name="payment" value="bank"><span>${icon('landmark', 'choice__icon')}</span><span><span class="choice__title">Chuyển khoản ngân hàng</span><span class="choice__desc">Nhân viên gửi thông tin tài khoản khi gọi xác nhận đơn</span></span></label>
+            <label class="choice"><input type="radio" name="payment" value="ewallet"><span>${icon('wallet', 'choice__icon')}</span><span><span class="choice__title">Ví MoMo, ZaloPay, VNPAY</span><span class="choice__desc">Nhân viên gửi mã QR khi gọi xác nhận đơn</span></span></label>
             <label class="choice"><input type="radio" name="payment" value="installment"><span>${icon('credit-card', 'choice__icon')}</span><span><span class="choice__title">Trả góp 0%</span><span class="choice__desc">Nhân viên liên hệ tư vấn hồ sơ trả góp</span></span></label>
             <label class="choice" data-store-pay hidden><input type="radio" name="payment" value="store"><span>${icon('store', 'choice__icon')}</span><span><span class="choice__title">Thanh toán tại cửa hàng</span><span class="choice__desc">Tiền mặt, thẻ ATM, Visa/MasterCard</span></span></label>
           </div>

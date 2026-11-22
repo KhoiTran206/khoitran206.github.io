@@ -119,7 +119,7 @@ const POLICIES = {
   'thanh-toan': {
     title: 'Hướng dẫn thanh toán',
     body: [
-      ['ul', ['Thanh toán khi nhận hàng (COD).', 'Chuyển khoản ngân hàng: nhân viên sẽ gửi thông tin tài khoản khi gọi xác nhận đơn.', 'Thanh toán trực tiếp tại cửa hàng: tiền mặt, thẻ ATM, Visa/MasterCard.']],
+      ['ul', ['Thanh toán khi nhận hàng (COD).', 'Chuyển khoản ngân hàng: nhân viên sẽ gửi thông tin tài khoản khi gọi xác nhận đơn.', 'Ví điện tử MoMo, ZaloPay, VNPAY: nhân viên gửi mã QR khi gọi xác nhận đơn, hoặc quét mã tại cửa hàng.', 'Thanh toán trực tiếp tại cửa hàng: tiền mặt, thẻ ATM, Visa/MasterCard.']],
     ],
   },
   'tra-gop': {
